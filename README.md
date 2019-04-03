@@ -16,6 +16,10 @@ With J2V all the structures are discovered automatically and two files are gener
 
 [Python 3](https://www.python.org/downloads/) must be installed.
 
+## How to run
+* use code from github or
+* `pip install j2v`
+
 ## Parameters
 
 * `json_files`: Files in JSON format, representing the data stored in a table
