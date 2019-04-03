@@ -20,7 +20,7 @@ with open("README.md", "r") as fh:
         python_requires='>=3',
         classifiers=[
             "Programming Language :: Python :: 3",
-            "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+            "License :: OSI Approved :: Apache Software License",
             "Operating System :: OS Independent",
         ],
     )
