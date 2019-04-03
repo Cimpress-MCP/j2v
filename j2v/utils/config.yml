@@ -1,0 +1,7 @@
+program:
+  generator:
+    TABLE_WITH_JSON_COLUMN_DEFAULT: table_with_JSON_column
+    OUTPUT_VIEW_ML_OUT_DEFAULT: output.view.ml
+    COLUMN_WITH_JSONS_DEFAULT: payload
+    EXPLORE_LKML_OUT_DEFAULT: explore.lkml
+    ELEMENT_ACCESS_STR: VALUE

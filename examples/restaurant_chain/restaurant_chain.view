@@ -1,0 +1,157 @@
+
+view: chains { 
+  sql_table_name: chains ;;
+
+  dimension: headquater_country {
+    description: "Headquater Country"
+    type: string
+    sql: ${TABLE}.raw_data:headquater:country::string ;;
+  }
+    
+  dimension: headquater_city {
+    description: "Headquater City"
+    type: string
+    sql: ${TABLE}.raw_data:headquater:city::string ;;
+  }
+    
+  dimension: building_address {
+    description: "Building Address"
+    type: string
+    sql: ${TABLE}.raw_data:headquater:building:address::string ;;
+  }
+    
+  dimension: raw_data_payload_primary_key_value {
+    description: "Raw data Payload Primary Key Value"
+    type: string
+    sql: ${TABLE}.raw_data:payloadPrimaryKeyValue::string ;;
+  }
+    
+  dimension: raw_data_data_generation_timestamp {
+    description: "Raw data Data Generation Timestamp"
+    type: date_time
+    sql: ${TABLE}.raw_data:dataGenerationTimestamp::string ;;
+  }
+    
+  dimension: raw_data_api_version {
+    description: "Raw data Api Version"
+    type: string
+    sql: ${TABLE}.raw_data:apiVersion::string ;;
+  }
+    
+  dimension: raw_data_data__provider {
+    description: "Raw data Data  Provider"
+    type: string
+    sql: ${TABLE}.raw_data:"data Provider"::string ;;
+  }
+    
+  dimension: headquater_employees {
+    description: "Headquater Employees"
+    type: number
+    sql: ${TABLE}.raw_data:headquater:employees::number ;;
+  }
+    
+}
+
+view: restaurants { 
+
+  dimension: address {
+    description: "Address"
+    type: string
+    sql: ${TABLE}.VALUE:address::string ;;
+  }
+    
+  dimension: city {
+    description: "City"
+    type: string
+    sql: ${TABLE}.VALUE:city::string ;;
+  }
+    
+  dimension: name {
+    description: "Name"
+    type: string
+    sql: ${TABLE}.VALUE:name::string ;;
+  }
+    
+  dimension: currency {
+    description: "Currency"
+    type: string
+    sql: ${TABLE}.VALUE:currency::string ;;
+  }
+    
+  dimension: country {
+    description: "Country"
+    type: string
+    sql: ${TABLE}.VALUE:country::string ;;
+  }
+    
+}
+
+view: menu { 
+
+  dimension: dish_name {
+    description: "Dish Name"
+    type: string
+    sql: ${TABLE}.VALUE:dishName::string ;;
+  }
+    
+  dimension: price {
+    description: "Price"
+    type: number
+    sql: ${TABLE}.VALUE:price::number ;;
+  }
+    
+}
+
+view: indegrients { 
+
+  dimension: _value {
+    description: " Value"
+    type: string
+    sql: ${TABLE}.VALUE::string ;;
+  }
+    
+}
+
+view: floors { 
+
+  dimension: _value {
+    description: " Value"
+    type: number
+    sql: ${TABLE}.VALUE::number ;;
+  }
+    
+}
+
+view: chains_restaurants { 
+
+  dimension: address {
+    description: "Address"
+    type: string
+    sql: ${TABLE}.VALUE:address::string ;;
+  }
+    
+  dimension: city {
+    description: "City"
+    type: string
+    sql: ${TABLE}.VALUE:city::string ;;
+  }
+    
+  dimension: name {
+    description: "Name"
+    type: string
+    sql: ${TABLE}.VALUE:name::string ;;
+  }
+    
+  dimension: currency {
+    description: "Currency"
+    type: string
+    sql: ${TABLE}.VALUE:currency::string ;;
+  }
+    
+  dimension: country {
+    description: "Country"
+    type: string
+    sql: ${TABLE}.VALUE:country::string ;;
+  }
+    
+}

@@ -1,0 +1,145 @@
+{
+  "apiVersion": "v0",
+  "dataProvider": "ABCXYZ Global Parking Manager",
+  "parkings": [
+    {
+      "id": 874023,
+      "name": "Park and Eat in Barcelona",
+      "owner": "Albert Einstein",
+      "capacity": 110,
+      "price": 2,
+      "priceCurrency": "EUR",
+      "priceUnit": "h",
+      "status": {
+        "carsNow": 2,
+        "isOpened": true,
+        "isBroken": false
+      },
+      "cars": [
+        {
+          "plate": "XY Z123",
+          "spot": 123,
+          "startTime": "2019-03-30T10:30:00.812Z",
+          "damages": [
+            {
+              "side": "left",
+              "state": "ok"
+            },
+            {
+              "side": "right",
+              "state": "ok"
+            }
+          ]
+        },
+        {
+          "plate": "BD RG55",
+          "spot": 12,
+          "startTime": "2019-03-30T10:40:00.812Z",
+          "damages": [
+            {
+              "side": "left",
+              "state": "ok"
+            },
+            {
+              "side": "right",
+              "state": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 54354,
+      "name": "Super Parking",
+      "owner": "Enrique Iglesias",
+      "capacity": 1000,
+      "price": 1.5,
+      "priceCurrency": "EUR",
+      "priceUnit": "h",
+      "status": {
+        "carsNow": 4,
+        "isOpened": true,
+        "isBroken": false
+      },
+      "cars": [
+        {
+          "plate": "AGEES5",
+          "spot": 45,
+          "startTime": "2019-03-30T10:20:00.812Z",
+          "damages": [
+            {
+              "side": "left",
+              "state": "ok"
+            },
+            {
+              "side": "right",
+              "state": "ok"
+            }
+          ]
+        },
+        {
+          "plate": "54Y45EA",
+          "spot": 4,
+          "startTime": "2019-03-30T10:24:00.812Z",
+          "damages": [
+            {
+              "side": "left",
+              "state": "ok"
+            },
+            {
+              "side": "right",
+              "state": "ok"
+            }
+          ]
+        },
+        {
+          "plate": "54Y54",
+          "spot": 89,
+          "startTime": "2019-03-30T10:21:00.812Z",
+          "damages": [
+            {
+              "side": "left",
+              "state": "broken"
+            },
+            {
+              "side": "right",
+              "state": "ok"
+            }
+          ]
+        },
+        {
+          "plate": "BFGR",
+          "spot": 888,
+          "startTime": "2019-03-30T10:23:00.812Z",
+          "damages": [
+            {
+              "side": "left",
+              "state": "broken"
+            },
+            {
+              "side": "right",
+              "state": "ok"
+            }
+          ]
+        },
+        {
+          "plate": "BFSE",
+          "spot": 444,
+          "startTime": "2019-03-30T10:26:00.812Z",
+          "damages": [
+            {
+              "side": "left",
+              "state": "broken"
+            },
+            {
+              "side": "right",
+              "state": "ok"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "dataGenerationTimestamp": "2019-03-30T11:30:00.812Z",
+  "payloadPrimaryKeyValue": "3a551b54-23d6-473c-b055-4430f8627d4a"
+}

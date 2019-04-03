@@ -1,0 +1,39 @@
+{
+  "apiVersion": "v3.4",
+  "data Provider": "Eat me",
+  "restaurants": [
+    {
+      "name": "Super Burger",
+      "city": "Sydney",
+      "country": "Australia",
+      "address": "Big Street 3",
+      "currency": "AUD",
+      "menu": [
+        {
+          "dishName": "BurgerPlus",
+          "price": 10,
+          "indegrients": [
+            "Meat",
+            "Cheese",
+            "Bun"
+          ]
+        }
+      ]
+    }
+  ],
+  "headquater": {
+    "employees": 36,
+    "city": "Olsztyn",
+    "country": "Poland",
+    "building": {
+      "address": "3 Maja 10",
+      "floors": [
+        1,
+        2,
+        7
+      ]
+    }
+  },
+  "dataGenerationTimestamp": "2019-03-30T11:30:00.812Z",
+  "payloadPrimaryKeyValue": "3ab21b54-22d6-473c-b055-4430f8927d4c"
+}
