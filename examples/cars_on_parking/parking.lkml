@@ -1,22 +1,15 @@
 include: "parking.view"
    
-explore: parking {
-  view_name: parking
-  from: parking
-  label: "parking explore"
-  description: "parking explore"
+explore: parking_table {
+  view_name: parking_table
+  from: parking_table
+  label: "parking_table explore"
+  description: "parking_table explore"
 
   join: parkings {
      from: parkings
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => parking.data:parkings) parkings;;
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => parking_table.data_column:parkings) parkings;;
      relationship: one_to_many 
-  }
-  
-  join: cars {
-     from: cars
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => parkings.VALUE:cars) cars;;
-     relationship: one_to_many 
-     required_joins: [parkings]
   }
   
   join: damages {

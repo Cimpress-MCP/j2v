@@ -5,6 +5,7 @@ dimension_str_template = """
     sql: ${{TABLE}}.{__path}::{json_type} ;;
   }}
     """
+field_template = "{TABLE}.{__path}::{json_type}"
 
 view_start_str_template = """
 view: {name} {{ {base_table}
@@ -30,6 +31,8 @@ explore_join_str_template = """
      relationship: one_to_many {required_joins_line}
   }}
   """
+join_template = "LATERAL FLATTEN(OUTER => TRUE, INPUT => {exploded_structure_path}) {alias}"
+
 req_joins_str_template = """
      required_joins: [{required_join}]"""
 

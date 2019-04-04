@@ -26,7 +26,6 @@ def get_dimension_types(dim_val):
     return dim_type, json_type
 
 
-
 def is_str_timestamp(potential_ts):
     """
     Checks if a string represents a timestamp
@@ -43,6 +42,7 @@ def is_str_timestamp(potential_ts):
 def is_non_empty_array_with_dicts(value):
     return is_non_empty_list(value) and is_dict(value[0])
 
+
 def is_non_empty_array_with_primitives(value):
     return is_non_empty_list(value) and is_primitive(value[0])
 
@@ -52,7 +52,11 @@ def is_dict(value):
 
 
 def is_non_empty_list(value):
-    return type(value) == list and len(value) > 0
+    if type(value) == list and len(value) > 0:
+        if type(value[0]) == list:
+            return False
+        return True
+    return False
 
 
 def is_primitive(value):

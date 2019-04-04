@@ -21,7 +21,7 @@ class Generator:
         Init empty lists and ops counter.
         """
         self.views_dimensions_expr = defaultdict(set)
-        self.explore_joins = list()
+        self.explore_joins = {}
         self.ops = 0
         # setting for name construction, leave 1 or increment
         self.maximum_naming_levels = 1
@@ -29,6 +29,9 @@ class Generator:
         self.output_view_file_name = output_view_file_name if output_view_file_name else OUTPUT_VIEW_ML_OUT_DEFAULT
         self.column_name = column_name if column_name else COLUMN_WITH_JSONS_DEFAULT
         self.sql_table_name = sql_table_name if sql_table_name else TABLE_WITH_JSON_COLUMN_DEFAULT
+        self.visited_paths = set()
+        self.all_joins = []
+        self.all_fields = defaultdict(set)
 
     def process_jsons(self, json_string_list):
         """
@@ -42,6 +45,20 @@ class Generator:
             self.collect_all_paths(current_dict=json_obj)
         self.__create_view_file()
         self.__create_explore_file()
+
+        self.print_sql()
+
+    def print_sql(self):
+        print("SELECT")
+
+        after_select = True
+        for view, fields in self.all_fields.items():
+            print(("," if not after_select else "") + "\n---{view} Information".format(view=view))
+            print("\n,".join(sorted(list(fields))))
+            after_select = False
+
+        print("FROM {table},".format(table=self.sql_table_name))
+        print("\n,".join(self.all_joins))
 
     def collect_all_paths(self, current_dict, current_path=None, current_view=None, root_view=None):
         """
@@ -61,13 +78,18 @@ class Generator:
         for key, value in current_dict.items():
             if type(key) != str:
                 continue
+            path = current_path + ":" + key
             if is_primitive(value):
                 self.__add_dimension(current_path, current_view, key, value)
             elif is_dict(value):
-                self.collect_all_paths(value, current_path + ":" + key, current_view, root_view)
+                self.collect_all_paths(value, path, current_view, root_view)
             elif is_non_empty_list(value):
                 sample_element = value[0]
-                new_view_name = (current_view + "_" + key) if self.views_dimensions_expr[key] else key
+                new_view_name = key
+                if path not in self.visited_paths and self.views_dimensions_expr[key]:
+                    # path not visited but view name exists
+                    new_view_name = (current_view + "_" + key)
+                self.visited_paths.add(path)
                 self.__add_explore_join(new_view_name=new_view_name, current_view=current_view,
                                         key=key, current_path=current_path)
 
@@ -100,7 +122,11 @@ class Generator:
                                                            exploded_structure_path=join_path,
                                                            required_joins_line=required_joins_line)
 
-        self.explore_joins.append(explore_join)
+        self.explore_joins[current_path] = explore_join
+        join_statement = lt.join_template.format(alias=new_view_name, exploded_structure_path=join_path)
+        # keep the order
+        if join_statement not in self.all_joins:
+            self.all_joins.append(join_statement)
 
     def __add_dimension(self, current_path, current_view, dimension_name, dim_val):
         """
@@ -134,6 +160,9 @@ class Generator:
 
         self.views_dimensions_expr[current_view].add(new_dimension)
 
+        sql_select = lt.field_template.format(__path=current_path, TABLE=current_view, json_type=json_type)
+        self.all_fields[current_view].add(sql_select)
+
     def __create_view_file(self):
         """
 
@@ -163,7 +192,8 @@ class Generator:
                                                  description=self.sql_table_name + " explore",
                                                  label=self.sql_table_name + " explore",
                                                  view_file_name=self.output_view_file_name))
-        for explore_join in self.explore_joins:
+        for explore_join in self.explore_joins.values():
             explore_out_file.write(explore_join)
+
         explore_out_file.write(lt.explore_end)
         explore_out_file.close()
