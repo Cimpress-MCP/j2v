@@ -106,7 +106,7 @@ With J2V all the structures are discovered automatically and two files are gener
 
 ### Ouput:
 
-#### SQL output:
+#### SQL output (now only Snowflake dialect supported):
 
 ```SQL
 SELECT
