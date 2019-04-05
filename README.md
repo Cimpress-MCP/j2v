@@ -1,7 +1,9 @@
 # JSONs to Looker views (J2V)
 
 J2V is a simple command-line tool to convert JSON to [Looker](https://looker.com/) readable files in forms of [Looker Views](https://docs.looker.com/reference/view-params/view) and [Looker Explores](https://docs.looker.com/reference/explore-params/explore).
+
 Also it outputs an SQL with proper paths and explosion expressions.
+
 This is useful to be used in combination with databases that are focusing on schema-on-read, and data is stored in raw JSON instead of exploded into columns of a table or view.
 
 ## Example use case
