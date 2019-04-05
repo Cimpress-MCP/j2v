@@ -12,6 +12,13 @@ explore: parking_table {
      relationship: one_to_many 
   }
   
+  join: cars {
+     from: cars
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => parkings.VALUE:cars) cars;;
+     relationship: one_to_many 
+     required_joins: [parkings]
+  }
+  
   join: damages {
      from: damages
      sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => cars.VALUE:damages) damages;;

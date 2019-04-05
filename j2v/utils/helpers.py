@@ -52,11 +52,9 @@ def is_dict(value):
 
 
 def is_non_empty_list(value):
-    if type(value) == list and len(value) > 0:
-        if type(value[0]) == list:
-            return False
-        return True
-    return False
+    # limit the level of nested lists
+    # eg we will not process a list like [[""]]
+    return type(value) == list and len(value) > 0 and type(value[0]) != list
 
 
 def is_primitive(value):

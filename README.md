@@ -2,6 +2,8 @@
 
 J2V is a simple command-line tool to convert JSON to [Looker](https://looker.com/) readable files in forms of [Looker Views](https://docs.looker.com/reference/view-params/view) and [Looker Explores](https://docs.looker.com/reference/explore-params/explore).
 
+Also it outputs an SQL with proper paths and explosion expressions.
+
 This is useful to be used in combination with databases that are focusing on schema-on-read, and data is stored in raw JSON instead of exploded into columns of a table or view.
 
 ## Example use case
@@ -31,7 +33,7 @@ With J2V all the structures are discovered automatically and two files are gener
 ## Output
 
 * `output_view`: File containing definitions of Looker views (see [examples](./examples/) directory in this repository)
-* `output_explore`: File containing definition of looker explore exploading the structures (see [examples](./examples/) directory in this repository)
+* `output_explore`: File containing definition of looker explore exploding the structures (see [examples](./examples/) directory in this repository)
 
 ## Example usage
 
@@ -58,3 +60,261 @@ With J2V all the structures are discovered automatically and two files are gener
 1. Make your change
 1. Make a pull request
 1. Happy contribution!
+
+## EXAMPLE
+
+### Input: 
+```json
+{
+  "apiVersion": "v3.4",
+  "data Provider": "Eat me",
+  "restaurants": [
+    {
+      "name": "Super Burger",
+      "city": "Sydney",
+      "country": "Australia",
+      "address": "Big Street 3",
+      "currency": "AUD",
+      "menu": [
+        {
+          "dishName": "BurgerPlus",
+          "price": 10,
+          "indegrients": [
+            "Meat",
+            "Cheese",
+            "Bun"
+          ]
+        }
+      ]
+    }
+  ],
+  "headquater": {
+    "employees": 36,
+    "city": "Olsztyn",
+    "country": "Poland",
+    "building": {
+      "address": "3 Maja 10",
+      "floors": [
+        1,
+        2,
+        7
+      ]
+    }
+  },
+  "dataGenerationTimestamp": "2019-03-30T11:30:00.812Z",
+  "payloadPrimaryKeyValue": "3ab21b54-22d6-473c-b055-4430f8927d4c"
+}
+```
+
+### Ouput:
+
+#### SQL output (now only Snowflake dialect supported):
+
+```SQL
+SELECT
+
+---chains_table Information
+chains_table.raw_data_column:"data Provider"::string
+,chains_table.raw_data_column:apiVersion::string
+,chains_table.raw_data_column:dataGenerationTimestamp::string
+,chains_table.raw_data_column:headquater:building:address::string
+,chains_table.raw_data_column:headquater:city::string
+,chains_table.raw_data_column:headquater:country::string
+,chains_table.raw_data_column:headquater:employees::number
+,chains_table.raw_data_column:payloadPrimaryKeyValue::string
+,
+---restaurants Information
+restaurants.VALUE:address::string
+,restaurants.VALUE:city::string
+,restaurants.VALUE:country::string
+,restaurants.VALUE:currency::string
+,restaurants.VALUE:name::string
+,
+---menu Information
+menu.VALUE:dishName::string
+,menu.VALUE:price::number
+,
+---indegrients Information
+indegrients.VALUE::string
+,
+---floors Information
+floors.VALUE::number
+FROM chains_table,
+LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table.raw_data_column:restaurants) restaurants
+,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants.VALUE:menu) menu
+,LATERAL FLATTEN(OUTER => TRUE, INPUT => menu.VALUE:indegrients) indegrients
+,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table.raw_data_column:headquater:building:floors) floors
+```
+
+#### Ouput files:
+
+##### View file:
+
+```LookML
+
+view: chains_table { 
+  sql_table_name: chains_table ;;
+
+  dimension: building_address {
+    description: "Building Address"
+    type: string
+    sql: ${TABLE}.raw_data_column:headquater:building:address::string ;;
+  }
+    
+  dimension: headquater_city {
+    description: "Headquater City"
+    type: string
+    sql: ${TABLE}.raw_data_column:headquater:city::string ;;
+  }
+    
+  dimension: raw_data_column_api_version {
+    description: "Raw data column Api Version"
+    type: string
+    sql: ${TABLE}.raw_data_column:apiVersion::string ;;
+  }
+    
+  dimension: headquater_country {
+    description: "Headquater Country"
+    type: string
+    sql: ${TABLE}.raw_data_column:headquater:country::string ;;
+  }
+    
+  dimension: headquater_employees {
+    description: "Headquater Employees"
+    type: number
+    sql: ${TABLE}.raw_data_column:headquater:employees::number ;;
+  }
+    
+  dimension: raw_data_column_data_generation_timestamp {
+    description: "Raw data column Data Generation Timestamp"
+    type: date_time
+    sql: ${TABLE}.raw_data_column:dataGenerationTimestamp::string ;;
+  }
+    
+  dimension: raw_data_column_data__provider {
+    description: "Raw data column Data  Provider"
+    type: string
+    sql: ${TABLE}.raw_data_column:"data Provider"::string ;;
+  }
+    
+  dimension: raw_data_column_payload_primary_key_value {
+    description: "Raw data column Payload Primary Key Value"
+    type: string
+    sql: ${TABLE}.raw_data_column:payloadPrimaryKeyValue::string ;;
+  }
+    
+}
+
+view: restaurants { 
+
+  dimension: address {
+    description: "Address"
+    type: string
+    sql: ${TABLE}.VALUE:address::string ;;
+  }
+    
+  dimension: city {
+    description: "City"
+    type: string
+    sql: ${TABLE}.VALUE:city::string ;;
+  }
+    
+  dimension: name {
+    description: "Name"
+    type: string
+    sql: ${TABLE}.VALUE:name::string ;;
+  }
+    
+  dimension: country {
+    description: "Country"
+    type: string
+    sql: ${TABLE}.VALUE:country::string ;;
+  }
+    
+  dimension: currency {
+    description: "Currency"
+    type: string
+    sql: ${TABLE}.VALUE:currency::string ;;
+  }
+    
+}
+
+view: menu { 
+
+  dimension: price {
+    description: "Price"
+    type: number
+    sql: ${TABLE}.VALUE:price::number ;;
+  }
+    
+  dimension: dish_name {
+    description: "Dish Name"
+    type: string
+    sql: ${TABLE}.VALUE:dishName::string ;;
+  }
+    
+}
+
+view: indegrients { 
+
+  dimension: _value {
+    description: " Value"
+    type: string
+    sql: ${TABLE}.VALUE::string ;;
+  }
+    
+}
+
+view: floors { 
+
+  dimension: _value {
+    description: " Value"
+    type: number
+    sql: ${TABLE}.VALUE::number ;;
+  }
+    
+}
+
+```
+
+##### Explore file:
+
+```LookML
+include: "restaurant_chain.view"
+   
+explore: chains_table {
+  view_name: chains_table
+  from: chains_table
+  label: "chains_table explore"
+  description: "chains_table explore"
+
+  join: restaurants {
+     from: restaurants
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table.raw_data_column:restaurants) restaurants;;
+     relationship: one_to_many 
+  }
+  
+  join: menu {
+     from: menu
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants.VALUE:menu) menu;;
+     relationship: one_to_many 
+     required_joins: [restaurants]
+  }
+  
+  join: indegrients {
+     from: indegrients
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => menu.VALUE:indegrients) indegrients;;
+     relationship: one_to_many 
+     required_joins: [menu]
+  }
+  
+  join: floors {
+     from: floors
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table.raw_data_column:headquater:building:floors) floors;;
+     relationship: one_to_many 
+  }
+  
+}
+```
+
+

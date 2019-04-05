@@ -17,6 +17,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     g = Generator(column_name=args.columnn_name, output_explore_file_name=args.output_explore,
                   output_view_file_name=args.output_view, sql_table_name=args.sql_table_name)
-    print("{date} Running the generator.".format(date=datetime.datetime.now()))
+    print("{date} Running the generator.\n\n".format(date=datetime.datetime.now()))
     g.process_jsons(args.json_files)
-    print("{date} Finished.".format(date=datetime.datetime.now()))
+    print("\n\n{date} Finished.".format(date=datetime.datetime.now()))

@@ -2,40 +2,22 @@
 view: chains_table { 
   sql_table_name: chains_table ;;
 
-  dimension: headquater_city {
-    description: "Headquater City"
-    type: string
-    sql: ${TABLE}.raw_data_column:headquater:city::string ;;
-  }
-    
   dimension: building_address {
     description: "Building Address"
     type: string
     sql: ${TABLE}.raw_data_column:headquater:building:address::string ;;
   }
     
-  dimension: raw_data_column_data__provider {
-    description: "Raw data column Data  Provider"
+  dimension: headquater_city {
+    description: "Headquater City"
     type: string
-    sql: ${TABLE}.raw_data_column:"data Provider"::string ;;
+    sql: ${TABLE}.raw_data_column:headquater:city::string ;;
   }
     
   dimension: raw_data_column_api_version {
     description: "Raw data column Api Version"
     type: string
     sql: ${TABLE}.raw_data_column:apiVersion::string ;;
-  }
-    
-  dimension: raw_data_column_data_generation_timestamp {
-    description: "Raw data column Data Generation Timestamp"
-    type: date_time
-    sql: ${TABLE}.raw_data_column:dataGenerationTimestamp::string ;;
-  }
-    
-  dimension: raw_data_column_payload_primary_key_value {
-    description: "Raw data column Payload Primary Key Value"
-    type: string
-    sql: ${TABLE}.raw_data_column:payloadPrimaryKeyValue::string ;;
   }
     
   dimension: headquater_country {
@@ -50,10 +32,40 @@ view: chains_table {
     sql: ${TABLE}.raw_data_column:headquater:employees::number ;;
   }
     
+  dimension: raw_data_column_data_generation_timestamp {
+    description: "Raw data column Data Generation Timestamp"
+    type: date_time
+    sql: ${TABLE}.raw_data_column:dataGenerationTimestamp::string ;;
+  }
+    
+  dimension: raw_data_column_data__provider {
+    description: "Raw data column Data  Provider"
+    type: string
+    sql: ${TABLE}.raw_data_column:"data Provider"::string ;;
+  }
+    
+  dimension: raw_data_column_payload_primary_key_value {
+    description: "Raw data column Payload Primary Key Value"
+    type: string
+    sql: ${TABLE}.raw_data_column:payloadPrimaryKeyValue::string ;;
+  }
+    
 }
 
 view: restaurants { 
 
+  dimension: address {
+    description: "Address"
+    type: string
+    sql: ${TABLE}.VALUE:address::string ;;
+  }
+    
+  dimension: city {
+    description: "City"
+    type: string
+    sql: ${TABLE}.VALUE:city::string ;;
+  }
+    
   dimension: name {
     description: "Name"
     type: string
@@ -66,22 +78,10 @@ view: restaurants {
     sql: ${TABLE}.VALUE:country::string ;;
   }
     
-  dimension: address {
-    description: "Address"
-    type: string
-    sql: ${TABLE}.VALUE:address::string ;;
-  }
-    
   dimension: currency {
     description: "Currency"
     type: string
     sql: ${TABLE}.VALUE:currency::string ;;
-  }
-    
-  dimension: city {
-    description: "City"
-    type: string
-    sql: ${TABLE}.VALUE:city::string ;;
   }
     
 }
