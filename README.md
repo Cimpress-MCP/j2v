@@ -59,9 +59,9 @@ With J2V all the structures are discovered automatically and two files are gener
 1. Make a pull request
 1. Happy contribution!
 
-##EXAMPLE
+## EXAMPLE
 
-###Input: 
+### Input: 
 ```json
 {
   "apiVersion": "v3.4",
@@ -104,9 +104,9 @@ With J2V all the structures are discovered automatically and two files are gener
 }
 ```
 
-###Ouput:
+### Ouput:
 
-####SQL output:
+#### SQL output:
 
 ```SQL
 SELECT
@@ -144,9 +144,9 @@ LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table.raw_data_column:restaurants
 ,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table.raw_data_column:headquater:building:floors) floors
 ```
 
-####Ouput files:
+#### Ouput files:
 
-#####View file:
+##### View file:
 
 ```LookML
 
@@ -275,7 +275,7 @@ view: floors {
 
 ```
 
-#####Explore file:
+##### Explore file:
 
 ```LookML
 include: "restaurant_chain.view"
