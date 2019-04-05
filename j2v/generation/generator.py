@@ -3,6 +3,7 @@ from string import digits
 import re
 from collections import defaultdict
 
+from j2v.str_templates import sql_templates as st
 from j2v.str_templates import looker_templates as lt
 from j2v.utils.helpers import *
 from j2v.utils.config import generator_config
@@ -88,7 +89,7 @@ class Generator:
                 new_view_name = key
                 if path not in self.visited_paths and self.views_dimensions_expr[key]:
                     # path not visited but view name exists
-                    new_view_name = (current_view + "_" + key)
+                    new_view_name = current_view + "_" + key
                 self.visited_paths.add(path)
                 self.__add_explore_join(new_view_name=new_view_name, current_view=current_view,
                                         key=key, current_path=current_path)
@@ -118,12 +119,14 @@ class Generator:
         else:
             required_joins_line = lt.req_joins_str_template.format(required_join=current_view)
 
+        join_statement = st.join_str_template.format(alias=new_view_name,
+                                                     exploded_structure_path=join_path)
         explore_join = lt.explore_join_str_template.format(alias=new_view_name, view=new_view_name,
-                                                           exploded_structure_path=join_path,
+                                                           join_expression=join_statement,
                                                            required_joins_line=required_joins_line)
 
-        self.explore_joins[current_path] = explore_join
-        join_statement = lt.join_template.format(alias=new_view_name, exploded_structure_path=join_path)
+        self.explore_joins[join_path] = explore_join
+
         # keep the order
         if join_statement not in self.all_joins:
             self.all_joins.append(join_statement)
@@ -160,7 +163,8 @@ class Generator:
 
         self.views_dimensions_expr[current_view].add(new_dimension)
 
-        sql_select = lt.field_template.format(__path=current_path, TABLE=current_view, json_type=json_type)
+        sql_select = st.field_str_template.format(__path=current_path, TABLE=current_view,
+                                                  json_type=json_type)
         self.all_fields[current_view].add(sql_select)
 
     def __create_view_file(self):

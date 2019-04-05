@@ -12,6 +12,13 @@ explore: chains_table {
      relationship: one_to_many 
   }
   
+  join: menu {
+     from: menu
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants.VALUE:menu) menu;;
+     relationship: one_to_many 
+     required_joins: [restaurants]
+  }
+  
   join: indegrients {
      from: indegrients
      sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => menu.VALUE:indegrients) indegrients;;
