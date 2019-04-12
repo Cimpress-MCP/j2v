@@ -13,7 +13,7 @@ class GeneratorTests(unittest.TestCase):
         For empty JSON nothing should be created.
         :return:
         """
-        g = Generator()
+        g = Generator(column_name="data_column",sql_table_name="data_table")
         g.collect_all_paths(current_dict={})
         self.assertFalse(g.views_dimensions_expr)
         self.assertFalse(g.explore_joins)
@@ -23,7 +23,7 @@ class GeneratorTests(unittest.TestCase):
         Int key in JSON should be ignored
         :return:
         """
-        g = Generator()
+        g = Generator(column_name="data_column",sql_table_name="data_table")
         g.collect_all_paths(current_dict={1: 2})
         self.assertFalse(g.views_dimensions_expr)
         self.assertFalse(g.explore_joins)
@@ -33,7 +33,7 @@ class GeneratorTests(unittest.TestCase):
         Simple test exactly 1 view should be created with 1 dimension, and one LATERAL FLATTEN expression
         :return:
         """
-        g = Generator()
+        g = Generator(column_name="data_column",sql_table_name="data_table")
         g.collect_all_paths(current_dict={"orders": [{"id": 3}, {"id": 334}]})
         self.assertIn("orders", g.views_dimensions_expr)
         self.assertEqual(1, len(g.views_dimensions_expr["orders"]))

@@ -8,22 +8,22 @@ explore: parking_table {
 
   join: parkings {
      from: parkings
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => parking_table.data_column:parkings) parkings;;
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => parking_table."data_column":"parkings") parkings;;
      relationship: one_to_many 
   }
   
-  join: cars {
-     from: cars
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => parkings.VALUE:cars) cars;;
+  join: parkings_VALUEcars {
+     from: parkings_VALUEcars
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => parkings.VALUE:"cars") parkings_VALUEcars;;
      relationship: one_to_many 
      required_joins: [parkings]
   }
   
-  join: damages {
-     from: damages
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => cars.VALUE:damages) damages;;
+  join: parkings_VALUEcars_VALUEdamages {
+     from: parkings_VALUEcars_VALUEdamages
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => parkings_VALUEcars.VALUE:"damages") parkings_VALUEcars_VALUEdamages;;
      relationship: one_to_many 
-     required_joins: [cars]
+     required_joins: [parkings_VALUEcars]
   }
   
 }

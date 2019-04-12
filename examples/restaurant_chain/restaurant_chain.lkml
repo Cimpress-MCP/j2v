@@ -8,27 +8,27 @@ explore: chains_table {
 
   join: restaurants {
      from: restaurants
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table.raw_data_column:restaurants) restaurants;;
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."raw_data_column":"restaurants") restaurants;;
      relationship: one_to_many 
   }
   
-  join: menu {
-     from: menu
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants.VALUE:menu) menu;;
+  join: restaurants_VALUEmenu {
+     from: restaurants_VALUEmenu
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants.VALUE:"menu") restaurants_VALUEmenu;;
      relationship: one_to_many 
      required_joins: [restaurants]
   }
   
-  join: indegrients {
-     from: indegrients
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => menu.VALUE:indegrients) indegrients;;
+  join: restaurants_VALUEmenu_VALUEindegrients {
+     from: restaurants_VALUEmenu_VALUEindegrients
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants_VALUEmenu.VALUE:"indegrients") restaurants_VALUEmenu_VALUEindegrients;;
      relationship: one_to_many 
-     required_joins: [menu]
+     required_joins: [restaurants_VALUEmenu]
   }
   
-  join: floors {
-     from: floors
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table.raw_data_column:headquater:building:floors) floors;;
+  join: headquater_building_floors {
+     from: headquater_building_floors
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."raw_data_column":"headquater":"building":"floors") headquater_building_floors;;
      relationship: one_to_many 
   }
   
