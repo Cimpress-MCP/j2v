@@ -37,3 +37,6 @@ req_joins_str_template = """
 explore_end = """
 }
 """
+
+
+invalid_dim_name_regex='[^0-9a-z_A-Z]+'

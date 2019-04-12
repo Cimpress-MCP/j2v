@@ -1,18 +1,22 @@
 import json
-from string import digits
 import re
 from collections import defaultdict
+from string import digits
 
-from j2v.str_templates import sql_templates as st
 from j2v.str_templates import looker_templates as lt
-from j2v.utils.helpers import *
+from j2v.str_templates import sql_templates as st
 from j2v.utils.config import generator_config
+from j2v.utils.helpers import *
 
 TABLE_WITH_JSON_COLUMN_DEFAULT = generator_config['TABLE_WITH_JSON_COLUMN_DEFAULT']
 OUTPUT_VIEW_ML_OUT_DEFAULT = generator_config['OUTPUT_VIEW_ML_OUT_DEFAULT']
 COLUMN_WITH_JSONS_DEFAULT = generator_config['COLUMN_WITH_JSONS_DEFAULT']
 EXPLORE_LKML_OUT_DEFAULT = generator_config['EXPLORE_LKML_OUT_DEFAULT']
 ELEMENT_ACCESS_STR = generator_config['ELEMENT_ACCESS_STR']
+
+
+def doublequote(str_expression):
+    return '"' + str_expression + '"'
 
 
 class Generator:
@@ -30,7 +34,6 @@ class Generator:
         self.output_view_file_name = output_view_file_name if output_view_file_name else OUTPUT_VIEW_ML_OUT_DEFAULT
         self.column_name = column_name if column_name else COLUMN_WITH_JSONS_DEFAULT
         self.sql_table_name = sql_table_name if sql_table_name else TABLE_WITH_JSON_COLUMN_DEFAULT
-        self.visited_paths = set()
         self.all_joins = []
         self.all_fields = defaultdict(set)
 
@@ -71,7 +74,7 @@ class Generator:
         :return:
         """
         if not current_path:
-            current_path = self.column_name
+            current_path = doublequote(self.column_name)
         if not current_view:
             current_view = self.sql_table_name
         if not root_view:
@@ -79,18 +82,15 @@ class Generator:
         for key, value in current_dict.items():
             if type(key) != str:
                 continue
-            path = current_path + ":" + key
+            path = current_path + ":" + doublequote(key)
             if is_primitive(value):
                 self.__add_dimension(current_path, current_view, key, value)
             elif is_dict(value):
                 self.collect_all_paths(value, path, current_view, root_view)
             elif is_non_empty_list(value):
                 sample_element = value[0]
-                new_view_name = key
-                if path not in self.visited_paths and self.views_dimensions_expr[key]:
-                    # path not visited but view name exists
-                    new_view_name = current_view + "_" + key
-                self.visited_paths.add(path)
+                new_view_name = re.sub(lt.invalid_dim_name_regex, '_', current_view + "_" + current_path + key).replace(
+                    self.sql_table_name + "_" + "_" + self.column_name + "_", "")
                 self.__add_explore_join(new_view_name=new_view_name, current_view=current_view,
                                         key=key, current_path=current_path)
 
@@ -111,14 +111,15 @@ class Generator:
         :param current_path:
         :return:
         """
-        join_path = current_view + (":" if current_view != self.sql_table_name else ".") + current_path + ":" + key
-        join_path = join_path.replace(":" + ELEMENT_ACCESS_STR, "." + ELEMENT_ACCESS_STR)
+
+        required_joins_line = lt.req_joins_str_template.format(required_join=current_view)
+        join_path = current_view + ":" + current_path + ":" + doublequote(key)
 
         if current_view is self.sql_table_name:
             required_joins_line = ""
-        else:
-            required_joins_line = lt.req_joins_str_template.format(required_join=current_view)
+            join_path = current_view + "." + current_path + ":" + doublequote(key)
 
+        join_path = join_path.replace(":" + ELEMENT_ACCESS_STR, "." + ELEMENT_ACCESS_STR)
         join_statement = st.join_str_template.format(alias=new_view_name,
                                                      exploded_structure_path=join_path)
         explore_join = lt.explore_join_str_template.format(alias=new_view_name, view=new_view_name,
@@ -142,19 +143,18 @@ class Generator:
         """
         dim_type, json_type = get_dimension_types(dim_val)
         self.ops += 1
-        dimension_name_path = '"' + dimension_name + '"' if " " in dimension_name else dimension_name
-        path_elements = list(filter(lambda _: ELEMENT_ACCESS_STR not in _, current_path.split(":")))
+        path_elements = filter(lambda _: ELEMENT_ACCESS_STR not in _, current_path.split(doublequote(":")))
+        path_elements = list(map(lambda _: _.replace('"', ""), path_elements))
         path_elements.reverse()
-        path_elements_for_name = path_elements[:self.maximum_naming_levels]
         # create nice description and dim name based on path and dimension name
-        dimension_name = re.sub('[^0-9a-z_A-Z]+', '_', dimension_name)
+        dimension_name = re.sub(lt.invalid_dim_name_regex, '_', dimension_name)
         dimension_name_words = re.sub('(?!^)([A-Z][a-z]+)', r' \1', dimension_name).split()
-        dimension_name_words_for_desc = map(lambda _: _.capitalize(),
-                                            path_elements_for_name + dimension_name_words)
-        dimension_name_words_for_dim = map(lambda _: _.lower(), path_elements_for_name + dimension_name_words)
+        dim_words = path_elements[:self.maximum_naming_levels] + dimension_name_words
+        dimension_name_words_for_desc = map(lambda _: _.capitalize(), dim_words)
+        dimension_name_words_for_dim = map(lambda _: _.lower(), dim_words)
         nice_description = ' '.join(dimension_name_words_for_desc).replace("_", " ")
         nice_dimension_name = '_'.join(dimension_name_words_for_dim).lstrip(digits)
-        current_path = current_path + (":" if current_path else "") + dimension_name_path
+        current_path = current_path + (":" if current_path else "") + doublequote(dimension_name)
 
         new_dimension = lt.dimension_str_template.format(__dimension_name=nice_dimension_name,
                                                          __desc=nice_description,
