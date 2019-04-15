@@ -12,18 +12,18 @@ explore: chains_table {
      relationship: one_to_many 
   }
   
-  join: restaurants_VALUEmenu {
-     from: restaurants_VALUEmenu
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants.VALUE:"menu") restaurants_VALUEmenu;;
+  join: restaurants_menu {
+     from: restaurants_menu
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants.VALUE:"menu") restaurants_menu;;
      relationship: one_to_many 
      required_joins: [restaurants]
   }
   
-  join: restaurants_VALUEmenu_VALUEindegrients {
-     from: restaurants_VALUEmenu_VALUEindegrients
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants_VALUEmenu.VALUE:"indegrients") restaurants_VALUEmenu_VALUEindegrients;;
+  join: restaurants_menu_indegrients {
+     from: restaurants_menu_indegrients
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants_menu.VALUE:"indegrients") restaurants_menu_indegrients;;
      relationship: one_to_many 
-     required_joins: [restaurants_VALUEmenu]
+     required_joins: [restaurants_menu]
   }
   
   join: headquater_building_floors {

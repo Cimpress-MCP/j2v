@@ -12,18 +12,18 @@ explore: parking_table {
      relationship: one_to_many 
   }
   
-  join: parkings_VALUEcars {
-     from: parkings_VALUEcars
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => parkings.VALUE:"cars") parkings_VALUEcars;;
+  join: parkings_cars {
+     from: parkings_cars
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => parkings.VALUE:"cars") parkings_cars;;
      relationship: one_to_many 
      required_joins: [parkings]
   }
   
-  join: parkings_VALUEcars_VALUEdamages {
-     from: parkings_VALUEcars_VALUEdamages
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => parkings_VALUEcars.VALUE:"damages") parkings_VALUEcars_VALUEdamages;;
+  join: parkings_cars_damages {
+     from: parkings_cars_damages
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => parkings_cars.VALUE:"damages") parkings_cars_damages;;
      relationship: one_to_many 
-     required_joins: [parkings_VALUEcars]
+     required_joins: [parkings_cars]
   }
   
 }

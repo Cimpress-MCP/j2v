@@ -1,12 +1,4 @@
-import json
-from string import digits
-import re
-from collections import defaultdict
-
-from j2v.str_templates import sql_templates as st
 from j2v.str_templates import looker_templates as lt
-from j2v.utils.helpers import *
-from j2v.utils.config import generator_config
 
 
 class LookerWriter:
@@ -22,16 +14,25 @@ class LookerWriter:
         :return:
         """
         views_out_file = open(self.output_view_file_name, "w")
+        views_out_file.write(self.get_view_str(views_dimensions_expr))
+        views_out_file.close()
+
+    def get_view_str(self, views_dimensions_expr):
+        """
+
+        :return:
+        """
+        views_out = []
         for view, dimensions in views_dimensions_expr.items():
             source_table = ""
             if view == self.sql_table_name:
                 source_table = """\n  sql_table_name: {sql_table} ;;""".format(sql_table=self.sql_table_name)
 
-            views_out_file.write(lt.view_start_str_template.format(name=view, base_table=source_table))
+            views_out.append(lt.view_start_str_template.format(name=view, base_table=source_table))
             for dim in dimensions:
-                views_out_file.write(dim)
-            views_out_file.write(lt.view_end_str)
-        views_out_file.close()
+                views_out.append(dim)
+            views_out.append(lt.view_end_str)
+        return "\n".join(views_out)
 
     def create_explore_file(self, explore_joins):
         """

@@ -1,5 +1,6 @@
-import yaml
 import os
+
+import yaml
 
 script_dir = os.path.dirname(__file__)
 config_file_path = os.path.join(script_dir, "config.yml")

@@ -1,4 +1,3 @@
-import json
 import re
 from collections import defaultdict
 from string import digits
@@ -49,25 +48,45 @@ class Generator:
         for key, value in current_dict.items():
             if type(key) != str:
                 continue
-            path = current_path + ":" + doublequote(key)
             if is_primitive(value):
                 self.__add_dimension(current_path, current_view, key, value)
             elif is_dict(value):
-                self.collect_all_paths(value, path, current_view, root_view)
-            elif is_non_empty_list(value):
+                relative_path = current_path + ":" + doublequote(key)
+                self.collect_all_paths(value, relative_path, current_view, root_view)
+            elif is_non_empty_1D_list(value):
+                new_view_name = self.__get_new_view_name(current_view, current_path, key)
                 sample_element = value[0]
-                new_view_name = re.sub(lt.invalid_dim_name_regex, '_', current_view + "_" + current_path + key).replace(
-                    self.sql_table_name + "_" + "_" + self.column_name + "_", "")
-                self.__add_explore_join(new_view_name=new_view_name, current_view=current_view,
-                                        key=key, current_path=current_path)
-
                 if is_dict(sample_element):
+                    self.__add_explore_join(new_view_name, current_view, key, current_path)
                     self.collect_all_paths(current_dict=sample_element, current_path=ELEMENT_ACCESS_STR,
                                            current_view=new_view_name,
                                            root_view=current_view)
 
                 elif is_primitive(sample_element):
+                    self.__add_explore_join(new_view_name, current_view, key, current_path)
                     self.__add_dimension("", new_view_name, ELEMENT_ACCESS_STR, sample_element)
+
+    def __get_new_view_name(self, current_view, current_path, key):
+        """
+
+        :param current_view:
+        :param current_path:
+        :param key:
+        :return:
+        """
+        # create name based on the full access path
+        # remove access string from view name, only one left most occurence,
+        # we cannot remove more, it can be in some field name
+        full_path = current_view + ":" + current_path.replace(ELEMENT_ACCESS_STR, "", 1) + key
+        # make the name valid Looker view name
+        v_name = re.sub(lt.invalid_dim_name_regex, '_', full_path)
+        # make view name nicer
+        v_name = re.sub("_+", "_", v_name)
+        # remove the table-column name prefix, only 1 left most occurrence
+        v_name = v_name.replace(
+            self.sql_table_name + "_" + self.column_name + "_", "", 1)
+
+        return v_name
 
     def __add_explore_join(self, new_view_name, current_view, key, current_path):
         """
@@ -83,6 +102,7 @@ class Generator:
         join_path = current_view + ":" + current_path + ":" + doublequote(key)
 
         if current_view is self.sql_table_name:
+            # root view
             required_joins_line = ""
             join_path = current_view + "." + current_path + ":" + doublequote(key)
 

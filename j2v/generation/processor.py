@@ -1,14 +1,8 @@
 import json
-from string import digits
-import re
-from collections import defaultdict
 
-from j2v.str_templates import sql_templates as st
-from j2v.str_templates import looker_templates as lt
-from j2v.utils.helpers import *
-from j2v.utils.config import generator_config
 from j2v.generation.generator import Generator
 from j2v.generation.result_writer import SQLWriter, LookerWriter
+from j2v.utils.config import generator_config
 
 TABLE_WITH_JSON_COLUMN_DEFAULT = generator_config['TABLE_WITH_JSON_COLUMN_DEFAULT']
 OUTPUT_VIEW_ML_OUT_DEFAULT = generator_config['OUTPUT_VIEW_ML_OUT_DEFAULT']
