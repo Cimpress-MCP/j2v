@@ -29,17 +29,42 @@ class MainProcessor:
         self.looker_writer = LookerWriter(self.output_explore_file_name, self.output_view_file_name,
                                           self.sql_table_name)
 
-    def process_jsons(self, json_string_list):
+    def process_json_files(self, json_file_list):
         """
 
-        :param json_string_list: List with python dicts
+        :param json_file_list: List with python dicts
         :return:
         """
-        for json_file in json_string_list:
+        for json_file in json_file_list:
             with open(json_file) as f_in:
                 json_obj = json.load(f_in)
-            self.generator.collect_all_paths(current_dict=json_obj)
+                self.process_single_dict(json_obj)
+
         self.looker_writer.create_view_file(self.generator.views_dimensions_expr)
         self.looker_writer.create_explore_file(self.generator.explore_joins)
-
         self.sql_writer.print_sql(self.generator.all_fields, self.generator.all_joins)
+
+    def transform(self, python_dict):
+        self.pre_process()
+        self.process_single_dict(python_dict)
+        model, sql, views = self.post_process()
+        return {"sql": sql, "model": model, "views": views}
+
+    def transform_rich(self, python_dict_list):
+        self.pre_process()
+        for python_dict in python_dict_list:
+            self.process_single_dict(python_dict)
+        model, sql, views = self.post_process()
+        return {"sql": sql, "model": model, "views": views}
+
+    def pre_process(self):
+        self.generator.clean()
+
+    def post_process(self):
+        views = self.looker_writer.get_view_str(self.generator.views_dimensions_expr)
+        model = self.looker_writer.get_explore_str(self.generator.explore_joins)
+        sql = self.sql_writer.print_sql(self.generator.all_fields, self.generator.all_joins)
+        return model, sql, views
+
+    def process_single_dict(self, python_dict):
+        self.generator.collect_all_paths(current_dict=python_dict)

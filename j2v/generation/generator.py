@@ -26,7 +26,12 @@ class Generator:
         self.maximum_naming_levels = 1
         self.column_name = column_name
         self.sql_table_name = sql_table_name
-        self.visited_paths = set()
+        self.all_joins = []
+        self.all_fields = defaultdict(set)
+
+    def clean(self):
+        self.explore_joins = {}
+        self.ops = 0
         self.all_joins = []
         self.all_fields = defaultdict(set)
 

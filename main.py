@@ -18,5 +18,5 @@ if __name__ == '__main__':
     p = MainProcessor(column_name=args.columnn_name, output_explore_file_name=args.output_explore,
                       output_view_file_name=args.output_view, sql_table_name=args.sql_table_name)
     print("{date} Running the generator.\n\n".format(date=datetime.datetime.now()))
-    p.process_jsons(args.json_files)
+    p.process_json_files(args.json_files)
     print("\n\n{date} Finished.".format(date=datetime.datetime.now()))
