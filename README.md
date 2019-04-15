@@ -111,39 +111,42 @@ With J2V all the structures are discovered automatically and two files are gener
 #### SQL output (now only Snowflake dialect supported):
 
 ```SQL
+
 SELECT
 
 ---chains_table Information
-chains_table."raw_data_column":"apiVersion"::string
-,chains_table."raw_data_column":"dataGenerationTimestamp"::string
-,chains_table."raw_data_column":"data_Provider"::string
-,chains_table."raw_data_column":"headquater":"building":"address"::string
-,chains_table."raw_data_column":"headquater":"city"::string
-,chains_table."raw_data_column":"headquater":"country"::string
-,chains_table."raw_data_column":"headquater":"employees"::number
-,chains_table."raw_data_column":"payloadPrimaryKeyValue"::string
+chains_table."raw_data_column":"apiVersion"::string AS APIVERSION
+,chains_table."raw_data_column":"data Provider"::string AS DATA_PROVIDER
+,chains_table."raw_data_column":"dataGenerationTimestamp"::string AS DATAGENERATIONTIMESTAMP
+,chains_table."raw_data_column":"headquater":"building":"address"::string AS HEADQUATER_BUILDING_ADDRESS
+,chains_table."raw_data_column":"headquater":"city"::string AS HEADQUATER_CITY
+,chains_table."raw_data_column":"headquater":"country"::string AS HEADQUATER_COUNTRY
+,chains_table."raw_data_column":"headquater":"employees"::number AS HEADQUATER_EMPLOYEES
+,chains_table."raw_data_column":"payloadPrimaryKeyValue"::string AS PAYLOADPRIMARYKEYVALUE
 ,
 ---restaurants Information
-restaurants.VALUE:"address"::string
-,restaurants.VALUE:"city"::string
-,restaurants.VALUE:"country"::string
-,restaurants.VALUE:"currency"::string
-,restaurants.VALUE:"name"::string
+restaurants.VALUE:"address"::string AS RESTAURANTS_ADDRESS
+,restaurants.VALUE:"city"::string AS RESTAURANTS_CITY
+,restaurants.VALUE:"country"::string AS RESTAURANTS_COUNTRY
+,restaurants.VALUE:"currency"::string AS RESTAURANTS_CURRENCY
+,restaurants.VALUE:"name"::string AS RESTAURANTS_NAME
 ,
 ---restaurants_menu Information
-restaurants_menu.VALUE:"dishName"::string
-,restaurants_menu.VALUE:"price"::number
+restaurants_menu.VALUE:"dishName"::string AS RESTAURANTS_MENU_DISHNAME
+,restaurants_menu.VALUE:"price"::number AS RESTAURANTS_MENU_PRICE
 ,
 ---restaurants_menu_indegrients Information
-restaurants_menu_indegrients."VALUE"::string
+restaurants_menu_indegrients.VALUE::string AS RESTAURANTS_MENU_INDEGRIENTS_VALUE
 ,
 ---headquater_building_floors Information
-headquater_building_floors."VALUE"::number
+headquater_building_floors.VALUE::number AS HEADQUATER_BUILDING_FLOORS_VALUE
 FROM chains_table,
 LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."raw_data_column":"restaurants") restaurants
 ,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants.VALUE:"menu") restaurants_menu
 ,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants_menu.VALUE:"indegrients") restaurants_menu_indegrients
 ,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."raw_data_column":"headquater":"building":"floors") headquater_building_floors
+
+
 ```
 
 #### Ouput files:
@@ -153,99 +156,61 @@ LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."raw_data_column":"restaura
 ```LookML
 
 
+
 view: chains_table { 
   sql_table_name: chains_table ;;
 
-
-  dimension: headquater_country {
-    description: "Headquater Country"
+  dimension: city {
+    description: "City"
     type: string
-    sql: ${TABLE}."raw_data_column":"headquater":"country"::string ;;
+    sql: ${TABLE}."raw_data_column":"headquater":"city"::string ;;
   }
     
-
-  dimension: headquater_employees {
-    description: "Headquater Employees"
-    type: number
-    sql: ${TABLE}."raw_data_column":"headquater":"employees"::number ;;
-  }
-    
-
-  dimension: raw_data_column_data_generation_timestamp {
-    description: "Raw data column Data Generation Timestamp"
-    type: date_time
-    sql: ${TABLE}."raw_data_column":"dataGenerationTimestamp"::string ;;
-  }
-    
-
-  dimension: raw_data_column_api_version {
-    description: "Raw data column Api Version"
+  dimension: provider {
+    description: "Provider"
     type: string
-    sql: ${TABLE}."raw_data_column":"apiVersion"::string ;;
+    sql: ${TABLE}."raw_data_column":"data Provider"::string ;;
   }
     
-
-  dimension: raw_data_column_payload_primary_key_value {
-    description: "Raw data column Payload Primary Key Value"
-    type: string
-    sql: ${TABLE}."raw_data_column":"payloadPrimaryKeyValue"::string ;;
-  }
-    
-
-  dimension: raw_data_column_data__provider {
-    description: "Raw data column Data  Provider"
-    type: string
-    sql: ${TABLE}."raw_data_column":"data_Provider"::string ;;
-  }
-    
-
   dimension: building_address {
     description: "Building Address"
     type: string
     sql: ${TABLE}."raw_data_column":"headquater":"building":"address"::string ;;
   }
     
-
-  dimension: headquater_city {
-    description: "Headquater City"
+  dimension: payload_primary_key_value {
+    description: "Payload Primary Key Value"
     type: string
-    sql: ${TABLE}."raw_data_column":"headquater":"city"::string ;;
+    sql: ${TABLE}."raw_data_column":"payloadPrimaryKeyValue"::string ;;
   }
     
-
+  dimension: data_generation_timestamp {
+    description: "Data Generation Timestamp"
+    type: date_time
+    sql: ${TABLE}."raw_data_column":"dataGenerationTimestamp"::string ;;
+  }
+    
+  dimension: api_version {
+    description: "Api Version"
+    type: string
+    sql: ${TABLE}."raw_data_column":"apiVersion"::string ;;
+  }
+    
+  dimension: employees {
+    description: "Employees"
+    type: number
+    sql: ${TABLE}."raw_data_column":"headquater":"employees"::number ;;
+  }
+    
+  dimension: country {
+    description: "Country"
+    type: string
+    sql: ${TABLE}."raw_data_column":"headquater":"country"::string ;;
+  }
+    
 }
 
-
 view: restaurants { 
-
-
-  dimension: address {
-    description: "Address"
-    type: string
-    sql: ${TABLE}.VALUE:"address"::string ;;
-  }
-    
-
-  dimension: name {
-    description: "Name"
-    type: string
-    sql: ${TABLE}.VALUE:"name"::string ;;
-  }
-    
-
-  dimension: city {
-    description: "City"
-    type: string
-    sql: ${TABLE}.VALUE:"city"::string ;;
-  }
-    
-
-  dimension: currency {
-    description: "Currency"
-    type: string
-    sql: ${TABLE}.VALUE:"currency"::string ;;
-  }
-    
 
   dimension: country {
     description: "Country"
@@ -253,53 +218,66 @@ view: restaurants {
     sql: ${TABLE}.VALUE:"country"::string ;;
   }
     
-
+  dimension: address {
+    description: "Address"
+    type: string
+    sql: ${TABLE}.VALUE:"address"::string ;;
+  }
+    
+  dimension: currency {
+    description: "Currency"
+    type: string
+    sql: ${TABLE}.VALUE:"currency"::string ;;
+  }
+    
+  dimension: name {
+    description: "Name"
+    type: string
+    sql: ${TABLE}.VALUE:"name"::string ;;
+  }
+    
+  dimension: city {
+    description: "City"
+    type: string
+    sql: ${TABLE}.VALUE:"city"::string ;;
+  }
+    
 }
-
 
 view: restaurants_menu { 
 
-
-  dimension: dish_name {
-    description: "Dish Name"
-    type: string
-    sql: ${TABLE}.VALUE:"dishName"::string ;;
-  }
-    
-
-  dimension: price {
-    description: "Price"
+  dimension: menu_price {
+    description: "Menu Price"
     type: number
     sql: ${TABLE}.VALUE:"price"::number ;;
   }
     
-
+  dimension: menu_dish_name {
+    description: "Menu Dish Name"
+    type: string
+    sql: ${TABLE}.VALUE:"dishName"::string ;;
+  }
+    
 }
-
 
 view: restaurants_menu_indegrients { 
 
-
-  dimension: _value {
-    description: " Value"
+  dimension: menu_indegrients_value {
+    description: "Menu Indegrients Value"
     type: string
-    sql: ${TABLE}."VALUE"::string ;;
+    sql: ${TABLE}.VALUE::string ;;
   }
     
-
 }
-
 
 view: headquater_building_floors { 
 
-
-  dimension: _value {
-    description: " Value"
+  dimension: building_floors_value {
+    description: "Building Floors Value"
     type: number
-    sql: ${TABLE}."VALUE"::number ;;
+    sql: ${TABLE}.VALUE::number ;;
   }
     
-
 }
 
 
