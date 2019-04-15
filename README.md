@@ -1,3 +1,4 @@
+[![PyPI version](https://badge.fury.io/py/j2v.svg)](https://badge.fury.io/py/j2v)
 # JSONs to Looker views (J2V)
 
 J2V is a simple command-line tool to convert JSON to [Looker](https://looker.com/) readable files in forms of [Looker Views](https://docs.looker.com/reference/view-params/view) and [Looker Explores](https://docs.looker.com/reference/explore-params/explore).
