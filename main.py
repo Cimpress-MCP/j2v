@@ -1,4 +1,4 @@
-from j2v.generation.generator import Generator
+from j2v.generation.processor import MainProcessor
 from j2v.utils.config import generator_config
 import argparse
 import datetime
@@ -15,8 +15,8 @@ if __name__ == '__main__':
     parser.add_argument("--sql_table_name", nargs=argparse.OPTIONAL, type=str,
                         default=generator_config['TABLE_WITH_JSON_COLUMN_DEFAULT'], )
     args = parser.parse_args()
-    g = Generator(column_name=args.columnn_name, output_explore_file_name=args.output_explore,
-                  output_view_file_name=args.output_view, sql_table_name=args.sql_table_name)
+    p = MainProcessor(column_name=args.columnn_name, output_explore_file_name=args.output_explore,
+                      output_view_file_name=args.output_view, sql_table_name=args.sql_table_name)
     print("{date} Running the generator.\n\n".format(date=datetime.datetime.now()))
-    g.process_jsons(args.json_files)
+    p.process_json_files(args.json_files)
     print("\n\n{date} Finished.".format(date=datetime.datetime.now()))

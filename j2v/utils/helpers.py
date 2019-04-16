@@ -40,18 +40,18 @@ def is_str_timestamp(potential_ts):
 
 
 def is_non_empty_array_with_dicts(value):
-    return is_non_empty_list(value) and is_dict(value[0])
+    return is_non_empty_1D_list(value) and is_dict(value[0])
 
 
 def is_non_empty_array_with_primitives(value):
-    return is_non_empty_list(value) and is_primitive(value[0])
+    return is_non_empty_1D_list(value) and is_primitive(value[0])
 
 
 def is_dict(value):
     return type(value) == dict
 
 
-def is_non_empty_list(value):
+def is_non_empty_1D_list(value):
     # limit the level of nested lists
     # eg we will not process a list like [[""]]
     return type(value) == list and len(value) > 0 and type(value[0]) != list
