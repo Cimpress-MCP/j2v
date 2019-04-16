@@ -2,6 +2,7 @@ from j2v.generation.processor import MainProcessor
 from j2v.utils.config import generator_config
 import argparse
 import datetime
+import time
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -17,6 +18,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
     p = MainProcessor(column_name=args.columnn_name, output_explore_file_name=args.output_explore,
                       output_view_file_name=args.output_view, sql_table_name=args.sql_table_name)
+    start_time = time.process_time()
     print("{date} Running the generator.\n\n".format(date=datetime.datetime.now()))
     p.process_json_files(args.json_files)
+    end_time = time.process_time()
     print("\n\n{date} Finished.".format(date=datetime.datetime.now()))
+    print("Took {duration:10.1f} ms".format(duration=(end_time - start_time) * 1000))

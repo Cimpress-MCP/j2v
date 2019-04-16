@@ -8,9 +8,8 @@ def get_dimension_types(dim_val):
     :return:
     """
     json_type = "string"
-    if dim_val is None or (type(dim_val) == list and len(dim_val) == 0):
-        dim_type = ""
-    elif type(dim_val) == str:
+    dim_type = "string"
+    if type(dim_val) == str:
         dim_type = "string"
         json_type = "string"
         if is_str_timestamp(dim_val):
@@ -21,8 +20,6 @@ def get_dimension_types(dim_val):
     elif type(dim_val) == int:
         dim_type = "number"
         json_type = "number"
-    else:
-        dim_type = "date"
     return dim_type, json_type
 
 
@@ -64,3 +61,7 @@ def is_primitive(value):
     :return:
     """
     return type(value) in (int, float, bool, str)
+
+
+def doublequote(str_expression):
+    return '"' + str_expression + '"'

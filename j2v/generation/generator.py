@@ -1,6 +1,5 @@
 import re
 from collections import defaultdict
-from string import digits
 
 from j2v.str_templates import looker_templates as lt
 from j2v.str_templates import sql_templates as st
@@ -8,10 +7,6 @@ from j2v.utils.config import generator_config
 from j2v.utils.helpers import *
 
 ELEMENT_ACCESS_STR = generator_config['ELEMENT_ACCESS_STR']
-
-
-def doublequote(str_expression):
-    return '"' + str_expression + '"'
 
 
 class Generator:
@@ -59,7 +54,7 @@ class Generator:
                 relative_path = current_path + ":" + doublequote(key)
                 self.collect_all_paths(value, relative_path, current_view, root_view)
             elif is_non_empty_1D_list(value):
-                new_view_name = self.__get_new_view_name(current_view, current_path, key)
+                new_view_name = self.__get_full_path_str(current_view, current_path, key)
                 sample_element = value[0]
                 if is_dict(sample_element):
                     self.__add_explore_join(new_view_name, current_view, key, current_path)
@@ -69,9 +64,9 @@ class Generator:
 
                 elif is_primitive(sample_element):
                     self.__add_explore_join(new_view_name, current_view, key, current_path)
-                    self.__add_dimension("", new_view_name, ELEMENT_ACCESS_STR, sample_element)
+                    self.__add_dimension("", new_view_name, ELEMENT_ACCESS_STR, sample_element, primitive_array=True)
 
-    def __get_new_view_name(self, current_view, current_path, key):
+    def __get_full_path_str(self, current_view, current_path, key):
         """
 
         :param current_view:
@@ -84,14 +79,14 @@ class Generator:
         # we cannot remove more, it can be in some field name
         full_path = current_view + ":" + current_path.replace(ELEMENT_ACCESS_STR, "", 1) + key
         # make the name valid Looker view name
-        v_name = re.sub(lt.invalid_dim_name_regex, '_', full_path)
+        full_path_nice = re.sub(lt.invalid_dim_name_regex, '_', full_path)
         # make view name nicer
-        v_name = re.sub("_+", "_", v_name)
+        full_path_nice = re.sub("_+", "_", full_path_nice)
         # remove the table-column name prefix, only 1 left most occurrence
-        v_name = v_name.replace(
+        full_path_nice = full_path_nice.replace(
             self.sql_table_name + "_" + self.column_name + "_", "", 1)
 
-        return v_name
+        return full_path_nice
 
     def __add_explore_join(self, new_view_name, current_view, key, current_path):
         """
@@ -124,10 +119,10 @@ class Generator:
         if join_statement not in self.all_joins:
             self.all_joins.append(join_statement)
 
-    def __add_dimension(self, current_path, current_view, dimension_name, dim_val):
+    def __add_dimension(self, field_path_sql, current_view, dimension_name, dim_val, primitive_array=False):
         """
 
-        :param current_path:
+        :param field_path_sql:
         :param current_view:
         :param dimension_name:
         :param dim_val:
@@ -135,26 +130,28 @@ class Generator:
         """
         dim_type, json_type = get_dimension_types(dim_val)
         self.ops += 1
-        path_elements = filter(lambda _: ELEMENT_ACCESS_STR not in _, current_path.split(doublequote(":")))
-        path_elements = list(map(lambda _: _.replace('"', ""), path_elements))
-        path_elements.reverse()
-        # create nice description and dim name based on path and dimension name
-        dimension_name = re.sub(lt.invalid_dim_name_regex, '_', dimension_name)
-        dimension_name_words = re.sub('(?!^)([A-Z][a-z]+)', r' \1', dimension_name).split()
-        dim_words = path_elements[:self.maximum_naming_levels] + dimension_name_words
-        dimension_name_words_for_desc = map(lambda _: _.capitalize(), dim_words)
-        dimension_name_words_for_dim = map(lambda _: _.lower(), dim_words)
-        nice_description = ' '.join(dimension_name_words_for_desc).replace("_", " ")
-        nice_dimension_name = '_'.join(dimension_name_words_for_dim).lstrip(digits)
-        current_path = current_path + (":" if current_path else "") + doublequote(dimension_name)
+        full_path_nice = self.__get_full_path_str(current_view, field_path_sql, dimension_name)
+        field_path_sql = field_path_sql + (":" if field_path_sql else "") + doublequote(dimension_name)
+        if primitive_array:
+            field_path_sql = dimension_name
 
-        new_dimension = lt.dimension_str_template.format(__dimension_name=nice_dimension_name,
-                                                         __desc=nice_description,
-                                                         __path=current_path,
+        name_elements = full_path_nice.split("_")
+
+        results = []
+        # split elements by camel case
+        for element in name_elements[self.maximum_naming_levels if len(name_elements) > 1 else 0:]:
+            results.extend(re.sub('(?!^)([A-Z][a-z]+)', r' \1', element).split())
+
+        nice_description = map(lambda _: _.capitalize(), results)
+        nice_dimension_name = map(lambda _: _.lower(), results)
+
+        new_dimension = lt.dimension_str_template.format(__dimension_name="_".join(nice_dimension_name),
+                                                         __desc=" ".join(nice_description),
+                                                         __path=field_path_sql,
                                                          looker_type=dim_type, json_type=json_type)
 
         self.views_dimensions_expr[current_view].add(new_dimension)
 
-        sql_select = st.field_str_template.format(__path=current_path, TABLE=current_view,
-                                                  json_type=json_type)
+        sql_select = st.field_str_template.format(__path=field_path_sql, TABLE=current_view,
+                                                  json_type=json_type, path_alias=full_path_nice.upper())
         self.all_fields[current_view].add(sql_select)
