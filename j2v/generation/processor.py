@@ -63,7 +63,7 @@ class MainProcessor:
     def post_process(self):
         views = self.looker_writer.get_view_str(self.generator.views_dimensions_expr)
         model = self.looker_writer.get_explore_str(self.generator.explore_joins)
-        sql = self.sql_writer.print_sql(self.generator.all_fields, self.generator.all_joins)
+        sql = self.sql_writer.get_sql_str(self.generator.all_fields, self.generator.all_joins)
         return model, sql, views
 
     def process_single_dict(self, python_dict):
