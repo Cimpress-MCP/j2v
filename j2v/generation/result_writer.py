@@ -65,7 +65,7 @@ class SQLWriter:
         self.sql_table_name = sql_table_name
 
     def print_sql(self, all_fields, all_joins):
-        return print("\n".join(self.get_sql_str(all_fields, all_joins)))
+        return print(self.get_sql_str(all_fields, all_joins))
 
     def get_sql_str(self, all_fields, all_joins):
         sql_out = list()
@@ -80,4 +80,4 @@ class SQLWriter:
 
         sql_out.append("FROM {table},".format(table=self.sql_table_name))
         sql_out.append("\n,".join(all_joins))
-        return sql_out
+        return "\n".join(sql_out)
