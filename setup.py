@@ -8,7 +8,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 with open("README.md", "r") as fh:
     setup(
         name='j2v',
-        version='1.2',
+        version='1.2.1',
         author="Michal Zasadzinski",
         author_email="michal.zasadzinski@gmail.com",
         description="A tool to generate Looker views and explores from sample JSONs",
@@ -18,6 +18,7 @@ with open("README.md", "r") as fh:
         packages=find_packages(),
         install_requires=['PyYAML>=5.1'],
         python_requires='>=3',
+        include_package_data=True,
         classifiers=[
             "Programming Language :: Python :: 3",
             "License :: OSI Approved :: Apache Software License",
