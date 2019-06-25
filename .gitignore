@@ -6,3 +6,4 @@ ENV/
 .idea/*
 *.pyc
 *.pyo
+examples/abc
