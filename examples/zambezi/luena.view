@@ -1,7 +1,37 @@
 
-view: LUEANA_LATEST { 
+view: JSON_VIEW { 
   sql_table_name: "CIMPRESS"."ZAMBEZI"."LUENA" ;;
 
+  dimension: mcpsku {
+    description: "Mcpsku"
+    type: string
+    sql: ${TABLE}."JSON":"mcpSKU"::string ;;
+  }
+    
+  dimension: modified {
+    description: "Modified"
+    type: date_time
+    sql: ${TABLE}."JSON":"modified"::string ;;
+  }
+    
+  dimension: category {
+    description: "Category"
+    type: string
+    sql: ${TABLE}."JSON":"category"::string ;;
+  }
+    
+  dimension: id {
+    description: "Id"
+    type: string
+    sql: ${TABLE}."JSON":"_datalakeMetadata":"id"::string ;;
+  }
+    
+  dimension: is_active {
+    description: "Is Active"
+    type: yesno
+    sql: ${TABLE}."JSON":"isActive"::boolean ;;
+  }
+    
   dimension: price {
     description: "Price"
     type: string
@@ -14,28 +44,10 @@ view: LUEANA_LATEST {
     sql: ${TABLE}."JSON":"_datalakeMetadata":"principal"::string ;;
   }
     
-  dimension: category {
-    description: "Category"
+  dimension: transaction_id {
+    description: "Transaction Id"
     type: string
-    sql: ${TABLE}."JSON":"category"::string ;;
-  }
-    
-  dimension: is_active {
-    description: "Is Active"
-    type: yesno
-    sql: ${TABLE}."JSON":"isActive"::boolean ;;
-  }
-    
-  dimension: received {
-    description: "Received"
-    type: date_time
-    sql: ${TABLE}."JSON":"_datalakeMetadata":"received"::string ;;
-  }
-    
-  dimension: mcpsku {
-    description: "Mcpsku"
-    type: string
-    sql: ${TABLE}."JSON":"mcpSKU"::string ;;
+    sql: ${TABLE}."JSON":"transactionId"::string ;;
   }
     
   dimension: stream_id {
@@ -44,22 +56,10 @@ view: LUEANA_LATEST {
     sql: ${TABLE}."JSON":"_datalakeMetadata":"streamId"::string ;;
   }
     
-  dimension: modified {
-    description: "Modified"
+  dimension: received {
+    description: "Received"
     type: date_time
-    sql: ${TABLE}."JSON":"modified"::string ;;
-  }
-    
-  dimension: id {
-    description: "Id"
-    type: string
-    sql: ${TABLE}."JSON":"_datalakeMetadata":"id"::string ;;
-  }
-    
-  dimension: transaction_id {
-    description: "Transaction Id"
-    type: string
-    sql: ${TABLE}."JSON":"transactionId"::string ;;
+    sql: ${TABLE}."JSON":"_datalakeMetadata":"received"::string ;;
   }
     
 }
