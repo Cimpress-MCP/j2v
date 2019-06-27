@@ -15,9 +15,12 @@ if __name__ == '__main__':
                         default=generator_config['COLUMN_WITH_JSONS_DEFAULT'], )
     parser.add_argument("--sql_table_name", nargs=argparse.OPTIONAL, type=str,
                         default=generator_config['TABLE_WITH_JSON_COLUMN_DEFAULT'], )
+    parser.add_argument("--table_alias", nargs=argparse.OPTIONAL, type=str,
+                        default=generator_config['TABLE_ALIAS_DEFAULT'], )
     args = parser.parse_args()
     p = MainProcessor(column_name=args.columnn_name, output_explore_file_name=args.output_explore,
-                      output_view_file_name=args.output_view, sql_table_name=args.sql_table_name)
+                      output_view_file_name=args.output_view, sql_table_name=args.sql_table_name,
+                      table_alias=args.table_alias)
     start_time = time.process_time()
     print("{date} Running the generator.\n\n".format(date=datetime.datetime.now()))
     p.process_json_files(args.json_files)

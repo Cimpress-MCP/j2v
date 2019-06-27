@@ -1,0 +1,25 @@
+{
+  "_datalakeMetadata": {
+    "id": "81b84e22-9ce1-400d-84a3-c257d92066cc",
+    "principal": "mtheodoulou@cimpress.com",
+    "received": "2019-06-23T22:01:58.953Z",
+    "streamId": "st-0qtt25wv7k"
+  },
+  "category": "Apparel",
+  "fulfillerList": [
+    {
+      "fulfiller": "MYOPIUM"
+    },
+    {
+      "fulfiller": "KINDALOO"
+    },
+    {
+      "fulfiller": "ETERNIS"
+    }
+  ],
+  "isActive": false,
+  "mcpSKU": "CIM-7BKCNA0J",
+  "modified": "2019-06-13T03:17:32.588Z",
+  "price": "$35.49",
+  "transactionId": "606738aa-01a5-46b1-b434-172783f1c323"
+}

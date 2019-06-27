@@ -9,12 +9,14 @@ OUTPUT_VIEW_ML_OUT_DEFAULT = generator_config['OUTPUT_VIEW_ML_OUT_DEFAULT']
 COLUMN_WITH_JSONS_DEFAULT = generator_config['COLUMN_WITH_JSONS_DEFAULT']
 EXPLORE_LKML_OUT_DEFAULT = generator_config['EXPLORE_LKML_OUT_DEFAULT']
 ELEMENT_ACCESS_STR = generator_config['ELEMENT_ACCESS_STR']
+TABLE_ALIAS_DEFAULT = generator_config['TABLE_ALIAS_DEFAULT']
 
 
 class MainProcessor:
 
     def __init__(self, column_name=COLUMN_WITH_JSONS_DEFAULT, output_explore_file_name=EXPLORE_LKML_OUT_DEFAULT,
-                 output_view_file_name=OUTPUT_VIEW_ML_OUT_DEFAULT, sql_table_name=TABLE_WITH_JSON_COLUMN_DEFAULT):
+                 output_view_file_name=OUTPUT_VIEW_ML_OUT_DEFAULT, sql_table_name=TABLE_WITH_JSON_COLUMN_DEFAULT,
+                 table_alias=TABLE_ALIAS_DEFAULT):
         """
         Init empty lists and ops counter.
         """
@@ -22,12 +24,13 @@ class MainProcessor:
         self.output_view_file_name = output_view_file_name if output_view_file_name else OUTPUT_VIEW_ML_OUT_DEFAULT
         self.column_name = column_name if column_name else COLUMN_WITH_JSONS_DEFAULT
         self.sql_table_name = sql_table_name if sql_table_name else TABLE_WITH_JSON_COLUMN_DEFAULT
+        self.table_alias = table_alias if table_alias else TABLE_ALIAS_DEFAULT
         self.generator = Generator(column_name=self.column_name,
-                                   sql_table_name=self.sql_table_name)
+                                   table_alias=self.table_alias)
 
-        self.sql_writer = SQLWriter(self.sql_table_name)
+        self.sql_writer = SQLWriter(self.sql_table_name, self.table_alias)
         self.looker_writer = LookerWriter(self.output_explore_file_name, self.output_view_file_name,
-                                          self.sql_table_name)
+                                          self.sql_table_name, self.table_alias)
 
     def process_json_files(self, json_file_list):
         """

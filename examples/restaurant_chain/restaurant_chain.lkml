@@ -1,14 +1,14 @@
 include: "restaurant_chain.view"
    
-explore: chains_table {
-  view_name: chains_table
-  from: chains_table
-  label: "chains_table explore"
-  description: "chains_table explore"
+explore: JSON_VIEW {
+  view_name: JSON_VIEW
+  from: JSON_VIEW
+  label: "JSON_VIEW explore"
+  description: "JSON_VIEW explore"
 
   join: restaurants {
      from: restaurants
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."raw_data_column":"restaurants") restaurants;;
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => JSON_VIEW."DATA":"restaurants") restaurants;;
      relationship: one_to_many 
   }
   
@@ -28,7 +28,7 @@ explore: chains_table {
   
   join: headquater_building_floors {
      from: headquater_building_floors
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."raw_data_column":"headquater":"building":"floors") headquater_building_floors;;
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => JSON_VIEW."DATA":"headquater":"building":"floors") headquater_building_floors;;
      relationship: one_to_many 
   }
   

@@ -3,10 +3,11 @@ from j2v.str_templates import looker_templates as lt
 
 class LookerWriter:
     def __init__(self, output_explore_file_name, output_view_file_name,
-                 sql_table_name):
+                 sql_table_name, table_alias):
         self.output_explore_file_name = output_explore_file_name
         self.output_view_file_name = output_view_file_name
         self.sql_table_name = sql_table_name
+        self.table_alias = table_alias
 
     def create_view_file(self, views_dimensions_expr):
         """
@@ -25,7 +26,7 @@ class LookerWriter:
         views_out = list()
         for view, dimensions in views_dimensions_expr.items():
             source_table = ""
-            if view == self.sql_table_name:
+            if view == self.table_alias:
                 source_table = """\n  sql_table_name: {sql_table} ;;""".format(sql_table=self.sql_table_name)
 
             views_out.append(lt.view_start_str_template.format(name=view, base_table=source_table))
@@ -49,10 +50,11 @@ class LookerWriter:
         """
         explore_out = list()
         explore_out.append(
-            lt.explore_start_str_template.format(explore_name=self.sql_table_name, base_view_alias=self.sql_table_name,
-                                                 base_view=self.sql_table_name,
-                                                 description=self.sql_table_name + " explore",
-                                                 label=self.sql_table_name + " explore",
+            lt.explore_start_str_template.format(explore_name=self.table_alias,
+                                                 base_view_alias=self.table_alias,
+                                                 base_view=self.table_alias,
+                                                 description=self.table_alias + " explore",
+                                                 label=self.table_alias + " explore",
                                                  view_file_name=self.output_view_file_name))
         explore_out.extend(explore_joins.values())
 
@@ -61,8 +63,9 @@ class LookerWriter:
 
 
 class SQLWriter:
-    def __init__(self, sql_table_name):
+    def __init__(self, sql_table_name, table_alias):
         self.sql_table_name = sql_table_name
+        self.table_alias = table_alias
 
     def print_sql(self, all_fields, all_joins):
         return print(self.get_sql_str(all_fields, all_joins))
@@ -78,6 +81,7 @@ class SQLWriter:
             sql_out.append("\n,".join(sorted(list(fields))))
             after_select = False
 
-        sql_out.append("FROM {table},".format(table=self.sql_table_name))
+        sql_out.append("FROM {table} AS {table_alias},".format(table=self.sql_table_name,
+                                                                         table_alias=self.table_alias))
         sql_out.append("\n,".join(all_joins))
         return "\n".join(sql_out)

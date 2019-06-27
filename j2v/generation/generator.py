@@ -10,7 +10,7 @@ ELEMENT_ACCESS_STR = generator_config['ELEMENT_ACCESS_STR']
 
 
 class Generator:
-    def __init__(self, column_name, sql_table_name):
+    def __init__(self, column_name, table_alias):
         """
         Init empty lists and ops counter.
         """
@@ -20,7 +20,7 @@ class Generator:
         # setting for name construction, leave 1 or increment
         self.maximum_naming_levels = 1
         self.column_name = column_name
-        self.sql_table_name = sql_table_name
+        self.table_alias = table_alias
         self.all_joins = []
         self.all_fields = defaultdict(set)
 
@@ -42,9 +42,9 @@ class Generator:
         if not current_path:
             current_path = doublequote(self.column_name)
         if not current_view:
-            current_view = self.sql_table_name
+            current_view = self.table_alias
         if not root_view:
-            root_view = self.sql_table_name
+            root_view = self.table_alias
         for key, value in current_dict.items():
             if type(key) != str:
                 continue
@@ -84,7 +84,7 @@ class Generator:
         full_path_nice = re.sub("_+", "_", full_path_nice)
         # remove the table-column name prefix, only 1 left most occurrence
         full_path_nice = full_path_nice.replace(
-            self.sql_table_name + "_" + self.column_name + "_", "", 1)
+            self.table_alias + "_" + self.column_name + "_", "", 1)
 
         return full_path_nice
 
@@ -101,7 +101,7 @@ class Generator:
         required_joins_line = lt.req_joins_str_template.format(required_join=current_view)
         join_path = current_view + ":" + current_path + ":" + doublequote(key)
 
-        if current_view is self.sql_table_name:
+        if current_view is self.table_alias:
             # root view
             required_joins_line = ""
             join_path = current_view + "." + current_path + ":" + doublequote(key)
