@@ -166,10 +166,16 @@ class Generator:
         self.all_fields[current_view].add(sql_select)
 
         if json_type.lower() == "number":
-            sql_no_nulls_select = st.non_nullable_numeric_field_str_template.format(__path=field_path_sql, TABLE=current_view,
-                                                  json_type=json_type, path_alias=full_path_nice.upper())
-        else:
-            sql_no_nulls_select = st.non_nullable_text_field_str_template.format(__path=field_path_sql, TABLE=current_view,
-                                                  json_type=json_type, path_alias=full_path_nice.upper())
+            sql_no_nulls_select = st.non_nullable_numeric_field_str_template.format(__path=field_path_sql,
+                TABLE=current_view, json_type=json_type, path_alias=full_path_nice.upper())
+
+        elif json_type.lower() == "string" and dim_type != "date_time":
+            sql_no_nulls_select = st.non_nullable_text_field_str_template.format(__path=field_path_sql,
+                TABLE=current_view, json_type=json_type, path_alias=full_path_nice.upper())
+
+        elif json_type.lower() == "boolean" or dim_type == "date_time":
+            sql_no_nulls_select = st.field_str_template.format(__path=field_path_sql, TABLE=current_view,
+                                                               json_type=json_type, path_alias=full_path_nice.upper())
+
         self.all_non_null_fields[current_view].add(sql_no_nulls_select)
 

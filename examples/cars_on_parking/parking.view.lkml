@@ -1,4 +1,3 @@
-
 view: JSON_TABLE { 
   sql_table_name: parking_table ;;
 
