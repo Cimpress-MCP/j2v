@@ -70,6 +70,10 @@ class SQLWriter:
     def print_sql(self, all_fields, all_joins):
         return print(self.get_sql_str(all_fields, all_joins))
 
+    def print_sql_no_nulls(self, all_fields, all_joins):
+        print("\n\n ---VIEW WITH NUll VALUE HANDLING---\n\n")
+        return print(self.get_sql_str(all_fields, all_joins))
+
     def get_sql_str(self, all_fields, all_joins):
         sql_out = list()
 

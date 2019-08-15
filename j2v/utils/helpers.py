@@ -18,9 +18,12 @@ def get_dimension_types(dim_val):
     elif type(dim_val) == bool:
         dim_type = "yesno"
         json_type = "boolean"
-    elif type(dim_val) == int:
+    elif type(dim_val) == int or type(dim_val) == float:
         dim_type = "number"
         json_type = "number"
+    elif dim_val is None:
+        dim_type = "string"
+        json_type = "string"
     return dim_type, json_type
 
 

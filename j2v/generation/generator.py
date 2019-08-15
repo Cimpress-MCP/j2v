@@ -23,12 +23,14 @@ class Generator:
         self.table_alias = table_alias
         self.all_joins = []
         self.all_fields = defaultdict(set)
+        self.all_non_null_fields = defaultdict(set)
 
     def clean(self):
         self.explore_joins = {}
         self.ops = 0
         self.all_joins = []
         self.all_fields = defaultdict(set)
+        self.all_non_null_fields = defaultdict(set)
 
     def collect_all_paths(self, current_dict, current_path=None, current_view=None, root_view=None):
         """
@@ -160,5 +162,14 @@ class Generator:
         self.views_dimensions_expr[current_view].add(new_dimension)
 
         sql_select = st.field_str_template.format(__path=field_path_sql, TABLE=current_view,
-                                                  json_type=json_type, path_alias=full_path_nice.upper())
+                                              json_type=json_type, path_alias=full_path_nice.upper())
         self.all_fields[current_view].add(sql_select)
+
+        if json_type.lower() == "number":
+            sql_no_nulls_select = st.non_nullable_numeric_field_str_template.format(__path=field_path_sql, TABLE=current_view,
+                                                  json_type=json_type, path_alias=full_path_nice.upper())
+        else:
+            sql_no_nulls_select = st.non_nullable_text_field_str_template.format(__path=field_path_sql, TABLE=current_view,
+                                                  json_type=json_type, path_alias=full_path_nice.upper())
+        self.all_non_null_fields[current_view].add(sql_no_nulls_select)
+
