@@ -46,6 +46,7 @@ class MainProcessor:
         self.looker_writer.create_view_file(self.generator.views_dimensions_expr)
         self.looker_writer.create_explore_file(self.generator.explore_joins)
         self.sql_writer.print_sql(self.generator.all_fields, self.generator.all_joins)
+        self.sql_writer.print_sql_no_nulls(self.generator.all_non_null_fields, self.generator.all_joins)
 
     def transform(self, python_dict):
         self.pre_process()
@@ -67,6 +68,7 @@ class MainProcessor:
         views = self.looker_writer.get_view_str(self.generator.views_dimensions_expr)
         model = self.looker_writer.get_explore_str(self.generator.explore_joins)
         sql = self.sql_writer.get_sql_str(self.generator.all_fields, self.generator.all_joins)
+        sql_no_nulls = self.sql_writer.get_sql_str(self.generator.all_non_null_fields, self.generator.all_joins)
         return model, sql, views
 
     def process_single_dict(self, python_dict):

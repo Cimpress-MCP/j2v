@@ -17,6 +17,7 @@ with open("README.md", "r") as fh:
         url="https://github.com/Cimpress-MCP/j2v",
         packages=find_packages(),
         install_requires=['PyYAML>=5.1'],
+        tests_require=["pytest", "pytest-mock"],
         python_requires='>=3',
         include_package_data=True,
         classifiers=[
