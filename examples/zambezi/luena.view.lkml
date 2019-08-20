@@ -1,7 +1,13 @@
 
-view: JSON_VIEW { 
+view: LUEANA_LATEST { 
   sql_table_name: "CIMPRESS"."ZAMBEZI"."LUENA" ;;
 
+  dimension: category {
+    description: "Category"
+    type: string
+    sql: ${TABLE}."JSON":"category"::string ;;
+  }
+    
   dimension: mcpsku {
     description: "Mcpsku"
     type: string
@@ -14,10 +20,28 @@ view: JSON_VIEW {
     sql: ${TABLE}."JSON":"modified"::string ;;
   }
     
-  dimension: category {
-    description: "Category"
+  dimension: transaction_id {
+    description: "Transaction Id"
     type: string
-    sql: ${TABLE}."JSON":"category"::string ;;
+    sql: ${TABLE}."JSON":"transactionId"::string ;;
+  }
+    
+  dimension: principal {
+    description: "Principal"
+    type: string
+    sql: ${TABLE}."JSON":"_datalakeMetadata":"principal"::string ;;
+  }
+    
+  dimension: stream_id {
+    description: "Stream Id"
+    type: string
+    sql: ${TABLE}."JSON":"_datalakeMetadata":"streamId"::string ;;
+  }
+    
+  dimension: price {
+    description: "Price"
+    type: string
+    sql: ${TABLE}."JSON":"price"::string ;;
   }
     
   dimension: id {
@@ -30,30 +54,6 @@ view: JSON_VIEW {
     description: "Is Active"
     type: yesno
     sql: ${TABLE}."JSON":"isActive"::boolean ;;
-  }
-    
-  dimension: price {
-    description: "Price"
-    type: string
-    sql: ${TABLE}."JSON":"price"::string ;;
-  }
-    
-  dimension: principal {
-    description: "Principal"
-    type: string
-    sql: ${TABLE}."JSON":"_datalakeMetadata":"principal"::string ;;
-  }
-    
-  dimension: transaction_id {
-    description: "Transaction Id"
-    type: string
-    sql: ${TABLE}."JSON":"transactionId"::string ;;
-  }
-    
-  dimension: stream_id {
-    description: "Stream Id"
-    type: string
-    sql: ${TABLE}."JSON":"_datalakeMetadata":"streamId"::string ;;
   }
     
   dimension: received {

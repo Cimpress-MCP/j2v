@@ -1,11 +1,11 @@
 
-view: parking_table { 
+view: JSON_TABLE { 
   sql_table_name: parking_table ;;
 
-  dimension: payload_primary_key_value {
-    description: "Payload Primary Key Value"
+  dimension: api_version {
+    description: "Api Version"
     type: string
-    sql: ${TABLE}."data_column":"payloadPrimaryKeyValue"::string ;;
+    sql: ${TABLE}."data_column":"apiVersion"::string ;;
   }
     
   dimension: data_generation_timestamp {
@@ -14,10 +14,10 @@ view: parking_table {
     sql: ${TABLE}."data_column":"dataGenerationTimestamp"::string ;;
   }
     
-  dimension: api_version {
-    description: "Api Version"
+  dimension: payload_primary_key_value {
+    description: "Payload Primary Key Value"
     type: string
-    sql: ${TABLE}."data_column":"apiVersion"::string ;;
+    sql: ${TABLE}."data_column":"payloadPrimaryKeyValue"::string ;;
   }
     
   dimension: data_provider {
@@ -36,28 +36,10 @@ view: parkings {
     sql: ${TABLE}.VALUE:"status":"isOpened"::boolean ;;
   }
     
-  dimension: price {
-    description: "Price"
-    type: number
-    sql: ${TABLE}.VALUE:"price"::number ;;
-  }
-    
-  dimension: status_cars_now {
-    description: "Status Cars Now"
-    type: number
-    sql: ${TABLE}.VALUE:"status":"carsNow"::number ;;
-  }
-    
   dimension: status_is_broken {
     description: "Status Is Broken"
     type: yesno
     sql: ${TABLE}.VALUE:"status":"isBroken"::boolean ;;
-  }
-    
-  dimension: owner {
-    description: "Owner"
-    type: string
-    sql: ${TABLE}.VALUE:"owner"::string ;;
   }
     
   dimension: price_currency {
@@ -66,28 +48,46 @@ view: parkings {
     sql: ${TABLE}.VALUE:"priceCurrency"::string ;;
   }
     
-  dimension: id {
-    description: "Id"
-    type: number
-    sql: ${TABLE}.VALUE:"id"::number ;;
-  }
-    
   dimension: capacity {
     description: "Capacity"
     type: number
     sql: ${TABLE}.VALUE:"capacity"::number ;;
   }
     
-  dimension: name {
-    description: "Name"
+  dimension: status_cars_now {
+    description: "Status Cars Now"
+    type: number
+    sql: ${TABLE}.VALUE:"status":"carsNow"::number ;;
+  }
+    
+  dimension: price {
+    description: "Price"
+    type: number
+    sql: ${TABLE}.VALUE:"price"::number ;;
+  }
+    
+  dimension: id {
+    description: "Id"
+    type: number
+    sql: ${TABLE}.VALUE:"id"::number ;;
+  }
+    
+  dimension: owner {
+    description: "Owner"
     type: string
-    sql: ${TABLE}.VALUE:"name"::string ;;
+    sql: ${TABLE}.VALUE:"owner"::string ;;
   }
     
   dimension: price_unit {
     description: "Price Unit"
     type: string
     sql: ${TABLE}.VALUE:"priceUnit"::string ;;
+  }
+    
+  dimension: name {
+    description: "Name"
+    type: string
+    sql: ${TABLE}.VALUE:"name"::string ;;
   }
     
 }
@@ -116,16 +116,16 @@ view: parkings_cars {
 
 view: parkings_cars_damages { 
 
-  dimension: cars_damages_state {
-    description: "Cars Damages State"
-    type: string
-    sql: ${TABLE}.VALUE:"state"::string ;;
-  }
-    
   dimension: cars_damages_side {
     description: "Cars Damages Side"
     type: string
     sql: ${TABLE}.VALUE:"side"::string ;;
+  }
+    
+  dimension: cars_damages_state {
+    description: "Cars Damages State"
+    type: string
+    sql: ${TABLE}.VALUE:"state"::string ;;
   }
     
 }

@@ -5,7 +5,7 @@ class LookerWriter:
     def __init__(self, output_explore_file_name, output_view_file_name,
                  sql_table_name, table_alias):
         self.output_explore_file_name = output_explore_file_name
-        self.output_view_file_name = output_view_file_name
+        self.output_view_file_name = output_view_file_name+".view.lkml"
         self.sql_table_name = sql_table_name
         self.table_alias = table_alias
 
