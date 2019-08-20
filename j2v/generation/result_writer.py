@@ -81,7 +81,9 @@ class SQLWriter:
             sql_out.append("\n,".join(sorted(list(fields))))
             after_select = False
 
-        sql_out.append("FROM {table} AS {table_alias},".format(table=self.sql_table_name,
-                                                                         table_alias=self.table_alias))
+        source_table_sql = "FROM {table} AS {table_alias}".format(table=self.sql_table_name, table_alias=self.table_alias)
+        if all_joins:
+            source_table_sql += ","
+        sql_out.append(source_table_sql)
         sql_out.append("\n,".join(all_joins))
         return "\n".join(sql_out)
