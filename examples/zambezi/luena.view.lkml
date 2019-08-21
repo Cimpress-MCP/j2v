@@ -2,22 +2,10 @@
 view: LUEANA_LATEST { 
   sql_table_name: "CIMPRESS"."ZAMBEZI"."LUENA" ;;
 
-  dimension: category {
-    description: "Category"
+  dimension: principal {
+    description: "Principal"
     type: string
-    sql: ${TABLE}."JSON":"category"::string ;;
-  }
-    
-  dimension: mcpsku {
-    description: "Mcpsku"
-    type: string
-    sql: ${TABLE}."JSON":"mcpSKU"::string ;;
-  }
-    
-  dimension: modified {
-    description: "Modified"
-    type: date_time
-    sql: ${TABLE}."JSON":"modified"::string ;;
+    sql: ${TABLE}."JSON":"_datalakeMetadata":"principal"::string ;;
   }
     
   dimension: transaction_id {
@@ -26,22 +14,10 @@ view: LUEANA_LATEST {
     sql: ${TABLE}."JSON":"transactionId"::string ;;
   }
     
-  dimension: principal {
-    description: "Principal"
+  dimension: mcpsku {
+    description: "Mcpsku"
     type: string
-    sql: ${TABLE}."JSON":"_datalakeMetadata":"principal"::string ;;
-  }
-    
-  dimension: stream_id {
-    description: "Stream Id"
-    type: string
-    sql: ${TABLE}."JSON":"_datalakeMetadata":"streamId"::string ;;
-  }
-    
-  dimension: price {
-    description: "Price"
-    type: string
-    sql: ${TABLE}."JSON":"price"::string ;;
+    sql: ${TABLE}."JSON":"mcpSKU"::string ;;
   }
     
   dimension: id {
@@ -56,10 +32,52 @@ view: LUEANA_LATEST {
     sql: ${TABLE}."JSON":"isActive"::boolean ;;
   }
     
-  dimension: received {
+  dimension_group: modified {
+    description: "Modified"
+    type: time
+    timeframes: [
+        raw,
+        time,
+        date,
+        week,
+        month,
+        quarter,
+        year
+    ]
+    sql: ${TABLE}."JSON":"modified"::timestamp ;;
+  }
+    
+  dimension_group: received {
     description: "Received"
-    type: date_time
-    sql: ${TABLE}."JSON":"_datalakeMetadata":"received"::string ;;
+    type: time
+    timeframes: [
+        raw,
+        time,
+        date,
+        week,
+        month,
+        quarter,
+        year
+    ]
+    sql: ${TABLE}."JSON":"_datalakeMetadata":"received"::timestamp ;;
+  }
+    
+  dimension: price {
+    description: "Price"
+    type: string
+    sql: ${TABLE}."JSON":"price"::string ;;
+  }
+    
+  dimension: stream_id {
+    description: "Stream Id"
+    type: string
+    sql: ${TABLE}."JSON":"_datalakeMetadata":"streamId"::string ;;
+  }
+    
+  dimension: category {
+    description: "Category"
+    type: string
+    sql: ${TABLE}."JSON":"category"::string ;;
   }
     
 }

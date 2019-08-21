@@ -13,7 +13,8 @@ def get_dimension_types(dim_val):
         dim_type = "string"
         json_type = "string"
         if is_str_timestamp(dim_val):
-            dim_type = "date_time"
+            dim_type = "time"
+            json_type = "timestamp"
     elif type(dim_val) == bool:
         dim_type = "yesno"
         json_type = "boolean"

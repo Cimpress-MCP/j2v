@@ -145,10 +145,17 @@ class Generator:
         nice_description = map(lambda _: _.capitalize(), results)
         nice_dimension_name = map(lambda _: _.lower(), results)
 
-        new_dimension = lt.dimension_str_template.format(__dimension_name="_".join(nice_dimension_name),
-                                                         __desc=" ".join(nice_description),
-                                                         __path=field_path_sql,
-                                                         looker_type=dim_type, json_type=json_type)
+        if dim_type == "time" and json_type == "timestamp":
+            new_dimension = lt.dimension_time_group_str_template.format(
+                __dimension_name="_".join(nice_dimension_name),
+                __desc=" ".join(nice_description),
+                __path=field_path_sql,
+                looker_type=dim_type, json_type=json_type)
+        else:
+            new_dimension = lt.dimension_str_template.format(__dimension_name="_".join(nice_dimension_name),
+                                                             __desc=" ".join(nice_description),
+                                                             __path=field_path_sql,
+                                                             looker_type=dim_type, json_type=json_type)
 
         self.views_dimensions_expr[current_view].add(new_dimension)
 
