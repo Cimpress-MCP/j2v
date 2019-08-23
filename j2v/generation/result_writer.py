@@ -5,7 +5,7 @@ class LookerWriter:
     def __init__(self, output_explore_file_name, output_view_file_name,
                  sql_table_name, table_alias):
         self.output_explore_file_name = output_explore_file_name
-        self.output_view_file_name = output_view_file_name
+        self.output_view_file_name = output_view_file_name+".view.lkml"
         self.sql_table_name = sql_table_name
         self.table_alias = table_alias
 
@@ -81,7 +81,9 @@ class SQLWriter:
             sql_out.append("\n,".join(sorted(list(fields))))
             after_select = False
 
-        sql_out.append("FROM {table} AS {table_alias},".format(table=self.sql_table_name,
-                                                                         table_alias=self.table_alias))
+        source_table_sql = "FROM {table} AS {table_alias}".format(table=self.sql_table_name, table_alias=self.table_alias)
+        if all_joins:
+            source_table_sql += ","
+        sql_out.append(source_table_sql)
         sql_out.append("\n,".join(all_joins))
         return "\n".join(sql_out)

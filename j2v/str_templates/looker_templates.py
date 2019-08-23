@@ -6,6 +6,23 @@ dimension_str_template = """
   }}
     """
 
+dimension_time_group_str_template = """
+  dimension_group: {__dimension_name} {{
+    description: \"{__desc}\"
+    type: {looker_type}
+    timeframes: [
+        raw,
+        time,
+        date,
+        week,
+        month,
+        quarter,
+        year
+    ]
+    sql: ${{TABLE}}.{__path}::{json_type} ;;
+  }}
+    """
+
 view_start_str_template = """
 view: {name} {{ {base_table}
 """
@@ -38,5 +55,4 @@ explore_end = """
 }
 """
 
-
-invalid_dim_name_regex='[^0-9a-z_A-Z]+'
+invalid_dim_name_regex = '[^0-9a-z_A-Z]+'
