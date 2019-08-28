@@ -173,7 +173,7 @@ class Generator:
                 sql_select = st.non_nullable_text_field_str_template.format(__path=field_path_sql,
                     TABLE=current_view, json_type=json_type, path_alias=full_path_nice.upper())
 
-            elif json_type == "boolean" or dim_type == "date_time":
+            else :
                 sql_select = st.field_str_template.format(__path=field_path_sql,
                     TABLE=current_view, json_type=json_type, path_alias=full_path_nice.upper())
 

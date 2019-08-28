@@ -11,7 +11,7 @@ from j2v.utils.helpers import get_dimension_types
         # TODO: implement support for conversion between string representation of number -> number
         # pytest.param("1", ("number", "number"), id="string representation of integer is mapped to number"),
         # pytest.param("100.99", ("number", "number"), id="string representation of float is mapped to number"),
-        pytest.param("2019-01-01T00:00:00.000Z", ("date_time", "string"), id="timestamp is mapped to string"),
+        pytest.param("2019-01-01T00:00:00.000Z", ("time", "timestamp"), id="timestamp is mapped to timestamp"),
         pytest.param(True, ("yesno", "boolean"), id="True is mapped to boolean"),
         # TODO: implement support for conversion between string representation of boolean -> boolean
         # pytest.param("true", ("yesno", "boolean"), id="'True' is mapped to boolean"),
