@@ -67,11 +67,9 @@ class SQLWriter:
         self.sql_table_name = sql_table_name
         self.table_alias = table_alias
 
-    def print_sql(self, all_fields, all_joins):
-        return print(self.get_sql_str(all_fields, all_joins))
-
-    def print_sql_no_nulls(self, all_fields, all_joins):
-        print("\n\n ---VIEW WITH NUll VALUE HANDLING---\n\n")
+    def print_sql(self, all_fields, all_joins, handle_nulls):
+        if  handle_nulls:
+            print("\n\n ---VIEW WITH NUll VALUE HANDLING---\n\n")
         return print(self.get_sql_str(all_fields, all_joins))
 
     def get_sql_str(self, all_fields, all_joins):
