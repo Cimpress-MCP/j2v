@@ -3,6 +3,8 @@ import json
 from j2v.generation.generator import Generator
 from j2v.generation.result_writer import SQLWriter, LookerWriter
 from j2v.utils.config import generator_config
+from six import string_types
+
 
 TABLE_WITH_JSON_COLUMN_DEFAULT = generator_config['TABLE_WITH_JSON_COLUMN_DEFAULT']
 OUTPUT_VIEW_ML_OUT_DEFAULT = generator_config['OUTPUT_VIEW_ML_OUT_DEFAULT']
@@ -10,13 +12,14 @@ COLUMN_WITH_JSONS_DEFAULT = generator_config['COLUMN_WITH_JSONS_DEFAULT']
 EXPLORE_LKML_OUT_DEFAULT = generator_config['EXPLORE_LKML_OUT_DEFAULT']
 ELEMENT_ACCESS_STR = generator_config['ELEMENT_ACCESS_STR']
 TABLE_ALIAS_DEFAULT = generator_config['TABLE_ALIAS_DEFAULT']
+HANDLE_NULL_VALUES_IN_SQL_DEFAULT = generator_config['HANDLE_NULL_VALUES_IN_SQL_DEFAULT']
 
 
 class MainProcessor:
 
     def __init__(self, column_name=COLUMN_WITH_JSONS_DEFAULT, output_explore_file_name=EXPLORE_LKML_OUT_DEFAULT,
                  output_view_file_name=OUTPUT_VIEW_ML_OUT_DEFAULT, sql_table_name=TABLE_WITH_JSON_COLUMN_DEFAULT,
-                 table_alias=TABLE_ALIAS_DEFAULT):
+                 table_alias=TABLE_ALIAS_DEFAULT, handle_null_values_in_sql=HANDLE_NULL_VALUES_IN_SQL_DEFAULT):
         """
         Init empty lists and ops counter.
         """
@@ -25,8 +28,10 @@ class MainProcessor:
         self.column_name = column_name if column_name else COLUMN_WITH_JSONS_DEFAULT
         self.sql_table_name = sql_table_name if sql_table_name else TABLE_WITH_JSON_COLUMN_DEFAULT
         self.table_alias = table_alias if table_alias else TABLE_ALIAS_DEFAULT
+        self.handle_null_values_in_sql = self._is_truthy(handle_null_values_in_sql)
         self.generator = Generator(column_name=self.column_name,
-                                   table_alias=self.table_alias)
+                                   table_alias=self.table_alias,
+                                   handle_null_values_in_sql=self.handle_null_values_in_sql)
 
         self.sql_writer = SQLWriter(self.sql_table_name, self.table_alias)
         self.looker_writer = LookerWriter(self.output_explore_file_name, self.output_view_file_name,
@@ -45,8 +50,8 @@ class MainProcessor:
 
         self.looker_writer.create_view_file(self.generator.views_dimensions_expr)
         self.looker_writer.create_explore_file(self.generator.explore_joins)
-        self.sql_writer.print_sql(self.generator.all_fields, self.generator.all_joins)
-        self.sql_writer.print_sql_no_nulls(self.generator.all_non_null_fields, self.generator.all_joins)
+
+        self.sql_writer.print_sql(self.generator.all_fields, self.generator.all_joins, self.handle_null_values_in_sql)
 
     def transform(self, python_dict):
         self.pre_process()
@@ -68,8 +73,23 @@ class MainProcessor:
         views = self.looker_writer.get_view_str(self.generator.views_dimensions_expr)
         model = self.looker_writer.get_explore_str(self.generator.explore_joins)
         sql = self.sql_writer.get_sql_str(self.generator.all_fields, self.generator.all_joins)
-        sql_no_nulls = self.sql_writer.get_sql_str(self.generator.all_non_null_fields, self.generator.all_joins)
         return model, sql, views
 
     def process_single_dict(self, python_dict):
         self.generator.collect_all_paths(current_dict=python_dict)
+
+    def _is_truthy(self, candidate_value):
+        """
+        Converts many representations of "True" into a boolean True
+        @param: candidate_value - the value to be evaluated. Any of the following will be considered True
+        "true", "TRUE", "True", "1", any number except zero, True
+        """
+        if isinstance(candidate_value, string_types):
+            return candidate_value.lower() in ["true", "1"]
+        elif isinstance(candidate_value, int):
+            return bool(candidate_value)
+        elif isinstance(candidate_value, bool):
+            return candidate_value
+        else:
+            raise TypeError("Expected a str, int or bool and got {}".format(type(candidate_value)))
+

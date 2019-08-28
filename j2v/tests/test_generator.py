@@ -17,7 +17,7 @@ def test_empty():
     For empty JSON nothing should be created.
     :return:
     """
-    g = Generator(column_name="data_column", table_alias="data_table")
+    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False)
     g.collect_all_paths(current_dict={})
     assert not g.views_dimensions_expr
     assert not g.explore_joins
@@ -28,7 +28,7 @@ def test_int_key():
     Int key in JSON should be ignored
     :return:
     """
-    g = Generator(column_name="data_column", table_alias="data_table")
+    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False)
     g.collect_all_paths(current_dict={1: 2})
     assert not g.views_dimensions_expr
     assert not g.explore_joins
@@ -39,25 +39,12 @@ def test_one_array():
     Exactly 1 view should be created with 1 dimension, and one LATERAL FLATTEN expression
     :return:
     """
-    g = Generator(column_name="data_column", table_alias="data_table")
+    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False)
     g.collect_all_paths(current_dict={ORDERS_TABLE_NAME: [{"id": 3}, {"id": 334}]})
     assert ORDERS_TABLE_NAME in g.views_dimensions_expr
     assert 1 == len(g.views_dimensions_expr["orders"])
     assert "id" in list(g.views_dimensions_expr["orders"])[0]
     assert 1 == len(g.explore_joins)
-
-
-def test_fields_and_non_null_fields_should_contain_the_same_number_of_elements():
-    """"
-    the number of values in all_fields and all_non_null_fields should match
-    """
-    g = Generator(column_name="data_column", table_alias="data_table")
-
-    g.collect_all_paths(current_dict={ORDERS_TABLE_NAME: [{"id": 3}, {"id": 334}]})
-
-    assert ORDERS_TABLE_NAME in g.all_fields
-    assert ORDERS_TABLE_NAME in g.all_non_null_fields
-    assert len(g.all_fields.get(ORDERS_TABLE_NAME)) == len(g.all_non_null_fields.get(ORDERS_TABLE_NAME))
 
 
 @pytest.mark.parametrize(
@@ -73,8 +60,8 @@ def test_replaces_nulls_values_in_json(json_data, prefix, suffix):
     """"
     the appropriate null handling code should be added to all columns in all_non_null_fields
     """
-    g = Generator(column_name="data_column",table_alias="data_table")
+    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=True)
     g.collect_all_paths(current_dict={ORDERS_TABLE_NAME: json_data})
-    for column_def in g.all_non_null_fields[ORDERS_TABLE_NAME]:
+    for column_def in g.all_fields[ORDERS_TABLE_NAME]:
         assert column_def.startswith(prefix)
         assert suffix in column_def

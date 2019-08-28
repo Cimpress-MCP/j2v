@@ -10,7 +10,7 @@ ELEMENT_ACCESS_STR = generator_config['ELEMENT_ACCESS_STR']
 
 
 class Generator:
-    def __init__(self, column_name, table_alias):
+    def __init__(self, column_name, table_alias, handle_null_values_in_sql):
         """
         Init empty lists and ops counter.
         """
@@ -21,16 +21,15 @@ class Generator:
         self.maximum_naming_levels = 1
         self.column_name = column_name
         self.table_alias = table_alias
+        self.handle_null_values_in_sql = handle_null_values_in_sql
         self.all_joins = []
         self.all_fields = defaultdict(set)
-        self.all_non_null_fields = defaultdict(set)
 
     def clean(self):
         self.explore_joins = {}
         self.ops = 0
         self.all_joins = []
         self.all_fields = defaultdict(set)
-        self.all_non_null_fields = defaultdict(set)
 
     def collect_all_paths(self, current_dict, current_path=None, current_view=None, root_view=None):
         """
@@ -154,21 +153,22 @@ class Generator:
 
         self.views_dimensions_expr[current_view].add(new_dimension)
 
-        sql_select = st.field_str_template.format(__path=field_path_sql, TABLE=current_view,
+        if not self.handle_null_values_in_sql:
+            sql_select = st.field_str_template.format(__path=field_path_sql, TABLE=current_view,
                                               json_type=json_type, path_alias=full_path_nice.upper())
+        if self.handle_null_values_in_sql:
+
+            if json_type == "number":
+                sql_select = st.non_nullable_numeric_field_str_template.format(__path=field_path_sql,
+                    TABLE=current_view, json_type=json_type, path_alias=full_path_nice.upper())
+
+            elif json_type == "string" and dim_type != "date_time":
+                sql_select = st.non_nullable_text_field_str_template.format(__path=field_path_sql,
+                    TABLE=current_view, json_type=json_type, path_alias=full_path_nice.upper())
+
+            elif json_type == "boolean" or dim_type == "date_time":
+                sql_select = st.field_str_template.format(__path=field_path_sql,
+                    TABLE=current_view, json_type=json_type, path_alias=full_path_nice.upper())
+
         self.all_fields[current_view].add(sql_select)
-
-        if json_type.lower() == "number":
-            sql_no_nulls_select = st.non_nullable_numeric_field_str_template.format(__path=field_path_sql,
-                TABLE=current_view, json_type=json_type, path_alias=full_path_nice.upper())
-
-        elif json_type.lower() == "string" and dim_type != "date_time":
-            sql_no_nulls_select = st.non_nullable_text_field_str_template.format(__path=field_path_sql,
-                TABLE=current_view, json_type=json_type, path_alias=full_path_nice.upper())
-
-        elif json_type.lower() == "boolean" or dim_type == "date_time":
-            sql_no_nulls_select = st.field_str_template.format(__path=field_path_sql, TABLE=current_view,
-                                                               json_type=json_type, path_alias=full_path_nice.upper())
-
-        self.all_non_null_fields[current_view].add(sql_no_nulls_select)
 
