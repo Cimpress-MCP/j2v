@@ -22,12 +22,12 @@ class MainProcessor:
         """
         Init empty lists and ops counter.
         """
-        self.output_explore_file_name = output_explore_file_name if output_explore_file_name else EXPLORE_LKML_OUT_DEFAULT
-        self.output_view_file_name = output_view_file_name if output_view_file_name else OUTPUT_VIEW_ML_OUT_DEFAULT
-        self.column_name = column_name if column_name else COLUMN_WITH_JSONS_DEFAULT
-        self.sql_table_name = sql_table_name if sql_table_name else TABLE_WITH_JSON_COLUMN_DEFAULT
-        self.table_alias = table_alias if table_alias else TABLE_ALIAS_DEFAULT
-        self.handle_null_values_in_sql = handle_null_values_in_sql
+        self.output_explore_file_name = output_explore_file_name or EXPLORE_LKML_OUT_DEFAULT
+        self.output_view_file_name = output_view_file_name or OUTPUT_VIEW_ML_OUT_DEFAULT
+        self.column_name = column_name or COLUMN_WITH_JSONS_DEFAULT
+        self.sql_table_name = sql_table_name or TABLE_WITH_JSON_COLUMN_DEFAULT
+        self.table_alias = table_alias or TABLE_ALIAS_DEFAULT
+        self.handle_null_values_in_sql = handle_null_values_in_sql or HANDLE_NULL_VALUES_IN_SQL_DEFAULT
         self.generator = Generator(column_name=self.column_name,
                                    table_alias=self.table_alias,
                                    handle_null_values_in_sql=self.handle_null_values_in_sql)
