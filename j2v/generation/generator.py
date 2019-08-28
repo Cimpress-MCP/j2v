@@ -10,7 +10,7 @@ ELEMENT_ACCESS_STR = generator_config['ELEMENT_ACCESS_STR']
 
 
 class Generator:
-    def __init__(self, column_name, table_alias):
+    def __init__(self, column_name, table_alias, handle_null_values_in_sql):
         """
         Init empty lists and ops counter.
         """
@@ -21,6 +21,7 @@ class Generator:
         self.maximum_naming_levels = 1
         self.column_name = column_name
         self.table_alias = table_alias
+        self.handle_null_values_in_sql = handle_null_values_in_sql
         self.all_joins = []
         self.all_fields = defaultdict(set)
 
@@ -159,6 +160,20 @@ class Generator:
 
         self.views_dimensions_expr[current_view].add(new_dimension)
 
-        sql_select = st.field_str_template.format(__path=field_path_sql, TABLE=current_view,
-                                                  json_type=json_type, path_alias=full_path_nice.upper())
+        sql_select = self._build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
+
         self.all_fields[current_view].add(sql_select)
+
+    def _build_sql_select(self, json_type, dim_type, field_path_sql, current_view, full_path_nice_upper):
+        if self.handle_null_values_in_sql:
+
+            if json_type == "number":
+                return st.non_nullable_numeric_field_str_template.format(__path=field_path_sql,
+                    TABLE=current_view, json_type=json_type, path_alias=full_path_nice_upper)
+
+            elif json_type == "string" and dim_type != "time":
+                return st.non_nullable_text_field_str_template.format(__path=field_path_sql,
+                    TABLE=current_view, json_type=json_type, path_alias=full_path_nice_upper)
+
+        return st.field_str_template.format(__path=field_path_sql,
+                    TABLE=current_view, json_type=json_type, path_alias=full_path_nice_upper)

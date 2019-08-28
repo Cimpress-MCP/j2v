@@ -4,29 +4,33 @@ from j2v.generation.generator import Generator
 from j2v.generation.result_writer import SQLWriter, LookerWriter
 from j2v.utils.config import generator_config
 
+
 TABLE_WITH_JSON_COLUMN_DEFAULT = generator_config['TABLE_WITH_JSON_COLUMN_DEFAULT']
 OUTPUT_VIEW_ML_OUT_DEFAULT = generator_config['OUTPUT_VIEW_ML_OUT_DEFAULT']
 COLUMN_WITH_JSONS_DEFAULT = generator_config['COLUMN_WITH_JSONS_DEFAULT']
 EXPLORE_LKML_OUT_DEFAULT = generator_config['EXPLORE_LKML_OUT_DEFAULT']
 ELEMENT_ACCESS_STR = generator_config['ELEMENT_ACCESS_STR']
 TABLE_ALIAS_DEFAULT = generator_config['TABLE_ALIAS_DEFAULT']
+HANDLE_NULL_VALUES_IN_SQL_DEFAULT = generator_config['HANDLE_NULL_VALUES_IN_SQL_DEFAULT']
 
 
 class MainProcessor:
 
     def __init__(self, column_name=COLUMN_WITH_JSONS_DEFAULT, output_explore_file_name=EXPLORE_LKML_OUT_DEFAULT,
                  output_view_file_name=OUTPUT_VIEW_ML_OUT_DEFAULT, sql_table_name=TABLE_WITH_JSON_COLUMN_DEFAULT,
-                 table_alias=TABLE_ALIAS_DEFAULT):
+                 table_alias=TABLE_ALIAS_DEFAULT, handle_null_values_in_sql=HANDLE_NULL_VALUES_IN_SQL_DEFAULT):
         """
         Init empty lists and ops counter.
         """
-        self.output_explore_file_name = output_explore_file_name if output_explore_file_name else EXPLORE_LKML_OUT_DEFAULT
-        self.output_view_file_name = output_view_file_name if output_view_file_name else OUTPUT_VIEW_ML_OUT_DEFAULT
-        self.column_name = column_name if column_name else COLUMN_WITH_JSONS_DEFAULT
-        self.sql_table_name = sql_table_name if sql_table_name else TABLE_WITH_JSON_COLUMN_DEFAULT
-        self.table_alias = table_alias if table_alias else TABLE_ALIAS_DEFAULT
+        self.output_explore_file_name = output_explore_file_name or EXPLORE_LKML_OUT_DEFAULT
+        self.output_view_file_name = output_view_file_name or OUTPUT_VIEW_ML_OUT_DEFAULT
+        self.column_name = column_name or COLUMN_WITH_JSONS_DEFAULT
+        self.sql_table_name = sql_table_name or TABLE_WITH_JSON_COLUMN_DEFAULT
+        self.table_alias = table_alias or TABLE_ALIAS_DEFAULT
+        self.handle_null_values_in_sql = handle_null_values_in_sql or HANDLE_NULL_VALUES_IN_SQL_DEFAULT
         self.generator = Generator(column_name=self.column_name,
-                                   table_alias=self.table_alias)
+                                   table_alias=self.table_alias,
+                                   handle_null_values_in_sql=self.handle_null_values_in_sql)
 
         self.sql_writer = SQLWriter(self.sql_table_name, self.table_alias)
         self.looker_writer = LookerWriter(self.output_explore_file_name, self.output_view_file_name,
@@ -45,7 +49,8 @@ class MainProcessor:
 
         self.looker_writer.create_view_file(self.generator.views_dimensions_expr)
         self.looker_writer.create_explore_file(self.generator.explore_joins)
-        self.sql_writer.print_sql(self.generator.all_fields, self.generator.all_joins)
+
+        self.sql_writer.print_sql(self.generator.all_fields, self.generator.all_joins, self.handle_null_values_in_sql)
 
     def transform(self, python_dict):
         self.pre_process()
@@ -71,3 +76,4 @@ class MainProcessor:
 
     def process_single_dict(self, python_dict):
         self.generator.collect_all_paths(current_dict=python_dict)
+
