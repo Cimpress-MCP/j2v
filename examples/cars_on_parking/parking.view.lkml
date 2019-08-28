@@ -1,3 +1,4 @@
+
 view: JSON_TABLE { 
   sql_table_name: parking_table ;;
 
@@ -38,40 +39,34 @@ view: JSON_TABLE {
 
 view: parkings { 
 
-  dimension: status_is_broken {
-    description: "Status Is Broken"
-    type: yesno
-    sql: ${TABLE}.VALUE:"status":"isBroken"::boolean ;;
-  }
-    
-  dimension: owner {
-    description: "Owner"
-    type: string
-    sql: ${TABLE}.VALUE:"owner"::string ;;
-  }
-    
-  dimension: id {
-    description: "Id"
-    type: number
-    sql: ${TABLE}.VALUE:"id"::number ;;
-  }
-    
   dimension: price_unit {
     description: "Price Unit"
     type: string
     sql: ${TABLE}.VALUE:"priceUnit"::string ;;
   }
     
-  dimension: status_is_opened {
-    description: "Status Is Opened"
-    type: yesno
-    sql: ${TABLE}.VALUE:"status":"isOpened"::boolean ;;
+  dimension: price {
+    description: "Price"
+    type: number
+    sql: ${TABLE}.VALUE:"price"::number ;;
+  }
+    
+  dimension: status_cars_now {
+    description: "Status Cars Now"
+    type: number
+    sql: ${TABLE}.VALUE:"status":"carsNow"::number ;;
   }
     
   dimension: capacity {
     description: "Capacity"
     type: number
     sql: ${TABLE}.VALUE:"capacity"::number ;;
+  }
+    
+  dimension: owner {
+    description: "Owner"
+    type: string
+    sql: ${TABLE}.VALUE:"owner"::string ;;
   }
     
   dimension: name {
@@ -86,16 +81,22 @@ view: parkings {
     sql: ${TABLE}.VALUE:"priceCurrency"::string ;;
   }
     
-  dimension: status_cars_now {
-    description: "Status Cars Now"
-    type: number
-    sql: ${TABLE}.VALUE:"status":"carsNow"::number ;;
+  dimension: status_is_opened {
+    description: "Status Is Opened"
+    type: yesno
+    sql: ${TABLE}.VALUE:"status":"isOpened"::boolean ;;
   }
     
-  dimension: price {
-    description: "Price"
+  dimension: id {
+    description: "Id"
     type: number
-    sql: ${TABLE}.VALUE:"price"::number ;;
+    sql: ${TABLE}.VALUE:"id"::number ;;
+  }
+    
+  dimension: status_is_broken {
+    description: "Status Is Broken"
+    type: yesno
+    sql: ${TABLE}.VALUE:"status":"isBroken"::boolean ;;
   }
     
 }

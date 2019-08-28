@@ -160,22 +160,20 @@ class Generator:
 
         self.views_dimensions_expr[current_view].add(new_dimension)
 
-        if not self.handle_null_values_in_sql:
-            sql_select = st.field_str_template.format(__path=field_path_sql, TABLE=current_view,
-                                              json_type=json_type, path_alias=full_path_nice.upper())
-        if self.handle_null_values_in_sql:
-
-            if json_type == "number":
-                sql_select = st.non_nullable_numeric_field_str_template.format(__path=field_path_sql,
-                    TABLE=current_view, json_type=json_type, path_alias=full_path_nice.upper())
-
-            elif json_type == "string" and dim_type != "date_time":
-                sql_select = st.non_nullable_text_field_str_template.format(__path=field_path_sql,
-                    TABLE=current_view, json_type=json_type, path_alias=full_path_nice.upper())
-
-            else :
-                sql_select = st.field_str_template.format(__path=field_path_sql,
-                    TABLE=current_view, json_type=json_type, path_alias=full_path_nice.upper())
+        sql_select = self._build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
 
         self.all_fields[current_view].add(sql_select)
 
+    def _build_sql_select(self, json_type, dim_type, field_path_sql, current_view, full_path_nice_upper):
+        if self.handle_null_values_in_sql:
+
+            if json_type == "number":
+                return st.non_nullable_numeric_field_str_template.format(__path=field_path_sql,
+                    TABLE=current_view, json_type=json_type, path_alias=full_path_nice_upper)
+
+            elif json_type == "string" and dim_type != "time":
+                return st.non_nullable_text_field_str_template.format(__path=field_path_sql,
+                    TABLE=current_view, json_type=json_type, path_alias=full_path_nice_upper)
+
+        return st.field_str_template.format(__path=field_path_sql,
+                    TABLE=current_view, json_type=json_type, path_alias=full_path_nice_upper)

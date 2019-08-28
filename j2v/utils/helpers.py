@@ -69,3 +69,19 @@ def is_primitive(value):
 
 def doublequote(str_expression):
     return '"' + str_expression + '"'
+
+
+def is_truthy(candidate_value):
+    """
+    Converts many representations of "True" into a boolean True
+    @param: candidate_value - the value to be evaluated. Any of the following will be considered True
+    "true", "TRUE", "True", "1", any number except zero, True
+    """
+    if isinstance(candidate_value, str):
+        return candidate_value.lower() in ["true", "1"]
+    elif isinstance(candidate_value, int):
+        return bool(candidate_value)
+    elif isinstance(candidate_value, bool):
+        return candidate_value
+    else:
+        raise TypeError("Expected a str, int or bool and got {}".format(type(candidate_value)))

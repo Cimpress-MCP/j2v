@@ -1,4 +1,4 @@
-include: "parking.view.view.lkml"
+include: "parking.view.lkml"
    
 explore: JSON_TABLE {
   view_name: JSON_TABLE

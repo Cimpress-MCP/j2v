@@ -3,7 +3,6 @@ import json
 from j2v.generation.generator import Generator
 from j2v.generation.result_writer import SQLWriter, LookerWriter
 from j2v.utils.config import generator_config
-from six import string_types
 
 
 TABLE_WITH_JSON_COLUMN_DEFAULT = generator_config['TABLE_WITH_JSON_COLUMN_DEFAULT']
@@ -28,7 +27,7 @@ class MainProcessor:
         self.column_name = column_name if column_name else COLUMN_WITH_JSONS_DEFAULT
         self.sql_table_name = sql_table_name if sql_table_name else TABLE_WITH_JSON_COLUMN_DEFAULT
         self.table_alias = table_alias if table_alias else TABLE_ALIAS_DEFAULT
-        self.handle_null_values_in_sql = self._is_truthy(handle_null_values_in_sql)
+        self.handle_null_values_in_sql = handle_null_values_in_sql
         self.generator = Generator(column_name=self.column_name,
                                    table_alias=self.table_alias,
                                    handle_null_values_in_sql=self.handle_null_values_in_sql)
@@ -77,19 +76,4 @@ class MainProcessor:
 
     def process_single_dict(self, python_dict):
         self.generator.collect_all_paths(current_dict=python_dict)
-
-    def _is_truthy(self, candidate_value):
-        """
-        Converts many representations of "True" into a boolean True
-        @param: candidate_value - the value to be evaluated. Any of the following will be considered True
-        "true", "TRUE", "True", "1", any number except zero, True
-        """
-        if isinstance(candidate_value, string_types):
-            return candidate_value.lower() in ["true", "1"]
-        elif isinstance(candidate_value, int):
-            return bool(candidate_value)
-        elif isinstance(candidate_value, bool):
-            return candidate_value
-        else:
-            raise TypeError("Expected a str, int or bool and got {}".format(type(candidate_value)))
 
