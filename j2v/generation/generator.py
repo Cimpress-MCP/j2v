@@ -49,7 +49,7 @@ class Generator:
         for key, value in current_dict.items():
             if type(key) != str:
                 continue
-            if is_primitive(value):
+            if is_primitive(value) or value is None:
                 self.__add_dimension(current_path, current_view, key, value)
             elif is_dict(value):
                 relative_path = current_path + ":" + doublequote(key)
@@ -169,11 +169,13 @@ class Generator:
 
             if json_type == "number":
                 return st.non_nullable_numeric_field_str_template.format(__path=field_path_sql,
-                    TABLE=current_view, json_type=json_type, path_alias=full_path_nice_upper)
+                                                                         TABLE=current_view, json_type=json_type,
+                                                                         path_alias=full_path_nice_upper)
 
             elif json_type == "string" and dim_type != "time":
                 return st.non_nullable_text_field_str_template.format(__path=field_path_sql,
-                    TABLE=current_view, json_type=json_type, path_alias=full_path_nice_upper)
+                                                                      TABLE=current_view, json_type=json_type,
+                                                                      path_alias=full_path_nice_upper)
 
         return st.field_str_template.format(__path=field_path_sql,
-                    TABLE=current_view, json_type=json_type, path_alias=full_path_nice_upper)
+                                            TABLE=current_view, json_type=json_type, path_alias=full_path_nice_upper)
