@@ -2,6 +2,7 @@
   "apiVersion": "v0",
   "dataProvider": "ABCXYZ Global Parking Manager",
   "parkings": [],
+  "client": null,
   "dataGenerationTimestamp": "2019-03-30T11:30:00.812Z",
   "payloadPrimaryKeyValue": "3ab21b54-22d6-473c-b055-4430f8927d4c"
 }
