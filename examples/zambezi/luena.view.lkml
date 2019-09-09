@@ -2,16 +2,16 @@
 view: LUEANA_LATEST { 
   sql_table_name: "CIMPRESS"."ZAMBEZI"."LUENA" ;;
 
-  dimension: category {
-    description: "Category"
+  dimension: id {
+    description: "Id"
     type: string
-    sql: ${TABLE}."JSON":"category"::string ;;
+    sql: ${TABLE}."JSON":"_datalakeMetadata":"id"::string ;;
   }
     
-  dimension: mcpsku {
-    description: "Mcpsku"
+  dimension: price {
+    description: "Price"
     type: string
-    sql: ${TABLE}."JSON":"mcpSKU"::string ;;
+    sql: ${TABLE}."JSON":"price"::string ;;
   }
     
   dimension_group: modified {
@@ -29,28 +29,22 @@ view: LUEANA_LATEST {
     sql: ${TABLE}."JSON":"modified"::timestamp ;;
   }
     
+  dimension: stream_id {
+    description: "Stream Id"
+    type: string
+    sql: ${TABLE}."JSON":"_datalakeMetadata":"streamId"::string ;;
+  }
+    
+  dimension: category {
+    description: "Category"
+    type: string
+    sql: ${TABLE}."JSON":"category"::string ;;
+  }
+    
   dimension: principal {
     description: "Principal"
     type: string
     sql: ${TABLE}."JSON":"_datalakeMetadata":"principal"::string ;;
-  }
-    
-  dimension: id {
-    description: "Id"
-    type: string
-    sql: ${TABLE}."JSON":"_datalakeMetadata":"id"::string ;;
-  }
-    
-  dimension: price {
-    description: "Price"
-    type: string
-    sql: ${TABLE}."JSON":"price"::string ;;
-  }
-    
-  dimension: is_active {
-    description: "Is Active"
-    type: yesno
-    sql: ${TABLE}."JSON":"isActive"::boolean ;;
   }
     
   dimension_group: received {
@@ -68,16 +62,22 @@ view: LUEANA_LATEST {
     sql: ${TABLE}."JSON":"_datalakeMetadata":"received"::timestamp ;;
   }
     
-  dimension: stream_id {
-    description: "Stream Id"
-    type: string
-    sql: ${TABLE}."JSON":"_datalakeMetadata":"streamId"::string ;;
+  dimension: is_active {
+    description: "Is Active"
+    type: yesno
+    sql: ${TABLE}."JSON":"isActive"::boolean ;;
   }
     
   dimension: transaction_id {
     description: "Transaction Id"
     type: string
     sql: ${TABLE}."JSON":"transactionId"::string ;;
+  }
+    
+  dimension: mcpsku {
+    description: "Mcpsku"
+    type: string
+    sql: ${TABLE}."JSON":"mcpSKU"::string ;;
   }
     
 }

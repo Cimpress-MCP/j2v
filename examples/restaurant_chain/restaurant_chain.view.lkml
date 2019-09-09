@@ -8,10 +8,28 @@ view: JSON_TABLE {
     sql: ${TABLE}."DATA":"headquater":"employees"::number ;;
   }
     
-  dimension: provider {
-    description: "Provider"
+  dimension: city {
+    description: "City"
     type: string
-    sql: ${TABLE}."DATA":"data Provider"::string ;;
+    sql: ${TABLE}."DATA":"headquater":"city"::string ;;
+  }
+    
+  dimension: building_address {
+    description: "Building Address"
+    type: string
+    sql: ${TABLE}."DATA":"headquater":"building":"address"::string ;;
+  }
+    
+  dimension: payload_primary_key_value {
+    description: "Payload Primary Key Value"
+    type: string
+    sql: ${TABLE}."DATA":"payloadPrimaryKeyValue"::string ;;
+  }
+    
+  dimension: country {
+    description: "Country"
+    type: string
+    sql: ${TABLE}."DATA":"headquater":"country"::string ;;
   }
     
   dimension_group: data_generation_timestamp {
@@ -29,28 +47,16 @@ view: JSON_TABLE {
     sql: ${TABLE}."DATA":"dataGenerationTimestamp"::timestamp ;;
   }
     
-  dimension: payload_primary_key_value {
-    description: "Payload Primary Key Value"
+  dimension: version {
+    description: "Version"
     type: string
-    sql: ${TABLE}."DATA":"payloadPrimaryKeyValue"::string ;;
+    sql: ${TABLE}."DATA":"version"::string ;;
   }
     
-  dimension: city {
-    description: "City"
+  dimension: provider {
+    description: "Provider"
     type: string
-    sql: ${TABLE}."DATA":"headquater":"city"::string ;;
-  }
-    
-  dimension: building_address {
-    description: "Building Address"
-    type: string
-    sql: ${TABLE}."DATA":"headquater":"building":"address"::string ;;
-  }
-    
-  dimension: country {
-    description: "Country"
-    type: string
-    sql: ${TABLE}."DATA":"headquater":"country"::string ;;
+    sql: ${TABLE}."DATA":"data Provider"::string ;;
   }
     
   dimension: api_version {
@@ -63,16 +69,16 @@ view: JSON_TABLE {
 
 view: restaurants { 
 
+  dimension: country {
+    description: "Country"
+    type: string
+    sql: ${TABLE}.VALUE:"country"::string ;;
+  }
+    
   dimension: address {
     description: "Address"
     type: string
     sql: ${TABLE}.VALUE:"address"::string ;;
-  }
-    
-  dimension: city {
-    description: "City"
-    type: string
-    sql: ${TABLE}.VALUE:"city"::string ;;
   }
     
   dimension: name {
@@ -87,10 +93,10 @@ view: restaurants {
     sql: ${TABLE}.VALUE:"currency"::string ;;
   }
     
-  dimension: country {
-    description: "Country"
+  dimension: city {
+    description: "City"
     type: string
-    sql: ${TABLE}.VALUE:"country"::string ;;
+    sql: ${TABLE}.VALUE:"city"::string ;;
   }
     
 }
