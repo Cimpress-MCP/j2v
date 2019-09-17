@@ -3,6 +3,7 @@ dimension_str_template = """
     description: \"{__desc}\"
     type: {looker_type}
     sql: ${{TABLE}}.{__path}::{json_type} ;;
+    {group_label_string}
   }}
     """
 

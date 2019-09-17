@@ -12,7 +12,7 @@ if __name__ == '__main__':
                         default=generator_config['OUTPUT_VIEW_ML_OUT_DEFAULT'], )
     parser.add_argument("--output_explore", nargs=argparse.OPTIONAL, type=str,
                         default=generator_config['EXPLORE_LKML_OUT_DEFAULT'], )
-    parser.add_argument("--columnn_name", nargs=argparse.OPTIONAL, type=str,
+    parser.add_argument("--column_name", nargs=argparse.OPTIONAL, type=str,
                         default=generator_config['COLUMN_WITH_JSONS_DEFAULT'], )
     parser.add_argument("--sql_table_name", nargs=argparse.OPTIONAL, type=str,
                         default=generator_config['TABLE_WITH_JSON_COLUMN_DEFAULT'], )
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     parser.add_argument("--handle_null_values_in_sql", nargs=argparse.OPTIONAL, type=str,
                         default=generator_config['HANDLE_NULL_VALUES_IN_SQL_DEFAULT'], )
     args = parser.parse_args()
-    p = MainProcessor(column_name=args.columnn_name, output_explore_file_name=args.output_explore,
+    p = MainProcessor(column_name=args.column_name, output_explore_file_name=args.output_explore,
                       output_view_file_name=args.output_view, sql_table_name=args.sql_table_name,
                       table_alias=args.table_alias, handle_null_values_in_sql=is_truthy(args.handle_null_values_in_sql))
     start_time = time.process_time()

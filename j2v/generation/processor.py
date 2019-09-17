@@ -4,7 +4,6 @@ from j2v.generation.generator import Generator
 from j2v.generation.result_writer import SQLWriter, LookerWriter
 from j2v.utils.config import generator_config
 
-
 TABLE_WITH_JSON_COLUMN_DEFAULT = generator_config['TABLE_WITH_JSON_COLUMN_DEFAULT']
 OUTPUT_VIEW_ML_OUT_DEFAULT = generator_config['OUTPUT_VIEW_ML_OUT_DEFAULT']
 COLUMN_WITH_JSONS_DEFAULT = generator_config['COLUMN_WITH_JSONS_DEFAULT']
@@ -38,7 +37,6 @@ class MainProcessor:
 
     def process_json_files(self, json_file_list):
         """
-
         :param json_file_list: List with python dicts
         :return:
         """
@@ -76,4 +74,3 @@ class MainProcessor:
 
     def process_single_dict(self, python_dict):
         self.generator.collect_all_paths(current_dict=python_dict)
-

@@ -29,7 +29,7 @@ With J2V all the structures are discovered automatically and two files are gener
 * `output_view`: Name of Looker View output file to be created
 * `output_explore`: Name of Looker model output file to be created
 * `sql_table_name`: Name of the DB table to be used (this is only used in the LookML files; no actual connection to a database will be done as part of this tool)
-* `columnn_name`: Name of the column in the DB table as specified in `sql_table_name`. (this is only used in the LookML files; no actual connection to a database will be done as part of this tool)
+* `column_name`: Name of the column in the DB table as specified in `sql_table_name`. (this is only used in the LookML files; no actual connection to a database will be done as part of this tool)
 
 ## Output
 
@@ -40,7 +40,7 @@ With J2V all the structures are discovered automatically and two files are gener
 
 ### Using all parameters
 
-`python3 main.py --json_files data1.json data2.json --output_view restaurant_chain.view --output_explore restaurant_chain.lkml --columnn_name raw_data --sql_table_name chains`
+`python3 main.py --json_files data1.json data2.json --output_view restaurant_chain.view --output_explore restaurant_chain.lkml --column_name raw_data --sql_table_name chains`
 
 ### Using only mandatory parameters
 

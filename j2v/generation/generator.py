@@ -24,6 +24,7 @@ class Generator:
         self.handle_null_values_in_sql = handle_null_values_in_sql
         self.all_joins = []
         self.all_fields = defaultdict(set)
+        self.groupLabel = None
 
     def clean(self):
         self.explore_joins = {}
@@ -50,11 +51,16 @@ class Generator:
             if type(key) != str:
                 continue
             if is_primitive(value) or value is None:
-                self.__add_dimension(current_path, current_view, key, value)
+                if self.groupLabel is not None and doublequote(self.groupLabel) in current_path.split(":"):
+                    self.__add_dimension(current_path, current_view, key, value, self.groupLabel)
+                else:
+                    self.__add_dimension(current_path, current_view, key, value, None)
             elif is_dict(value):
                 relative_path = current_path + ":" + doublequote(key)
+                self.groupLabel = key
                 self.collect_all_paths(value, relative_path, current_view, root_view)
             elif is_non_empty_1D_list(value):
+                print(current_path, key)
                 new_view_name = self.__get_full_path_str(current_view, current_path, key)
                 sample_element = value[0]
                 if is_dict(sample_element):
@@ -65,7 +71,8 @@ class Generator:
 
                 elif is_primitive(sample_element):
                     self.__add_explore_join(new_view_name, current_view, key, current_path)
-                    self.__add_dimension("", new_view_name, ELEMENT_ACCESS_STR, sample_element, primitive_array=True)
+                    self.__add_dimension("", new_view_name, ELEMENT_ACCESS_STR, sample_element, None,
+                                         primitive_array=True)
 
     def __get_full_path_str(self, current_view, current_path, key):
         """
@@ -120,7 +127,7 @@ class Generator:
         if join_statement not in self.all_joins:
             self.all_joins.append(join_statement)
 
-    def __add_dimension(self, field_path_sql, current_view, dimension_name, dim_val, primitive_array=False):
+    def __add_dimension(self, field_path_sql, current_view, dimension_name, dim_val, group_label, primitive_array=False):
         """
 
         :param field_path_sql:
@@ -146,6 +153,8 @@ class Generator:
         nice_description = map(lambda _: _.capitalize(), results)
         nice_dimension_name = map(lambda _: _.lower(), results)
 
+        grouplabel_string = "{}:\"{}\"".format("group_label", group_label) if group_label is not None else ""
+
         if dim_type == "time" and json_type == "timestamp":
             new_dimension = lt.dimension_time_group_str_template.format(
                 __dimension_name="_".join(nice_dimension_name),
@@ -156,7 +165,8 @@ class Generator:
             new_dimension = lt.dimension_str_template.format(__dimension_name="_".join(nice_dimension_name),
                                                              __desc=" ".join(nice_description),
                                                              __path=field_path_sql,
-                                                             looker_type=dim_type, json_type=json_type)
+                                                             looker_type=dim_type, json_type=json_type,
+                                                             group_label_string=grouplabel_string)
 
         self.views_dimensions_expr[current_view].add(new_dimension)
 
@@ -179,3 +189,5 @@ class Generator:
 
         return st.field_str_template.format(__path=field_path_sql,
                                             TABLE=current_view, json_type=json_type, path_alias=full_path_nice_upper)
+
+
