@@ -31,9 +31,10 @@ class Generator:
         self.all_joins = []
         self.all_fields = defaultdict(set)
 
-    def collect_all_paths(self, current_dict, current_path=None, current_view=None, root_view=None):
+    def collect_all_paths(self, current_dict, current_path=None, current_view=None, root_view=None, group_label=None):
         """
         Recursive. Explores the data in JSON and takes appropriate actions.
+        :param group_label: group label for dimension
         :param current_dict: Currently processed dict
         :param current_path: Path from the root dict
         :param current_view: Currently processed view
@@ -50,10 +51,10 @@ class Generator:
             if type(key) != str:
                 continue
             if is_primitive(value) or value is None:
-                self.__add_dimension(current_path, current_view, key, value)
+                self.__add_dimension(current_path, current_view, key, value, group_label)
             elif is_dict(value):
                 relative_path = current_path + ":" + doublequote(key)
-                self.collect_all_paths(value, relative_path, current_view, root_view)
+                self.collect_all_paths(value, relative_path, current_view, root_view, key)
             elif is_non_empty_1D_list(value):
                 new_view_name = self.__get_full_path_str(current_view, current_path, key)
                 sample_element = value[0]
@@ -65,7 +66,8 @@ class Generator:
 
                 elif is_primitive(sample_element):
                     self.__add_explore_join(new_view_name, current_view, key, current_path)
-                    self.__add_dimension("", new_view_name, ELEMENT_ACCESS_STR, sample_element, primitive_array=True)
+                    self.__add_dimension("", new_view_name, ELEMENT_ACCESS_STR, sample_element, None,
+                                         primitive_array=True)
 
     def __get_full_path_str(self, current_view, current_path, key):
         """
@@ -76,7 +78,7 @@ class Generator:
         :return:
         """
         # create name based on the full access path
-        # remove access string from view name, only one left most occurence,
+        # remove access string from view name, only one left most occurrence,
         # we cannot remove more, it can be in some field name
         full_path = current_view + ":" + current_path.replace(ELEMENT_ACCESS_STR, "", 1) + key
         # make the name valid Looker view name
@@ -120,13 +122,13 @@ class Generator:
         if join_statement not in self.all_joins:
             self.all_joins.append(join_statement)
 
-    def __add_dimension(self, field_path_sql, current_view, dimension_name, dim_val, primitive_array=False):
+    def __add_dimension(self, field_path_sql, current_view, dimension_name, dim_val, group_label, primitive_array=False):
         """
-
         :param field_path_sql:
         :param current_view:
         :param dimension_name:
         :param dim_val:
+        :param group_label:
         :return:
         """
         dim_type, json_type = get_dimension_types(dim_val)
@@ -146,6 +148,8 @@ class Generator:
         nice_description = map(lambda _: _.capitalize(), results)
         nice_dimension_name = map(lambda _: _.lower(), results)
 
+        group_label_string = "\n\t{}:\"{}\"".format("group_label", group_label) if group_label is not None else ""
+
         if dim_type == "time" and json_type == "timestamp":
             new_dimension = lt.dimension_time_group_str_template.format(
                 __dimension_name="_".join(nice_dimension_name),
@@ -156,7 +160,8 @@ class Generator:
             new_dimension = lt.dimension_str_template.format(__dimension_name="_".join(nice_dimension_name),
                                                              __desc=" ".join(nice_description),
                                                              __path=field_path_sql,
-                                                             looker_type=dim_type, json_type=json_type)
+                                                             looker_type=dim_type, json_type=json_type,
+                                                             group_label_string=group_label_string)
 
         self.views_dimensions_expr[current_view].add(new_dimension)
 
@@ -176,6 +181,7 @@ class Generator:
                 return st.non_nullable_text_field_str_template.format(__path=field_path_sql,
                                                                       TABLE=current_view, json_type=json_type,
                                                                       path_alias=full_path_nice_upper)
-
         return st.field_str_template.format(__path=field_path_sql,
                                             TABLE=current_view, json_type=json_type, path_alias=full_path_nice_upper)
+
+
