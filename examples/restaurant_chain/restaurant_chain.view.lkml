@@ -6,30 +6,7 @@ view: JSON_TABLE {
     description: "Employees"
     type: number
     sql: ${TABLE}."DATA":"headquater":"employees"::number ;;
-  }
-    
-  dimension: city {
-    description: "City"
-    type: string
-    sql: ${TABLE}."DATA":"headquater":"city"::string ;;
-  }
-    
-  dimension: building_address {
-    description: "Building Address"
-    type: string
-    sql: ${TABLE}."DATA":"headquater":"building":"address"::string ;;
-  }
-    
-  dimension: payload_primary_key_value {
-    description: "Payload Primary Key Value"
-    type: string
-    sql: ${TABLE}."DATA":"payloadPrimaryKeyValue"::string ;;
-  }
-    
-  dimension: country {
-    description: "Country"
-    type: string
-    sql: ${TABLE}."DATA":"headquater":"country"::string ;;
+    group_label:"headquater"
   }
     
   dimension_group: data_generation_timestamp {
@@ -47,56 +24,92 @@ view: JSON_TABLE {
     sql: ${TABLE}."DATA":"dataGenerationTimestamp"::timestamp ;;
   }
     
+  dimension: payload_primary_key_value {
+    description: "Payload Primary Key Value"
+    type: string
+    sql: ${TABLE}."DATA":"payloadPrimaryKeyValue"::string ;;
+    
+  }
+    
+  dimension: country {
+    description: "Country"
+    type: string
+    sql: ${TABLE}."DATA":"headquater":"country"::string ;;
+    group_label:"headquater"
+  }
+    
+  dimension: city {
+    description: "City"
+    type: string
+    sql: ${TABLE}."DATA":"headquater":"city"::string ;;
+    group_label:"headquater"
+  }
+    
   dimension: version {
     description: "Version"
     type: string
     sql: ${TABLE}."DATA":"version"::string ;;
-  }
     
-  dimension: provider {
-    description: "Provider"
-    type: string
-    sql: ${TABLE}."DATA":"data Provider"::string ;;
   }
     
   dimension: api_version {
     description: "Api Version"
     type: string
     sql: ${TABLE}."DATA":"apiVersion"::string ;;
+    
+  }
+    
+  dimension: provider {
+    description: "Provider"
+    type: string
+    sql: ${TABLE}."DATA":"data Provider"::string ;;
+    
+  }
+    
+  dimension: building_address {
+    description: "Building Address"
+    type: string
+    sql: ${TABLE}."DATA":"headquater":"building":"address"::string ;;
+    group_label:"building"
   }
     
 }
 
 view: restaurants { 
 
-  dimension: country {
-    description: "Country"
+  dimension: city {
+    description: "City"
     type: string
-    sql: ${TABLE}.VALUE:"country"::string ;;
+    sql: ${TABLE}.VALUE:"city"::string ;;
+    
   }
     
   dimension: address {
     description: "Address"
     type: string
     sql: ${TABLE}.VALUE:"address"::string ;;
+    
   }
     
   dimension: name {
     description: "Name"
     type: string
     sql: ${TABLE}.VALUE:"name"::string ;;
+    
+  }
+    
+  dimension: country {
+    description: "Country"
+    type: string
+    sql: ${TABLE}.VALUE:"country"::string ;;
+    
   }
     
   dimension: currency {
     description: "Currency"
     type: string
     sql: ${TABLE}.VALUE:"currency"::string ;;
-  }
     
-  dimension: city {
-    description: "City"
-    type: string
-    sql: ${TABLE}.VALUE:"city"::string ;;
   }
     
 }
@@ -107,12 +120,14 @@ view: restaurants_menu {
     description: "Menu Price"
     type: number
     sql: ${TABLE}.VALUE:"price"::number ;;
+    
   }
     
   dimension: menu_dish_name {
     description: "Menu Dish Name"
     type: string
     sql: ${TABLE}.VALUE:"dishName"::string ;;
+    
   }
     
 }
@@ -123,6 +138,7 @@ view: restaurants_menu_indegrients {
     description: "Menu Indegrients Value"
     type: string
     sql: ${TABLE}.VALUE::string ;;
+    
   }
     
 }
@@ -133,6 +149,7 @@ view: headquater_building_floors {
     description: "Building Floors Value"
     type: number
     sql: ${TABLE}.VALUE::number ;;
+    
   }
     
 }
