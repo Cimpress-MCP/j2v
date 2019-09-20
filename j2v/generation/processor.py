@@ -1,3 +1,4 @@
+import io
 import json
 
 from j2v.generation.generator import Generator

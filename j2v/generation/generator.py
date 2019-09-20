@@ -24,6 +24,7 @@ class Generator:
         self.handle_null_values_in_sql = handle_null_values_in_sql
         self.all_joins = []
         self.all_fields = defaultdict(set)
+        self.a = set()
 
     def clean(self):
         self.explore_joins = {}
@@ -88,7 +89,6 @@ class Generator:
         # remove the table-column name prefix, only 1 left most occurrence
         full_path_nice = full_path_nice.replace(
             self.table_alias + "_" + self.column_name + "_", "", 1)
-
         return full_path_nice
 
     def __add_explore_join(self, new_view_name, current_view, key, current_path):
@@ -122,7 +122,7 @@ class Generator:
         if join_statement not in self.all_joins:
             self.all_joins.append(join_statement)
 
-    def __add_dimension(self, field_path_sql, current_view, dimension_name, dim_val, group_label, primitive_array=False):
+    def __add_dimension(self, field_path_sql, current_view, dimension_name, dim_val, group_label,primitive_array=False):
         """
         :param field_path_sql:
         :param current_view:
@@ -135,6 +135,7 @@ class Generator:
         self.ops += 1
         full_path_nice = self.__get_full_path_str(current_view, field_path_sql, dimension_name)
         field_path_sql = field_path_sql + (":" if field_path_sql else "") + doublequote(dimension_name)
+
         if primitive_array:
             field_path_sql = dimension_name
 
@@ -150,14 +151,20 @@ class Generator:
 
         group_label_string = "\n\t{}:\"{}\"".format("group_label", group_label) if group_label is not None else ""
 
+        dimension_name_final = "_".join(nice_dimension_name)
+        if dimension_name_final not in self.a:
+            self.a.add(dimension_name_final)
+        else:
+            dimension_name_final = "_".join([name_elements[0] if len(name_elements) > 1 else "", dimension_name_final])
+
         if dim_type == "time" and json_type == "timestamp":
             new_dimension = lt.dimension_time_group_str_template.format(
-                __dimension_name="_".join(nice_dimension_name),
+                __dimension_name=dimension_name_final,
                 __desc=" ".join(nice_description),
                 __path=field_path_sql,
                 looker_type=dim_type, json_type=json_type)
         else:
-            new_dimension = lt.dimension_str_template.format(__dimension_name="_".join(nice_dimension_name),
+            new_dimension = lt.dimension_str_template.format(__dimension_name=dimension_name_final,
                                                              __desc=" ".join(nice_description),
                                                              __path=field_path_sql,
                                                              looker_type=dim_type, json_type=json_type,
@@ -183,5 +190,3 @@ class Generator:
                                                                       path_alias=full_path_nice_upper)
         return st.field_str_template.format(__path=field_path_sql,
                                             TABLE=current_view, json_type=json_type, path_alias=full_path_nice_upper)
-
-
