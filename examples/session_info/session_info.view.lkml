@@ -2,131 +2,186 @@
 view: JSON_TABLE { 
   sql_table_name: session_info ;;
 
-  dimension: java_vm {
-    description: "Java Vm"
-    type: string
-    sql: ${TABLE}."session_user":"clientEnvironment":"JAVA_VM"::string ;;
-	group_label:"clientEnvironment"
+  dimension_group: received {
+    description: "Received"
+    type: time
+    timeframes: [
+        raw,
+        time,
+        date,
+        week,
+        month,
+        quarter,
+        year
+    ]
+    sql: ${TABLE}."session_user":"_datalakeMetadata":"received"::timestamp ;;
   }
     
-  dimension: os_version {
-    description: "Os Version"
+  dimension: stream_id {
+    description: "Stream Id"
     type: string
-    sql: ${TABLE}."session_user":"clientEnvironment":"OS_VERSION"::string ;;
-	group_label:"clientEnvironment"
+    sql: ${TABLE}."session_user":"_datalakeMetadata":"streamId"::string ;;
+	group_label:"_datalakeMetadata"
   }
     
-  dimension: is_active {
-    description: "Is Active"
-    type: yesno
-    sql: ${TABLE}."session_user":"isActive"::boolean ;;
+  dimension: ip {
+    description: "Ip"
+    type: string
+    sql: ${TABLE}."session_user":"ip"::string ;;
   }
     
-  dimension: current_database {
-    description: "Current Database"
+  dimension: agent {
+    description: "Agent"
     type: string
-    sql: ${TABLE}."session_user":"currentDatabase"::string ;;
-  }
-    
-  dimension: client_application {
-    description: "Client Application"
-    type: string
-    sql: ${TABLE}."session_user":"clientApplication"::string ;;
-  }
-    
-  dimension: java_version {
-    description: "Java Version"
-    type: string
-    sql: ${TABLE}."session_user":"clientEnvironment":"JAVA_VERSION"::string ;;
-	group_label:"clientEnvironment"
-  }
-    
-  dimension: account_name {
-    description: "Account Name"
-    type: string
-    sql: ${TABLE}."session_user":"accountName"::string ;;
-  }
-    
-  dimension: user_login_name {
-    description: "User Login Name"
-    type: string
-    sql: ${TABLE}."session_user":"userLoginName"::string ;;
-  }
-    
-  dimension: ocsp_mode {
-    description: "Ocsp Mode"
-    type: string
-    sql: ${TABLE}."session_user":"clientEnvironment":"OCSP_MODE"::string ;;
-	group_label:"clientEnvironment"
-  }
-    
-  dimension: java_runtime {
-    description: "Java Runtime"
-    type: string
-    sql: ${TABLE}."session_user":"clientEnvironment":"JAVA_RUNTIME"::string ;;
-	group_label:"clientEnvironment"
-  }
-    
-  dimension: client_net_address {
-    description: "Client Net Address"
-    type: string
-    sql: ${TABLE}."session_user":"clientNetAddress"::string ;;
-  }
-    
-  dimension: database_provider {
-    description: "Database Provider"
-    type: string
-    sql: ${TABLE}."session_user":"databaseProvider"::string ;;
-  }
-    
-  dimension: user_name {
-    description: "User Name"
-    type: string
-    sql: ${TABLE}."session_user":"userName"::string ;;
-  }
-    
-  dimension: application {
-    description: "Application"
-    type: string
-    sql: ${TABLE}."session_user":"clientEnvironment":"APPLICATION"::string ;;
-	group_label:"clientEnvironment"
-  }
-    
-  dimension: os {
-    description: "Os"
-    type: string
-    sql: ${TABLE}."session_user":"clientEnvironment":"OS"::string ;;
-	group_label:"clientEnvironment"
+    sql: ${TABLE}."session_user":"user_agent"::string ;;
   }
     
   dimension: id {
     description: "Id"
-    type: number
-    sql: ${TABLE}."session_user":"id"::number ;;
+    type: string
+    sql: ${TABLE}."session_user":"_datalakeMetadata":"id"::string ;;
+	group_label:"_datalakeMetadata"
   }
     
-  dimension: current_schema {
-    description: "Current Schema"
+  dimension: device {
+    description: "Device"
     type: string
-    sql: ${TABLE}."session_user":"currentSchema"::string ;;
+    sql: ${TABLE}."session_user":"details":"device"::string ;;
+	group_label:"details"
   }
     
-  dimension: user_display_name {
-    description: "User Display Name"
+  dimension: log_id {
+    description: "Id"
     type: string
-    sql: ${TABLE}."session_user":"userDisplayName"::string ;;
+    sql: ${TABLE}."session_user":"log_id"::string ;;
   }
     
-  dimension: current_warehouse {
-    description: "Current Warehouse"
+  dimension: scope {
+    description: "Scope"
     type: string
-    sql: ${TABLE}."session_user":"currentWarehouse"::string ;;
+    sql: ${TABLE}."session_user":"details":"scope"::string ;;
+	group_label:"details"
   }
     
-  dimension: current_role {
-    description: "Current Role"
+  dimension: user_id {
+    description: "Id"
     type: string
-    sql: ${TABLE}."session_user":"currentRole"::string ;;
+    sql: ${TABLE}."session_user":"user_id"::string ;;
+  }
+    
+  dimension: type {
+    description: "Type"
+    type: string
+    sql: ${TABLE}."session_user":"type"::string ;;
+  }
+    
+  dimension: user_name {
+    description: "Name"
+    type: string
+    sql: ${TABLE}."session_user":"user_name"::string ;;
+  }
+    
+  dimension: client_version {
+    description: "Client Version"
+    type: string
+    sql: ${TABLE}."session_user":"auth0_client":"version"::string ;;
+	group_label:"auth0_client"
+  }
+    
+  dimension: client_id {
+    description: "Id"
+    type: string
+    sql: ${TABLE}."session_user":"client_id"::string ;;
+  }
+    
+  dimension: target {
+    description: "Target"
+    type: string
+    sql: ${TABLE}."session_user":"details":"target"::string ;;
+	group_label:"details"
+  }
+    
+  dimension_group: date {
+    description: "Date"
+    type: time
+    timeframes: [
+        raw,
+        time,
+        date,
+        week,
+        month,
+        quarter,
+        year
+    ]
+    sql: ${TABLE}."session_user":"date"::timestamp ;;
+  }
+    
+  dimension: is_mobile {
+    description: "Is Mobile"
+    type: yesno
+    sql: ${TABLE}."session_user":"isMobile"::boolean ;;
+  }
+    
+  dimension: principal {
+    description: "Principal"
+    type: string
+    sql: ${TABLE}."session_user":"_datalakeMetadata":"principal"::string ;;
+	group_label:"_datalakeMetadata"
+  }
+    
+  dimension: grant_type {
+    description: "Grant Type"
+    type: string
+    sql: ${TABLE}."session_user":"details":"grant_type"::string ;;
+	group_label:"details"
+  }
+    
+  dimension: hostname {
+    description: "Hostname"
+    type: string
+    sql: ${TABLE}."session_user":"hostname"::string ;;
+  }
+    
+  dimension: client_name {
+    description: "Client Name"
+    type: string
+    sql: ${TABLE}."session_user":"auth0_client":"name"::string ;;
+	group_label:"auth0_client"
+  }
+    
+  dimension: connection_id {
+    description: "Id"
+    type: string
+    sql: ${TABLE}."session_user":"connection_id"::string ;;
+  }
+    
+  dimension: api_type {
+    description: "Api Type"
+    type: string
+    sql: ${TABLE}."session_user":"details":"api_type"::string ;;
+	group_label:"details"
+  }
+    
+  dimension: name {
+    description: "Name"
+    type: string
+    sql: ${TABLE}."session_user":"client_name"::string ;;
+  }
+    
+  dimension: _id {
+    description: "Id"
+    type: string
+    sql: ${TABLE}."session_user":"_id"::string ;;
+  }
+    
+}
+
+view: description { 
+
+  dimension: value {
+    description: "Value"
+    type: string
+    sql: ${TABLE}.VALUE::string ;;
   }
     
 }

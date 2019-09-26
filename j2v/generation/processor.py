@@ -1,4 +1,3 @@
-import io
 import json
 
 from j2v.generation.generator import Generator
@@ -46,10 +45,10 @@ class MainProcessor:
                 json_obj = json.load(f_in)
                 self.process_single_dict(json_obj)
 
-        self.looker_writer.create_view_file(self.generator.views_dimensions_expr)
+        self.looker_writer.create_view_file(self.generator.dim_definitions)
         self.looker_writer.create_explore_file(self.generator.explore_joins)
 
-        self.sql_writer.print_sql(self.generator.all_fields, self.generator.all_joins, self.handle_null_values_in_sql)
+        self.sql_writer.print_sql(self.generator.dim_sql_definitions, self.generator.all_joins, self.handle_null_values_in_sql)
 
     def transform(self, python_dict):
         self.pre_process()
@@ -68,9 +67,9 @@ class MainProcessor:
         self.generator.clean()
 
     def post_process(self):
-        views = self.looker_writer.get_view_str(self.generator.views_dimensions_expr)
+        views = self.looker_writer.get_view_str(self.generator.dim_definitions)
         model = self.looker_writer.get_explore_str(self.generator.explore_joins)
-        sql = self.sql_writer.get_sql_str(self.generator.all_fields, self.generator.all_joins)
+        sql = self.sql_writer.get_sql_str(self.generator.dim_sql_definitions, self.generator.all_joins)
         return model, sql, views
 
     def process_single_dict(self, python_dict):

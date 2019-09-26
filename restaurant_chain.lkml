@@ -1,34 +1,34 @@
-include: "restaurant_chain.view"
+include: "restaurant_chain.view.lkml"
    
-explore: chains_table {
-  view_name: chains_table
-  from: chains_table
-  label: "chains_table explore"
-  description: "chains_table explore"
+explore: JSON_TABLE {
+  view_name: JSON_TABLE
+  from: JSON_TABLE
+  label: "JSON_TABLE explore"
+  description: "JSON_TABLE explore"
 
-  join: chains_table_raw_data_column_restaurants {
-     from: chains_table_raw_data_column_restaurants
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."raw_data_column":"restaurants") chains_table_raw_data_column_restaurants;;
+  join: restaurants {
+     from: restaurants
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => JSON_TABLE."DATA":"restaurants") restaurants;;
      relationship: one_to_many 
   }
   
   join: restaurants_menu {
      from: restaurants_menu
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table_raw_data_column_restaurants.VALUE:"menu") restaurants_menu;;
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants.VALUE:"menu") restaurants_menu;;
      relationship: one_to_many 
-     required_joins: [chains_table_raw_data_column_restaurants]
+     required_joins: [restaurants]
   }
   
-  join: restaurants_menu_indegrients {
-     from: restaurants_menu_indegrients
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants_menu.VALUE:"indegrients") restaurants_menu_indegrients;;
+  join: restaurants_menu_ingredients {
+     from: restaurants_menu_ingredients
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants_menu.VALUE:"ingredients") restaurants_menu_ingredients;;
      relationship: one_to_many 
      required_joins: [restaurants_menu]
   }
   
-  join: chains_table_raw_data_column_headquater_building_floors {
-     from: chains_table_raw_data_column_headquater_building_floors
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."raw_data_column":"headquater":"building":"floors") chains_table_raw_data_column_headquater_building_floors;;
+  join: headquarter_building_floors {
+     from: headquarter_building_floors
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => JSON_TABLE."DATA":"headquarter":"building":"floors") headquarter_building_floors;;
      relationship: one_to_many 
   }
   

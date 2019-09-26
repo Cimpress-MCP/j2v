@@ -14,7 +14,7 @@ class Generator:
         """
         Init empty lists and ops counter.
         """
-        self.views_dimensions_expr = defaultdict(set)
+        self.dim_definitions = defaultdict(set)
         self.explore_joins = {}
         self.ops = 0
         # setting for name construction, leave 1 or increment
@@ -23,14 +23,15 @@ class Generator:
         self.table_alias = table_alias
         self.handle_null_values_in_sql = handle_null_values_in_sql
         self.all_joins = []
-        self.all_fields = defaultdict(set)
-        self.a = set()
+        self.dim_sql_definitions = defaultdict(set)
+        self.dim_names = defaultdict(set)
 
     def clean(self):
         self.explore_joins = {}
         self.ops = 0
         self.all_joins = []
-        self.all_fields = defaultdict(set)
+        self.dim_sql_definitions = defaultdict(set)
+        self.dim_names = defaultdict(set)
 
     def collect_all_paths(self, current_dict, current_path=None, current_view=None, root_view=None, group_label=None):
         """
@@ -152,10 +153,11 @@ class Generator:
         group_label_string = "\n\t{}:\"{}\"".format("group_label", group_label) if group_label is not None else ""
 
         dimension_name_final = "_".join(nice_dimension_name)
-        if dimension_name_final not in self.a:
-            self.a.add(dimension_name_final)
-        else:
+
+        if dimension_name_final in self.dim_names:
             dimension_name_final = "_".join([name_elements[0] if len(name_elements) > 1 else "", dimension_name_final])
+
+        self.dim_names[current_view].add(dimension_name_final)
 
         if dim_type == "time" and json_type == "timestamp":
             new_dimension = lt.dimension_time_group_str_template.format(
@@ -170,11 +172,11 @@ class Generator:
                                                              looker_type=dim_type, json_type=json_type,
                                                              group_label_string=group_label_string)
 
-        self.views_dimensions_expr[current_view].add(new_dimension)
+        self.dim_definitions[current_view].add(new_dimension)
 
         sql_select = self._build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
 
-        self.all_fields[current_view].add(sql_select)
+        self.dim_sql_definitions[current_view].add(sql_select)
 
     def _build_sql_select(self, json_type, dim_type, field_path_sql, current_view, full_path_nice_upper):
         if self.handle_null_values_in_sql:
