@@ -25,13 +25,13 @@ class Generator:
         self.all_joins = []
         self.dim_sql_definitions = defaultdict(set)
         self.dim_names = defaultdict(set)
+        self.fields = defaultdict(defaultdict)
 
     def clean(self):
         self.explore_joins = {}
         self.ops = 0
         self.all_joins = []
         self.dim_sql_definitions = defaultdict(set)
-        self.dim_names = defaultdict(set)
 
     def collect_all_paths(self, current_dict, current_path=None, current_view=None, root_view=None, group_label=None):
         """
@@ -123,7 +123,8 @@ class Generator:
         if join_statement not in self.all_joins:
             self.all_joins.append(join_statement)
 
-    def __add_dimension(self, field_path_sql, current_view, dimension_name, dim_val, group_label,primitive_array=False):
+    def __add_dimension(self, field_path_sql, current_view, dimension_name, dim_val, group_label,
+                        primitive_array=False):
         """
         :param field_path_sql:
         :param current_view:
@@ -154,8 +155,12 @@ class Generator:
 
         dimension_name_final = "_".join(nice_dimension_name)
 
-        if dimension_name_final in self.dim_names:
-            dimension_name_final = "_".join([name_elements[0] if len(name_elements) > 1 else "", dimension_name_final])
+        sql_select = self._build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
+        self.fields[current_view][dimension_name_final] = sql_select
+
+        # check for duplicate dimension name in current view by checking the sql definitions in the same view
+        if dimension_name_final in self.dim_names[current_view] and sql_select not in self.dim_sql_definitions[current_view]:
+            dimension_name_final = "_".join(["" if len(name_elements) == 1 else name_elements[0], dimension_name_final])
 
         self.dim_names[current_view].add(dimension_name_final)
 
@@ -173,9 +178,6 @@ class Generator:
                                                              group_label_string=group_label_string)
 
         self.dim_definitions[current_view].add(new_dimension)
-
-        sql_select = self._build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
-
         self.dim_sql_definitions[current_view].add(sql_select)
 
     def _build_sql_select(self, json_type, dim_type, field_path_sql, current_view, full_path_nice_upper):
