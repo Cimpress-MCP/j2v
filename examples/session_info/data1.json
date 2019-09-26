@@ -2,6 +2,10 @@
   "accountName": "ADMIN",
   "clientApplication": "JDBC 3.8.4",
   "clientEnvironment": {
+    "ENV": {
+      "id": 1212312312,
+      "name": "blah"
+    },
     "APPLICATION": "JEST",
     "JAVA_RUNTIME": "Java(TM) SE Runtime Environment",
     "JAVA_VERSION": "1.8.0",
