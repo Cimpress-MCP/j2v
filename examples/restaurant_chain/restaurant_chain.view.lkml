@@ -2,11 +2,30 @@
 view: JSON_TABLE { 
   sql_table_name: RESTAURANT_DETAILS ;;
 
+  dimension: employees {
+    description: "Employees"
+    type: number
+    sql: ${TABLE}."DATA":"headquarter":"employees"::number ;;
+	group_label:"headquarter"
+  }
+    
+  dimension: version {
+    description: "Version"
+    type: string
+    sql: ${TABLE}."DATA":"version"::string ;;
+  }
+    
   dimension: city {
     description: "City"
     type: string
     sql: ${TABLE}."DATA":"headquarter":"city"::string ;;
 	group_label:"headquarter"
+  }
+    
+  dimension: provider {
+    description: "Provider"
+    type: string
+    sql: ${TABLE}."DATA":"data Provider"::string ;;
   }
     
   dimension: api_version {
@@ -15,10 +34,17 @@ view: JSON_TABLE {
     sql: ${TABLE}."DATA":"apiVersion"::string ;;
   }
     
-  dimension: version {
-    description: "Version"
+  dimension: building_address {
+    description: "Building Address"
     type: string
-    sql: ${TABLE}."DATA":"version"::string ;;
+    sql: ${TABLE}."DATA":"headquarter":"building":"address"::string ;;
+	group_label:"building"
+  }
+    
+  dimension: payload_primary_key_value {
+    description: "Payload Primary Key Value"
+    type: string
+    sql: ${TABLE}."DATA":"payloadPrimaryKeyValue"::string ;;
   }
     
   dimension: country {
@@ -43,48 +69,10 @@ view: JSON_TABLE {
     sql: ${TABLE}."DATA":"dataGenerationTimestamp"::timestamp ;;
   }
     
-  dimension: provider {
-    description: "Provider"
-    type: string
-    sql: ${TABLE}."DATA":"data Provider"::string ;;
-  }
-    
-  dimension: payload_primary_key_value {
-    description: "Payload Primary Key Value"
-    type: string
-    sql: ${TABLE}."DATA":"payloadPrimaryKeyValue"::string ;;
-  }
-    
-  dimension: employees {
-    description: "Employees"
-    type: number
-    sql: ${TABLE}."DATA":"headquarter":"employees"::number ;;
-	group_label:"headquarter"
-  }
-    
-  dimension: building_address {
-    description: "Building Address"
-    type: string
-    sql: ${TABLE}."DATA":"headquarter":"building":"address"::string ;;
-	group_label:"building"
-  }
-    
 }
 
 view: restaurants { 
 
-  dimension: currency {
-    description: "Currency"
-    type: string
-    sql: ${TABLE}.VALUE:"currency"::string ;;
-  }
-    
-  dimension: country {
-    description: "Country"
-    type: string
-    sql: ${TABLE}.VALUE:"country"::string ;;
-  }
-    
   dimension: address {
     description: "Address"
     type: string
@@ -97,6 +85,18 @@ view: restaurants {
     sql: ${TABLE}.VALUE:"city"::string ;;
   }
     
+  dimension: currency {
+    description: "Currency"
+    type: string
+    sql: ${TABLE}.VALUE:"currency"::string ;;
+  }
+    
+  dimension: country {
+    description: "Country"
+    type: string
+    sql: ${TABLE}.VALUE:"country"::string ;;
+  }
+    
   dimension: name {
     description: "Name"
     type: string
@@ -107,16 +107,16 @@ view: restaurants {
 
 view: restaurants_menu { 
 
-  dimension: menu_dish_name {
-    description: "Menu Dish Name"
-    type: string
-    sql: ${TABLE}.VALUE:"dishName"::string ;;
-  }
-    
   dimension: menu_price {
     description: "Menu Price"
     type: number
     sql: ${TABLE}.VALUE:"price"::number ;;
+  }
+    
+  dimension: menu_dish_name {
+    description: "Menu Dish Name"
+    type: string
+    sql: ${TABLE}.VALUE:"dishName"::string ;;
   }
     
 }

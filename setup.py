@@ -9,8 +9,8 @@ with open("README.md", "r") as fh:
     setup(
         name='j2v',
         version='1.3.7',
-        author="Michal Zasadzinski",
-        author_email="michal.zasadzinski@gmail.com",
+        author="Michal Zasadzinski, Ruthwik Ganesh",
+        author_email="michal.zasadzinski@gmail.com, ruthwikganesh@gmail.com",
         description="A tool to generate Looker views and explores from sample JSONs",
         long_description=long_description,
         long_description_content_type='text/markdown',

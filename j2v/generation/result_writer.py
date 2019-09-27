@@ -80,7 +80,7 @@ class SQLWriter:
         after_select = True
         for view, fields in all_fields.items():
             sql_out.append(("," if not after_select else "") + "\n---{view} Information".format(view=view))
-            sql_out.append("\n,".join(sorted(list(fields))))
+            sql_out.append("\n,".join(sorted(list(fields.values()))))
             after_select = False
 
         source_table_sql = "FROM {table} AS {table_alias}".format(table=self.sql_table_name, table_alias=self.table_alias)

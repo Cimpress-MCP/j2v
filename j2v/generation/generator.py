@@ -23,15 +23,12 @@ class Generator:
         self.table_alias = table_alias
         self.handle_null_values_in_sql = handle_null_values_in_sql
         self.all_joins = []
-        self.dim_sql_definitions = defaultdict(set)
-        self.dim_names = defaultdict(set)
-        self.fields = defaultdict(defaultdict)
+        self.dimension_sql = defaultdict(defaultdict)
 
     def clean(self):
         self.explore_joins = {}
         self.ops = 0
         self.all_joins = []
-        self.dim_sql_definitions = defaultdict(set)
 
     def collect_all_paths(self, current_dict, current_path=None, current_view=None, root_view=None, group_label=None):
         """
@@ -156,13 +153,12 @@ class Generator:
         dimension_name_final = "_".join(nice_dimension_name)
 
         sql_select = self._build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
-        self.fields[current_view][dimension_name_final] = sql_select
 
         # check for duplicate dimension name in current view by checking the sql definitions in the same view
-        if dimension_name_final in self.dim_names[current_view] and sql_select not in self.dim_sql_definitions[current_view]:
+        if dimension_name_final in self.dimension_sql[current_view] and sql_select not in self.dimension_sql[current_view][dimension_name_final]:
             dimension_name_final = "_".join(["" if len(name_elements) == 1 else name_elements[0], dimension_name_final])
 
-        self.dim_names[current_view].add(dimension_name_final)
+        self.dimension_sql[current_view][dimension_name_final] = sql_select
 
         if dim_type == "time" and json_type == "timestamp":
             new_dimension = lt.dimension_time_group_str_template.format(
@@ -178,7 +174,6 @@ class Generator:
                                                              group_label_string=group_label_string)
 
         self.dim_definitions[current_view].add(new_dimension)
-        self.dim_sql_definitions[current_view].add(sql_select)
 
     def _build_sql_select(self, json_type, dim_type, field_path_sql, current_view, full_path_nice_upper):
         if self.handle_null_values_in_sql:
