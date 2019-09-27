@@ -1,0 +1,35 @@
+{
+  "accountName": "ADMIN",
+  "clientApplication": "JDBC 3.8.4",
+  "clientEnvironment": {
+    "APPLICATION": "JEST",
+    "JAVA_RUNTIME": "Java(TM) SE Runtime Environment",
+    "JAVA_VERSION": "1.8.0",
+    "JAVA_VM": "Java HotSpot(TM) 64-Bit Server VM",
+    "OCSP_MODE": "FAIL_OPEN",
+    "OS": "Linux",
+    "OS_VERSION": "3.10.x86_64"
+  },
+  "clientNetAddress": "11.11.11.111",
+  "currentDatabase": "JEST_RUN",
+  "currentRole": null,
+  "currentSchema": "JEST_RUN_RESULT",
+  "currentWarehouse": "SUPER_WH",
+  "databaseProvider": null,
+  "id": 123123423424,
+  "isActive": false,
+  "userDisplayName": null,
+  "userLoginName": null,
+  "userName": "SESSION_USER",
+  "ALL": {
+    "things": {
+      "id": 1,
+      "secret": {
+        "id": 2,
+        "secret_for_you": {
+          "id": 2333
+        }
+      }
+    }
+  }
+}

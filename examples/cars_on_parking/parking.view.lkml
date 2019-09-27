@@ -14,18 +14,6 @@ view: JSON_TABLE {
     sql: ${TABLE}."data_column":"payloadPrimaryKeyValue"::string ;;
   }
     
-  dimension: api_version {
-    description: "Api Version"
-    type: string
-    sql: ${TABLE}."data_column":"apiVersion"::string ;;
-  }
-    
-  dimension: data_provider {
-    description: "Data Provider"
-    type: string
-    sql: ${TABLE}."data_column":"dataProvider"::string ;;
-  }
-    
   dimension_group: data_generation_timestamp {
     description: "Data Generation Timestamp"
     type: time
@@ -39,6 +27,18 @@ view: JSON_TABLE {
         year
     ]
     sql: ${TABLE}."data_column":"dataGenerationTimestamp"::timestamp ;;
+  }
+    
+  dimension: api_version {
+    description: "Api Version"
+    type: string
+    sql: ${TABLE}."data_column":"apiVersion"::string ;;
+  }
+    
+  dimension: data_provider {
+    description: "Data Provider"
+    type: string
+    sql: ${TABLE}."data_column":"dataProvider"::string ;;
   }
     
 }
