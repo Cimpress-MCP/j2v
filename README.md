@@ -80,30 +80,23 @@ With J2V all the structures are discovered automatically and two files are gener
         {
           "dishName": "BurgerPlus",
           "price": 10,
-          "indegrients": [
-            "Meat",
-            "Cheese",
-            "Bun"
-          ]
+          "ingredients": ["Meat", "Cheese", "Bun"]
         }
       ]
     }
   ],
-  "headquater": {
+  "headquarter": {
     "employees": 36,
     "city": "Olsztyn",
     "country": "Poland",
     "building": {
       "address": "3 Maja 10",
-      "floors": [
-        1,
-        2,
-        7
-      ]
+      "floors": [1, 2, 7]
     }
   },
   "dataGenerationTimestamp": "2019-03-30T11:30:00.812Z",
-  "payloadPrimaryKeyValue": "3ab21b54-22d6-473c-b055-4430f8927d4c"
+  "payloadPrimaryKeyValue": "3ab21b54-22d6-473c-b055-4430f8927d4c",
+  "version": null
 }
 ```
 
@@ -115,38 +108,38 @@ With J2V all the structures are discovered automatically and two files are gener
 
 SELECT
 
----chains_table Information
-chains_table."raw_data_column":"apiVersion"::string AS APIVERSION
-,chains_table."raw_data_column":"data Provider"::string AS DATA_PROVIDER
-,chains_table."raw_data_column":"dataGenerationTimestamp"::string AS DATAGENERATIONTIMESTAMP
-,chains_table."raw_data_column":"headquater":"building":"address"::string AS HEADQUATER_BUILDING_ADDRESS
-,chains_table."raw_data_column":"headquater":"city"::string AS HEADQUATER_CITY
-,chains_table."raw_data_column":"headquater":"country"::string AS HEADQUATER_COUNTRY
-,chains_table."raw_data_column":"headquater":"employees"::number AS HEADQUATER_EMPLOYEES
-,chains_table."raw_data_column":"payloadPrimaryKeyValue"::string AS PAYLOADPRIMARYKEYVALUE
+---JSON_TABLE Information
+IFNULL(JSON_TABLE."DATA":"apiVersion"::string,'N/A') AS APIVERSION
+,IFNULL(JSON_TABLE."DATA":"data Provider"::string,'N/A') AS DATA_PROVIDER
+,IFNULL(JSON_TABLE."DATA":"headquarter":"building":"address"::string,'N/A') AS HEADQUARTER_BUILDING_ADDRESS
+,IFNULL(JSON_TABLE."DATA":"headquarter":"city"::string,'N/A') AS HEADQUARTER_CITY
+,IFNULL(JSON_TABLE."DATA":"headquarter":"country"::string,'N/A') AS HEADQUARTER_COUNTRY
+,IFNULL(JSON_TABLE."DATA":"headquarter":"employees"::number,0) AS HEADQUARTER_EMPLOYEES
+,IFNULL(JSON_TABLE."DATA":"payloadPrimaryKeyValue"::string,'N/A') AS PAYLOADPRIMARYKEYVALUE
+,IFNULL(JSON_TABLE."DATA":"version"::string,'N/A') AS VERSION
+,JSON_TABLE."DATA":"dataGenerationTimestamp"::timestamp AS DATAGENERATIONTIMESTAMP
 ,
 ---restaurants Information
-restaurants.VALUE:"address"::string AS RESTAURANTS_ADDRESS
-,restaurants.VALUE:"city"::string AS RESTAURANTS_CITY
-,restaurants.VALUE:"country"::string AS RESTAURANTS_COUNTRY
-,restaurants.VALUE:"currency"::string AS RESTAURANTS_CURRENCY
-,restaurants.VALUE:"name"::string AS RESTAURANTS_NAME
+IFNULL(restaurants.VALUE:"address"::string,'N/A') AS RESTAURANTS_ADDRESS
+,IFNULL(restaurants.VALUE:"city"::string,'N/A') AS RESTAURANTS_CITY
+,IFNULL(restaurants.VALUE:"country"::string,'N/A') AS RESTAURANTS_COUNTRY
+,IFNULL(restaurants.VALUE:"currency"::string,'N/A') AS RESTAURANTS_CURRENCY
+,IFNULL(restaurants.VALUE:"name"::string,'N/A') AS RESTAURANTS_NAME
 ,
 ---restaurants_menu Information
-restaurants_menu.VALUE:"dishName"::string AS RESTAURANTS_MENU_DISHNAME
-,restaurants_menu.VALUE:"price"::number AS RESTAURANTS_MENU_PRICE
+IFNULL(restaurants_menu.VALUE:"dishName"::string,'N/A') AS RESTAURANTS_MENU_DISHNAME
+,IFNULL(restaurants_menu.VALUE:"price"::number,0) AS RESTAURANTS_MENU_PRICE
 ,
----restaurants_menu_indegrients Information
-restaurants_menu_indegrients.VALUE::string AS RESTAURANTS_MENU_INDEGRIENTS_VALUE
+---restaurants_menu_ingredients Information
+IFNULL(restaurants_menu_ingredients.VALUE::string,'N/A') AS RESTAURANTS_MENU_INGREDIENTS_VALUE
 ,
----headquater_building_floors Information
-headquater_building_floors.VALUE::number AS HEADQUATER_BUILDING_FLOORS_VALUE
-FROM chains_table,
-LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."raw_data_column":"restaurants") restaurants
+---headquarter_building_floors Information
+IFNULL(headquarter_building_floors.VALUE::number,0) AS HEADQUARTER_BUILDING_FLOORS_VALUE
+FROM RESTAURANT_DETAILS AS JSON_TABLE,
+LATERAL FLATTEN(OUTER => TRUE, INPUT => JSON_TABLE."DATA":"restaurants") restaurants
 ,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants.VALUE:"menu") restaurants_menu
-,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants_menu.VALUE:"indegrients") restaurants_menu_indegrients
-,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."raw_data_column":"headquater":"building":"floors") headquater_building_floors
-
+,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants_menu.VALUE:"ingredients") restaurants_menu_ingredients
+,LATERAL FLATTEN(OUTER => TRUE, INPUT => JSON_TABLE."DATA":"headquarter":"building":"floors") headquarter_building_floors
 
 ```
 
@@ -156,67 +149,90 @@ LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."raw_data_column":"restaura
 
 ```LookML
 
+view: JSON_TABLE { 
+  sql_table_name: RESTAURANT_DETAILS ;;
 
-
-view: chains_table { 
-  sql_table_name: chains_table ;;
-
-  dimension: city {
-    description: "City"
+  dimension: country {
+    description: "Country"
     type: string
-    sql: ${TABLE}."raw_data_column":"headquater":"city"::string ;;
-  }
-    
-  dimension: provider {
-    description: "Provider"
-    type: string
-    sql: ${TABLE}."raw_data_column":"data Provider"::string ;;
-  }
-    
-  dimension: building_address {
-    description: "Building Address"
-    type: string
-    sql: ${TABLE}."raw_data_column":"headquater":"building":"address"::string ;;
-  }
-    
-  dimension: payload_primary_key_value {
-    description: "Payload Primary Key Value"
-    type: string
-    sql: ${TABLE}."raw_data_column":"payloadPrimaryKeyValue"::string ;;
-  }
-    
-  dimension: data_generation_timestamp {
-    description: "Data Generation Timestamp"
-    type: date_time
-    sql: ${TABLE}."raw_data_column":"dataGenerationTimestamp"::string ;;
-  }
-    
-  dimension: api_version {
-    description: "Api Version"
-    type: string
-    sql: ${TABLE}."raw_data_column":"apiVersion"::string ;;
+    sql: ${TABLE}."DATA":"headquarter":"country"::string ;;
+	group_label:"headquarter"
   }
     
   dimension: employees {
     description: "Employees"
     type: number
-    sql: ${TABLE}."raw_data_column":"headquater":"employees"::number ;;
+    sql: ${TABLE}."DATA":"headquarter":"employees"::number ;;
+	group_label:"headquarter"
   }
     
-  dimension: country {
-    description: "Country"
+  dimension: building_address {
+    description: "Building Address"
     type: string
-    sql: ${TABLE}."raw_data_column":"headquater":"country"::string ;;
+    sql: ${TABLE}."DATA":"headquarter":"building":"address"::string ;;
+	group_label:"building"
+  }
+    
+  dimension: provider {
+    description: "Provider"
+    type: string
+    sql: ${TABLE}."DATA":"data Provider"::string ;;
+  }
+    
+  dimension: city {
+    description: "City"
+    type: string
+    sql: ${TABLE}."DATA":"headquarter":"city"::string ;;
+	group_label:"headquarter"
+  }
+    
+  dimension: version {
+    description: "Version"
+    type: string
+    sql: ${TABLE}."DATA":"version"::string ;;
+  }
+    
+  dimension: payload_primary_key_value {
+    description: "Payload Primary Key Value"
+    type: string
+    sql: ${TABLE}."DATA":"payloadPrimaryKeyValue"::string ;;
+  }
+    
+  dimension: api_version {
+    description: "Api Version"
+    type: string
+    sql: ${TABLE}."DATA":"apiVersion"::string ;;
+  }
+    
+  dimension_group: data_generation_timestamp {
+    description: "Data Generation Timestamp"
+    type: time
+    timeframes: [
+        raw,
+        time,
+        date,
+        week,
+        month,
+        quarter,
+        year
+    ]
+    sql: ${TABLE}."DATA":"dataGenerationTimestamp"::timestamp ;;
   }
     
 }
 
 view: restaurants { 
 
-  dimension: country {
-    description: "Country"
+  dimension: currency {
+    description: "Currency"
     type: string
-    sql: ${TABLE}.VALUE:"country"::string ;;
+    sql: ${TABLE}.VALUE:"currency"::string ;;
+  }
+    
+  dimension: city {
+    description: "City"
+    type: string
+    sql: ${TABLE}.VALUE:"city"::string ;;
   }
     
   dimension: address {
@@ -225,22 +241,16 @@ view: restaurants {
     sql: ${TABLE}.VALUE:"address"::string ;;
   }
     
-  dimension: currency {
-    description: "Currency"
-    type: string
-    sql: ${TABLE}.VALUE:"currency"::string ;;
-  }
-    
   dimension: name {
     description: "Name"
     type: string
     sql: ${TABLE}.VALUE:"name"::string ;;
   }
     
-  dimension: city {
-    description: "City"
+  dimension: country {
+    description: "Country"
     type: string
-    sql: ${TABLE}.VALUE:"city"::string ;;
+    sql: ${TABLE}.VALUE:"country"::string ;;
   }
     
 }
@@ -261,17 +271,17 @@ view: restaurants_menu {
     
 }
 
-view: restaurants_menu_indegrients { 
+view: restaurants_menu_ingredients { 
 
-  dimension: menu_indegrients_value {
-    description: "Menu Indegrients Value"
+  dimension: menu_ingredients_value {
+    description: "Menu Ingredients Value"
     type: string
     sql: ${TABLE}.VALUE::string ;;
   }
     
 }
 
-view: headquater_building_floors { 
+view: headquarter_building_floors { 
 
   dimension: building_floors_value {
     description: "Building Floors Value"
@@ -281,23 +291,22 @@ view: headquater_building_floors {
     
 }
 
-
 ```
 
 ##### Explore file:
 
 ```LookML
-include: "restaurant_chain.view"
+include: "restaurant_chain.view.lkml"
    
-explore: chains_table {
-  view_name: chains_table
-  from: chains_table
-  label: "chains_table explore"
-  description: "chains_table explore"
+explore: JSON_TABLE {
+  view_name: JSON_TABLE
+  from: JSON_TABLE
+  label: "JSON_TABLE explore"
+  description: "JSON_TABLE explore"
 
   join: restaurants {
      from: restaurants
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."raw_data_column":"restaurants") restaurants;;
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => JSON_TABLE."DATA":"restaurants") restaurants;;
      relationship: one_to_many 
   }
   
@@ -308,19 +317,18 @@ explore: chains_table {
      required_joins: [restaurants]
   }
   
-  join: restaurants_menu_indegrients {
-     from: restaurants_menu_indegrients
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants_menu.VALUE:"indegrients") restaurants_menu_indegrients;;
+  join: restaurants_menu_ingredients {
+     from: restaurants_menu_ingredients
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants_menu.VALUE:"ingredients") restaurants_menu_ingredients;;
      relationship: one_to_many 
      required_joins: [restaurants_menu]
   }
   
-  join: headquater_building_floors {
-     from: headquater_building_floors
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."raw_data_column":"headquater":"building":"floors") headquater_building_floors;;
+  join: headquarter_building_floors {
+     from: headquarter_building_floors
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => JSON_TABLE."DATA":"headquarter":"building":"floors") headquarter_building_floors;;
      relationship: one_to_many 
-  }
-  
+  } 
 }
 
 ```

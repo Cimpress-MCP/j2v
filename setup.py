@@ -8,7 +8,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 with open("README.md", "r") as fh:
     setup(
         name='j2v',
-        version='1.3.7',
+        version='1.3.8',
         author="Michal Zasadzinski, Ruthwik Ganesh",
         author_email="michal.zasadzinski@gmail.com, ruthwikganesh@gmail.com",
         description="A tool to generate Looker views and explores from sample JSONs",

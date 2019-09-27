@@ -1,11 +1,23 @@
 
-view: JSON_TABLE { 
+view: session { 
   sql_table_name: session_info ;;
 
-  dimension: ocsp_mode {
-    description: "Ocsp Mode"
+  dimension: client_net_address {
+    description: "Client Net Address"
     type: string
-    sql: ${TABLE}."session_user":"clientEnvironment":"OCSP_MODE"::string ;;
+    sql: ${TABLE}."session_user":"clientNetAddress"::string ;;
+  }
+    
+  dimension: database_provider {
+    description: "Database Provider"
+    type: string
+    sql: ${TABLE}."session_user":"databaseProvider"::string ;;
+  }
+    
+  dimension: application {
+    description: "Application"
+    type: string
+    sql: ${TABLE}."session_user":"clientEnvironment":"APPLICATION"::string ;;
 	group_label:"clientEnvironment"
   }
     
@@ -16,10 +28,10 @@ view: JSON_TABLE {
 	group_label:"clientEnvironment"
   }
     
-  dimension: current_database {
-    description: "Current Database"
-    type: string
-    sql: ${TABLE}."session_user":"currentDatabase"::string ;;
+  dimension: id {
+    description: "Id"
+    type: number
+    sql: ${TABLE}."session_user":"id"::number ;;
   }
     
   dimension: os_version {
@@ -29,10 +41,11 @@ view: JSON_TABLE {
 	group_label:"clientEnvironment"
   }
     
-  dimension: database_provider {
-    description: "Database Provider"
+  dimension: ocsp_mode {
+    description: "Ocsp Mode"
     type: string
-    sql: ${TABLE}."session_user":"databaseProvider"::string ;;
+    sql: ${TABLE}."session_user":"clientEnvironment":"OCSP_MODE"::string ;;
+	group_label:"clientEnvironment"
   }
     
   dimension: current_warehouse {
@@ -41,10 +54,10 @@ view: JSON_TABLE {
     sql: ${TABLE}."session_user":"currentWarehouse"::string ;;
   }
     
-  dimension: client_application {
-    description: "Client Application"
+  dimension: current_role {
+    description: "Current Role"
     type: string
-    sql: ${TABLE}."session_user":"clientApplication"::string ;;
+    sql: ${TABLE}."session_user":"currentRole"::string ;;
   }
     
   dimension: java_runtime {
@@ -54,30 +67,10 @@ view: JSON_TABLE {
 	group_label:"clientEnvironment"
   }
     
-  dimension: java_vm {
-    description: "Java Vm"
+  dimension: current_schema {
+    description: "Current Schema"
     type: string
-    sql: ${TABLE}."session_user":"clientEnvironment":"JAVA_VM"::string ;;
-	group_label:"clientEnvironment"
-  }
-    
-  dimension: application {
-    description: "Application"
-    type: string
-    sql: ${TABLE}."session_user":"clientEnvironment":"APPLICATION"::string ;;
-	group_label:"clientEnvironment"
-  }
-    
-  dimension: user_name {
-    description: "User Name"
-    type: string
-    sql: ${TABLE}."session_user":"userName"::string ;;
-  }
-    
-  dimension: client_net_address {
-    description: "Client Net Address"
-    type: string
-    sql: ${TABLE}."session_user":"clientNetAddress"::string ;;
+    sql: ${TABLE}."session_user":"currentSchema"::string ;;
   }
     
   dimension: user_login_name {
@@ -86,10 +79,16 @@ view: JSON_TABLE {
     sql: ${TABLE}."session_user":"userLoginName"::string ;;
   }
     
-  dimension: os {
-    description: "Os"
+  dimension: user_name {
+    description: "User Name"
     type: string
-    sql: ${TABLE}."session_user":"clientEnvironment":"OS"::string ;;
+    sql: ${TABLE}."session_user":"userName"::string ;;
+  }
+    
+  dimension: java_vm {
+    description: "Java Vm"
+    type: string
+    sql: ${TABLE}."session_user":"clientEnvironment":"JAVA_VM"::string ;;
 	group_label:"clientEnvironment"
   }
     
@@ -99,34 +98,35 @@ view: JSON_TABLE {
     sql: ${TABLE}."session_user":"userDisplayName"::string ;;
   }
     
-  dimension: is_active {
-    description: "Is Active"
-    type: yesno
-    sql: ${TABLE}."session_user":"isActive"::boolean ;;
-  }
-    
-  dimension: current_role {
-    description: "Current Role"
+  dimension: os {
+    description: "Os"
     type: string
-    sql: ${TABLE}."session_user":"currentRole"::string ;;
-  }
-    
-  dimension: id {
-    description: "Id"
-    type: number
-    sql: ${TABLE}."session_user":"id"::number ;;
-  }
-    
-  dimension: current_schema {
-    description: "Current Schema"
-    type: string
-    sql: ${TABLE}."session_user":"currentSchema"::string ;;
+    sql: ${TABLE}."session_user":"clientEnvironment":"OS"::string ;;
+	group_label:"clientEnvironment"
   }
     
   dimension: account_name {
     description: "Account Name"
     type: string
     sql: ${TABLE}."session_user":"accountName"::string ;;
+  }
+    
+  dimension: current_database {
+    description: "Current Database"
+    type: string
+    sql: ${TABLE}."session_user":"currentDatabase"::string ;;
+  }
+    
+  dimension: is_active {
+    description: "Is Active"
+    type: yesno
+    sql: ${TABLE}."session_user":"isActive"::boolean ;;
+  }
+    
+  dimension: client_application {
+    description: "Client Application"
+    type: string
+    sql: ${TABLE}."session_user":"clientApplication"::string ;;
   }
     
 }
