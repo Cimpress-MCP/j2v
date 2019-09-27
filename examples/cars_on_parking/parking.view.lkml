@@ -2,10 +2,22 @@
 view: JSON_TABLE { 
   sql_table_name: parking_table ;;
 
+  dimension: api_version {
+    description: "Api Version"
+    type: string
+    sql: ${TABLE}."data_column":"apiVersion"::string ;;
+  }
+    
   dimension: client {
     description: "Client"
     type: string
     sql: ${TABLE}."data_column":"client"::string ;;
+  }
+    
+  dimension: data_provider {
+    description: "Data Provider"
+    type: string
+    sql: ${TABLE}."data_column":"dataProvider"::string ;;
   }
     
   dimension: payload_primary_key_value {
@@ -27,18 +39,6 @@ view: JSON_TABLE {
         year
     ]
     sql: ${TABLE}."data_column":"dataGenerationTimestamp"::timestamp ;;
-  }
-    
-  dimension: api_version {
-    description: "Api Version"
-    type: string
-    sql: ${TABLE}."data_column":"apiVersion"::string ;;
-  }
-    
-  dimension: data_provider {
-    description: "Data Provider"
-    type: string
-    sql: ${TABLE}."data_column":"dataProvider"::string ;;
   }
     
 }

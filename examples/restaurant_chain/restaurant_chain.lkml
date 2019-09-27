@@ -1,14 +1,14 @@
 include: "restaurant_chain.view.lkml"
    
-explore: JSON_TABLE {
-  view_name: JSON_TABLE
-  from: JSON_TABLE
-  label: "JSON_TABLE explore"
-  description: "JSON_TABLE explore"
+explore: chains_table {
+  view_name: chains_table
+  from: chains_table
+  label: "chains_table explore"
+  description: "chains_table explore"
 
   join: restaurants {
      from: restaurants
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => JSON_TABLE."DATA":"restaurants") restaurants;;
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."DATA":"restaurants") restaurants;;
      relationship: one_to_many 
   }
   
@@ -28,7 +28,7 @@ explore: JSON_TABLE {
   
   join: headquarter_building_floors {
      from: headquarter_building_floors
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => JSON_TABLE."DATA":"headquarter":"building":"floors") headquarter_building_floors;;
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."DATA":"headquarter":"building":"floors") headquarter_building_floors;;
      relationship: one_to_many 
   }
   
