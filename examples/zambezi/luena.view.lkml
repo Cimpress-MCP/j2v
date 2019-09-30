@@ -12,7 +12,7 @@ view: LUEANA_LATEST {
     description: "Id"
     type: string
     sql: ${TABLE}."JSON":"_datalakeMetadata":"id"::string ;;
-	group_label:"_datalakeMetadata"
+    group_label:"_datalakeMetadata"
   }
     
   dimension: is_active {
@@ -37,14 +37,14 @@ view: LUEANA_LATEST {
     description: "Principal"
     type: string
     sql: ${TABLE}."JSON":"_datalakeMetadata":"principal"::string ;;
-	group_label:"_datalakeMetadata"
+    group_label:"_datalakeMetadata"
   }
     
   dimension: stream_id {
     description: "Stream Id"
     type: string
     sql: ${TABLE}."JSON":"_datalakeMetadata":"streamId"::string ;;
-	group_label:"_datalakeMetadata"
+    group_label:"_datalakeMetadata"
   }
     
   dimension: transaction_id {

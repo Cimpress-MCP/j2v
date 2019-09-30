@@ -62,6 +62,6 @@ def test_replaces_nulls_values_in_json(json_data, prefix, suffix):
     """
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=True)
     g.collect_all_paths(current_dict={ORDERS_TABLE_NAME: json_data})
-    for column_def in g.dim_sql_definitions[ORDERS_TABLE_NAME]:
+    for column_def in g.dim_sql_definitions[ORDERS_TABLE_NAME].values():
         assert column_def.startswith(prefix)
         assert suffix in column_def

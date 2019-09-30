@@ -12,28 +12,28 @@ view: chains_table {
     description: "Building Address"
     type: string
     sql: ${TABLE}."DATA":"headquarter":"building":"address"::string ;;
-	group_label:"building"
+    group_label:"building"
   }
     
   dimension: city {
     description: "City"
     type: string
     sql: ${TABLE}."DATA":"headquarter":"city"::string ;;
-	group_label:"headquarter"
+    group_label:"headquarter"
   }
     
   dimension: country {
     description: "Country"
     type: string
     sql: ${TABLE}."DATA":"headquarter":"country"::string ;;
-	group_label:"headquarter"
+    group_label:"headquarter"
   }
     
   dimension: employees {
     description: "Employees"
     type: number
     sql: ${TABLE}."DATA":"headquarter":"employees"::number ;;
-	group_label:"headquarter"
+    group_label:"headquarter"
   }
     
   dimension: payload_primary_key_value {
