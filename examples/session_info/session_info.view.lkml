@@ -12,7 +12,7 @@ view: session {
     description: "Application"
     type: string
     sql: ${TABLE}."session_user":"clientEnvironment":"APPLICATION"::string ;;
-	group_label:"clientEnvironment"
+    group_label:"clientEnvironment"
   }
     
   dimension: client_application {
@@ -73,63 +73,63 @@ view: session {
     description: "Java Runtime"
     type: string
     sql: ${TABLE}."session_user":"clientEnvironment":"JAVA_RUNTIME"::string ;;
-	group_label:"clientEnvironment"
+    group_label:"clientEnvironment"
   }
     
   dimension: java_version {
     description: "Java Version"
     type: string
     sql: ${TABLE}."session_user":"clientEnvironment":"JAVA_VERSION"::string ;;
-	group_label:"clientEnvironment"
+    group_label:"clientEnvironment"
   }
     
   dimension: java_vm {
     description: "Java Vm"
     type: string
     sql: ${TABLE}."session_user":"clientEnvironment":"JAVA_VM"::string ;;
-	group_label:"clientEnvironment"
+    group_label:"clientEnvironment"
   }
     
   dimension: ocsp_mode {
     description: "Ocsp Mode"
     type: string
     sql: ${TABLE}."session_user":"clientEnvironment":"OCSP_MODE"::string ;;
-	group_label:"clientEnvironment"
+    group_label:"clientEnvironment"
   }
     
   dimension: os {
     description: "Os"
     type: string
     sql: ${TABLE}."session_user":"clientEnvironment":"OS"::string ;;
-	group_label:"clientEnvironment"
+    group_label:"clientEnvironment"
   }
     
   dimension: os_version {
     description: "Os Version"
     type: string
     sql: ${TABLE}."session_user":"clientEnvironment":"OS_VERSION"::string ;;
-	group_label:"clientEnvironment"
+    group_label:"clientEnvironment"
   }
     
   dimension: things_id {
     description: "Things Id"
     type: number
     sql: ${TABLE}."session_user":"ALL":"things":"id"::number ;;
-	group_label:"things"
+    group_label:"things"
   }
     
   dimension: things_secret_id {
     description: "Things Secret Id"
     type: number
     sql: ${TABLE}."session_user":"ALL":"things":"secret":"id"::number ;;
-	group_label:"secret"
+    group_label:"secret"
   }
     
   dimension: things_secret_secret_for_you_id {
     description: "Things Secret Secret For You Id"
     type: number
     sql: ${TABLE}."session_user":"ALL":"things":"secret":"secret_for_you":"id"::number ;;
-	group_label:"secret_for_you"
+    group_label:"secret_for_you"
   }
     
   dimension: user_display_name {

@@ -148,7 +148,7 @@ class Generator:
         nice_description = map(lambda _: _.capitalize(), results)
         nice_dimension_name = map(lambda _: _.lower(), results)
 
-        group_label_string = "\n\t{}:\"{}\"".format("group_label", group_label) if group_label is not None else ""
+        group_label_string = "\n    {}:\"{}\"".format("group_label", group_label) if group_label is not None else ""
 
         dimension_name_final = "_".join(nice_dimension_name)
 
