@@ -19,7 +19,7 @@ def test_empty():
     """
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False)
     g.collect_all_paths(current_dict={})
-    assert not g.views_dimensions_expr
+    assert not g.dim_definitions
     assert not g.explore_joins
 
 
@@ -30,7 +30,7 @@ def test_int_key():
     """
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False)
     g.collect_all_paths(current_dict={1: 2})
-    assert not g.views_dimensions_expr
+    assert not g.dim_definitions
     assert not g.explore_joins
 
 
@@ -41,9 +41,9 @@ def test_one_array():
     """
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False)
     g.collect_all_paths(current_dict={ORDERS_TABLE_NAME: [{"id": 3}, {"id": 334}]})
-    assert ORDERS_TABLE_NAME in g.views_dimensions_expr
-    assert 1 == len(g.views_dimensions_expr["orders"])
-    assert "id" in list(g.views_dimensions_expr["orders"])[0]
+    assert ORDERS_TABLE_NAME in g.dim_definitions
+    assert 1 == len(g.dim_definitions["orders"])
+    assert "id" in list(g.dim_definitions["orders"])[0]
     assert 1 == len(g.explore_joins)
 
 
@@ -62,6 +62,6 @@ def test_replaces_nulls_values_in_json(json_data, prefix, suffix):
     """
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=True)
     g.collect_all_paths(current_dict={ORDERS_TABLE_NAME: json_data})
-    for column_def in g.all_fields[ORDERS_TABLE_NAME]:
+    for column_def in g.dim_sql_definitions[ORDERS_TABLE_NAME]:
         assert column_def.startswith(prefix)
         assert suffix in column_def

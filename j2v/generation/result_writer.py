@@ -5,7 +5,7 @@ class LookerWriter:
     def __init__(self, output_explore_file_name, output_view_file_name,
                  sql_table_name, table_alias):
         self.output_explore_file_name = output_explore_file_name
-        self.output_view_file_name = output_view_file_name+".view.lkml"
+        self.output_view_file_name = output_view_file_name + ".view.lkml"
         self.sql_table_name = sql_table_name
         self.table_alias = table_alias
 
@@ -30,7 +30,7 @@ class LookerWriter:
                 source_table = """\n  sql_table_name: {sql_table} ;;""".format(sql_table=self.sql_table_name)
 
             views_out.append(lt.view_start_str_template.format(name=view, base_table=source_table))
-            views_out.extend(dimensions)
+            views_out.extend(sorted(list(dimensions)))
             views_out.append(lt.view_end_str)
         return "".join(views_out)
 
@@ -76,16 +76,18 @@ class SQLWriter:
         sql_out = list()
 
         sql_out.append("SELECT")
-
-        after_select = True
+        afterSelect = True
         for view, fields in all_fields.items():
-            sql_out.append(("," if not after_select else "") + "\n---{view} Information".format(view=view))
-            sql_out.append("\n,".join(sorted(list(fields))))
-            after_select = False
+            if not afterSelect:
+                sql_out[-1] += ","
+            sql_out.append("---{view} Information".format(view=view))
+            sql_out.append(",\n".join(sorted(list(fields.values()))))
+            afterSelect = False
 
-        source_table_sql = "FROM {table} AS {table_alias}".format(table=self.sql_table_name, table_alias=self.table_alias)
+        source_table_sql = "FROM {table} AS {table_alias}".format(table=self.sql_table_name,
+                                                                  table_alias=self.table_alias)
         if all_joins:
             source_table_sql += ","
         sql_out.append(source_table_sql)
-        sql_out.append("\n,".join(all_joins))
+        sql_out.append(",\n".join(all_joins))
         return "\n".join(sql_out)
