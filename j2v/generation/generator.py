@@ -23,7 +23,7 @@ class Generator:
         self.table_alias = table_alias
         self.handle_null_values_in_sql = handle_null_values_in_sql
         self.all_joins = []
-        self.dimension_sql = defaultdict(defaultdict)
+        self.dim_sql_definitions = defaultdict(defaultdict)
 
     def clean(self):
         self.explore_joins = {}
@@ -155,10 +155,10 @@ class Generator:
         sql_select = self._build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
 
         # check for duplicate dimension name in current view by checking the sql definitions in the same view
-        if dimension_name_final in self.dimension_sql[current_view] and sql_select not in self.dimension_sql[current_view][dimension_name_final]:
+        if dimension_name_final in self.dim_sql_definitions[current_view] and sql_select not in self.dim_sql_definitions[current_view][dimension_name_final]:
             dimension_name_final = "_".join(["" if len(name_elements) == 1 else name_elements[0], dimension_name_final])
 
-        self.dimension_sql[current_view][dimension_name_final] = sql_select
+        self.dim_sql_definitions[current_view][dimension_name_final] = sql_select
 
         if dim_type == "time" and json_type == "timestamp":
             new_dimension = lt.dimension_time_group_str_template.format(
