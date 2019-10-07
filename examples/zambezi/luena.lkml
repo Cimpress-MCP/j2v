@@ -1,14 +1,14 @@
 include: "luena.view.lkml"
    
-explore: lueana_latest {
-  view_name: lueana_latest
-  from: lueana_latest
-  label: "lueana_latest explore"
-  description: "lueana_latest explore"
+explore: LUEANA_LATEST {
+  view_name: LUEANA_LATEST
+  from: LUEANA_LATEST
+  label: "LUEANA_LATEST explore"
+  description: "LUEANA_LATEST explore"
 
-  join: FULFILLERSLIST {
-     from: FULFILLERSLIST
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => lueana_latest."JSON":"FULFILLERSLIST") FULFILLERSLIST;;
+  join: fulfillerList {
+     from: fulfillerList
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => LUEANA_LATEST."JSON":"fulfillerList") fulfillerList;;
      relationship: one_to_many 
   }
   

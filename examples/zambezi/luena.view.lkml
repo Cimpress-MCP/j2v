@@ -85,7 +85,7 @@ view: lueana_latest {
     
 }
 
-view: FULFILLERSLIST { 
+view: fulfillerlist { 
 
   dimension: fulfiller {
     description: "Fulfiller"

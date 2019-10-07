@@ -1,14 +1,14 @@
 include: "parking.view.lkml"
    
-explore: json_table {
-  view_name: json_table
-  from: json_table
-  label: "json_table explore"
-  description: "json_table explore"
+explore: JSON_TABLE {
+  view_name: JSON_TABLE
+  from: JSON_TABLE
+  label: "JSON_TABLE explore"
+  description: "JSON_TABLE explore"
 
   join: parkings {
      from: parkings
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => json_table."data_column":"parkings") parkings;;
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => JSON_TABLE."data_column":"parkings") parkings;;
      relationship: one_to_many 
   }
   
