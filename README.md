@@ -41,7 +41,7 @@ With J2V all the structures are discovered automatically and two files are gener
 
 ### Using all parameters
 
-`python3 main.py --json_files data1.json data2.json --output_view restaurant_chain.view --output_explore restaurant_chain.lkml --column_name raw_data --sql_table_name chains`
+`python3 main.py --json_files data1.json data2.json --output_view restaurant_chain --output_explore restaurant_chain --column_name raw_data --sql_table_name chains`
 
 ### Using only mandatory parameters
 

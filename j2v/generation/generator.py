@@ -55,7 +55,7 @@ class Generator:
                 relative_path = current_path + ":" + doublequote(key)
                 self.collect_all_paths(value, relative_path, current_view, root_view, key)
             elif is_non_empty_1D_list(value):
-                new_view_name = self.__get_full_path_str(current_view, current_path, key)
+                new_view_name = self.__get_full_path_str(current_view, current_path, key).lower()
                 sample_element = value[0]
                 if is_dict(sample_element):
                     self.__add_explore_join(new_view_name, current_view, key, current_path)
