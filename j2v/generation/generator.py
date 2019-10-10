@@ -10,7 +10,7 @@ ELEMENT_ACCESS_STR = generator_config['ELEMENT_ACCESS_STR']
 
 
 class Generator:
-    def __init__(self, column_name, table_alias, handle_null_values_in_sql):
+    def __init__(self, column_name, table_alias, handle_null_values_in_sql, primary_key=None):
         """
         Init empty lists and ops counter.
         """
@@ -21,6 +21,7 @@ class Generator:
         self.maximum_naming_levels = 1
         self.column_name = column_name
         self.table_alias = table_alias
+        self.primary_key = primary_key
         self.handle_null_values_in_sql = handle_null_values_in_sql
         self.all_joins = []
         self.dim_sql_definitions = defaultdict(defaultdict)
@@ -55,7 +56,7 @@ class Generator:
                 relative_path = current_path + ":" + doublequote(key)
                 self.collect_all_paths(value, relative_path, current_view, root_view, key)
             elif is_non_empty_1D_list(value):
-                new_view_name = self.__get_full_path_str(current_view, current_path, key)
+                new_view_name = self.__get_full_path_str(current_view, current_path, key).lower()
                 sample_element = value[0]
                 if is_dict(sample_element):
                     self.__add_explore_join(new_view_name, current_view, key, current_path)
@@ -120,8 +121,8 @@ class Generator:
         if join_statement not in self.all_joins:
             self.all_joins.append(join_statement)
 
-    def __add_dimension(self, field_path_sql, current_view, dimension_name, dim_val, group_label,
-                        primitive_array=False):
+    def __add_dimension(self, field_path_sql, current_view, dimension_name, dim_val,
+                        group_label, primitive_array=False):
         """
         :param field_path_sql:
         :param current_view:
@@ -152,6 +153,8 @@ class Generator:
 
         dimension_name_final = "_".join(nice_dimension_name)
 
+        primary_key_field = "\n    primary_key: yes" if self.primary_key is not None and dimension_name_final in self.primary_key else ""
+
         sql_select = self._build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
 
         # check for duplicate dimension name in current view by checking the sql definitions in the same view
@@ -169,6 +172,7 @@ class Generator:
         else:
             new_dimension = lt.dimension_str_template.format(__dimension_name=dimension_name_final,
                                                              __desc=" ".join(nice_description),
+                                                             primary_key_field=primary_key_field,
                                                              __path=field_path_sql,
                                                              looker_type=dim_type, json_type=json_type,
                                                              group_label_string=group_label_string)

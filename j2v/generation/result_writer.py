@@ -28,7 +28,7 @@ class LookerWriter:
             source_table = ""
             if view == self.table_alias:
                 source_table = """\n  sql_table_name: {sql_table} ;;""".format(sql_table=self.sql_table_name)
-            views_out.append(lt.view_start_str_template.format(name=view.lower(), base_table=source_table))
+            views_out.append(lt.view_start_str_template.format(name=view, base_table=source_table))
             views_out.extend(sorted(list(dimensions)))
             views_out.append(lt.view_end_str)
         return "".join(views_out)
