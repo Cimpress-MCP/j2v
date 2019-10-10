@@ -100,6 +100,7 @@ class Generator:
         :return:
         """
 
+        key = key.lower()
         required_joins_line = lt.req_joins_str_template.format(required_join=current_view)
         join_path = current_view + ":" + current_path + ":" + doublequote(key)
 
