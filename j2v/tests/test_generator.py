@@ -28,7 +28,8 @@ def test_int_key():
     Int key in JSON should be ignored
     :return:
     """
-    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False)
+    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
+                  primary_key=None)
     g.collect_all_paths(current_dict={1: 2})
     assert not g.dim_definitions
     assert not g.explore_joins
@@ -39,7 +40,8 @@ def test_one_array():
     Exactly 1 view should be created with 1 dimension, and one LATERAL FLATTEN expression
     :return:
     """
-    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False)
+    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
+                  primary_key=None)
     g.collect_all_paths(current_dict={ORDERS_TABLE_NAME: [{"id": 3}, {"id": 334}]})
     assert ORDERS_TABLE_NAME in g.dim_definitions
     assert 1 == len(g.dim_definitions["orders"])
@@ -51,8 +53,10 @@ def test_one_array():
     "json_data, prefix, suffix",
     [
         pytest.param([{"id": 3}, {"id": 334}], IF_NULL_PREFIX, NUMERIC_SUFFIX, id="replace null integer values with 0"),
-        pytest.param([{"price_1": 3.01}, {"price_2": 3.34}], IF_NULL_PREFIX, NUMERIC_SUFFIX, id="replace null float values with 0"),
-        pytest.param([{"name": "P Sherman"}, {"address": "42 Wallaby Way, Sydney"}], IF_NULL_PREFIX, STRING_SUFFIX, id="replace null string values with N/A"),
+        pytest.param([{"price_1": 3.01}, {"price_2": 3.34}], IF_NULL_PREFIX, NUMERIC_SUFFIX,
+                     id="replace null float values with 0"),
+        pytest.param([{"name": "P Sherman"}, {"address": "42 Wallaby Way, Sydney"}], IF_NULL_PREFIX, STRING_SUFFIX,
+                     id="replace null string values with N/A"),
 
     ],
 )

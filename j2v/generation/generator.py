@@ -10,7 +10,7 @@ ELEMENT_ACCESS_STR = generator_config['ELEMENT_ACCESS_STR']
 
 
 class Generator:
-    def __init__(self, column_name, table_alias, handle_null_values_in_sql):
+    def __init__(self, column_name, table_alias, handle_null_values_in_sql, primary_key):
         """
         Init empty lists and ops counter.
         """
@@ -24,6 +24,7 @@ class Generator:
         self.handle_null_values_in_sql = handle_null_values_in_sql
         self.all_joins = []
         self.dim_sql_definitions = defaultdict(defaultdict)
+        self.primary_key = primary_key
 
     def clean(self):
         self.explore_joins = {}
@@ -152,6 +153,8 @@ class Generator:
 
         dimension_name_final = "_".join(nice_dimension_name)
 
+        primary_key_field = "\n    primary_key: yes" if self.primary_key is not None and dimension_name in self.primary_key else ""
+
         sql_select = self._build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
 
         # check for duplicate dimension name in current view by checking the sql definitions in the same view
@@ -169,6 +172,7 @@ class Generator:
         else:
             new_dimension = lt.dimension_str_template.format(__dimension_name=dimension_name_final,
                                                              __desc=" ".join(nice_description),
+                                                             primary_key_field=primary_key_field,
                                                              __path=field_path_sql,
                                                              looker_type=dim_type, json_type=json_type,
                                                              group_label_string=group_label_string)

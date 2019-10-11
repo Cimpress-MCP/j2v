@@ -10,6 +10,7 @@ view: LUEANA_LATEST {
     
   dimension: id {
     description: "Id"
+    primary_key: yes
     type: string
     sql: ${TABLE}."JSON":"_datalakeMetadata":"id"::string ;;
     group_label:"_datalakeMetadata"
