@@ -153,7 +153,7 @@ class Generator:
 
         dimension_name_final = "_".join(nice_dimension_name)
 
-        primary_key_field = "\n    primary_key: yes" if self.primary_key is not None and dimension_name in self.primary_key else ""
+        primary_key_field = "\n    primary_key: yes" if self.primary_key == dimension_name else ""
 
         sql_select = self._build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
 

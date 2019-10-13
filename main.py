@@ -20,8 +20,7 @@ if __name__ == '__main__':
                         default=generator_config['TABLE_ALIAS_DEFAULT'], )
     parser.add_argument("--handle_null_values_in_sql", nargs=argparse.OPTIONAL, type=str,
                         default=generator_config['HANDLE_NULL_VALUES_IN_SQL_DEFAULT'], )
-    parser.add_argument("--primary_key", nargs=argparse.OPTIONAL, type=str,
-                        default=None,)
+    parser.add_argument("--primary_key", nargs=argparse.OPTIONAL, type=str,)
     args = parser.parse_args()
     p = MainProcessor(column_name=args.column_name, output_explore_file_name=args.output_explore,
                       output_view_file_name=args.output_view, sql_table_name=args.sql_table_name,
