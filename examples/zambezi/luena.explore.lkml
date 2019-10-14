@@ -1,10 +1,10 @@
 include: "luena.view.lkml"
    
-explore: LUEANA_LATEST {
-  view_name: LUEANA_LATEST
-  from: LUEANA_LATEST
-  label: "LUEANA_LATEST explore"
-  description: "LUEANA_LATEST explore"
+explore: lueana_latest {
+  view_name: lueana_latest
+  from: lueana_latest
+  label: "lueana_latest explore"
+  description: "lueana_latest explore"
 
   join: fulfillerlist {
      from: fulfillerlist

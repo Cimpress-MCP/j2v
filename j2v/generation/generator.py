@@ -31,10 +31,11 @@ class Generator:
         self.ops = 0
         self.all_joins = []
 
-    def collect_all_paths(self, current_dict, current_path=None, current_view=None, root_view=None, group_label=None):
+    def collect_all_paths(self, current_dict, current_path=None, current_view=None, root_view=None,
+                          parent_object_key=None):
         """
         Recursive. Explores the data in JSON and takes appropriate actions.
-        :param group_label: group label for dimension
+        :param parent_object_key: group label for dimension
         :param current_dict: Currently processed dict
         :param current_path: Path from the root dict
         :param current_view: Currently processed view
@@ -51,7 +52,7 @@ class Generator:
             if type(key) != str:
                 continue
             if is_primitive(value) or value is None:
-                self.__add_dimension(current_path, current_view, key, value, group_label)
+                self.__add_dimension(current_path, current_view, key, value, parent_object_key)
             elif is_dict(value):
                 relative_path = current_path + ":" + doublequote(key)
                 self.collect_all_paths(value, relative_path, current_view, root_view, key)
@@ -121,14 +122,14 @@ class Generator:
         if join_statement not in self.all_joins:
             self.all_joins.append(join_statement)
 
-    def __add_dimension(self, field_path_sql, current_view, dimension_name, dim_val, group_label,
+    def __add_dimension(self, field_path_sql, current_view, dimension_name, dim_val, parent_object_key,
                         primitive_array=False):
         """
         :param field_path_sql:
         :param current_view:
         :param dimension_name:
         :param dim_val:
-        :param group_label:
+        :param parent_object_key:
         :return:
         """
         dim_type, json_type = get_dimension_types(dim_val)
@@ -146,15 +147,14 @@ class Generator:
         for element in name_elements[self.maximum_naming_levels if len(name_elements) > 1 else 0:]:
             results.extend(re.sub('(?!^)([A-Z][a-z]+)', r' \1', element).split())
 
-        nested_level = len(field_path_sql.split(":"))-1  # root is level 1
         nice_description = map(lambda _: _.capitalize(), results)
         nice_dimension_name = map(lambda _: _.lower(), results)
 
-        group_label_string = "\n    {}:\"{}\"".format("group_label", group_label) if group_label is not None else ""
+        group_label_string = "\n    {}:\"{}\"".format("group_label", parent_object_key) if parent_object_key is not None else ""
 
         dimension_name_final = "_".join(nice_dimension_name)
 
-        primary_key_field = "\n    primary_key: yes" if nested_level == 1 and self.primary_key == dimension_name else ""
+        primary_key_field = "\n    primary_key: yes" if parent_object_key is None and self.primary_key == dimension_name else ""
 
         sql_select = self._build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
 
