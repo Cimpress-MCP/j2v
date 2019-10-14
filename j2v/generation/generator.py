@@ -146,6 +146,7 @@ class Generator:
         for element in name_elements[self.maximum_naming_levels if len(name_elements) > 1 else 0:]:
             results.extend(re.sub('(?!^)([A-Z][a-z]+)', r' \1', element).split())
 
+        nested_level = len(field_path_sql.split(":"))-1  # root is level 1
         nice_description = map(lambda _: _.capitalize(), results)
         nice_dimension_name = map(lambda _: _.lower(), results)
 
@@ -153,7 +154,7 @@ class Generator:
 
         dimension_name_final = "_".join(nice_dimension_name)
 
-        primary_key_field = "\n    primary_key: yes" if self.primary_key == dimension_name else ""
+        primary_key_field = "\n    primary_key: yes" if nested_level == 1 and self.primary_key == dimension_name else ""
 
         sql_select = self._build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
 

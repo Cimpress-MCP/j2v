@@ -59,6 +59,7 @@ view: session {
     
   dimension: id {
     description: "Id"
+    primary_key: yes
     type: number
     sql: ${TABLE}."session_user":"id"::number ;;
   }
