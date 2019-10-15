@@ -103,6 +103,21 @@ view: restaurants {
     sql: ${TABLE}.VALUE:"name"::string ;;
   }
     
+  dimension_group: open_time {
+    description: "Open Time"
+    type: epoch
+    timeframes: [
+        raw,
+        time,
+        date,
+        week,
+        month,
+        quarter,
+        year
+    ]
+    sql: ${TABLE}.VALUE:"openTime"::number ;;
+  }
+    
 }
 
 view: restaurants_menu { 

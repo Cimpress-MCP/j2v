@@ -89,6 +89,14 @@ class Generator:
             self.table_alias + "_" + self.column_name + "_", "", 1)
         return full_path_nice
 
+    def get_epoch_conversion(self, epoch_lenght):
+        conversion = 1
+        if epoch_lenght == 13:
+            conversion = 10 ** 3
+        elif epoch_lenght == 16:
+            conversion = 10 ** 6
+        return "/"+str(conversion) if conversion > 1 else ""
+
     def __add_explore_join(self, new_view_name, current_view, key, current_path):
         """
 
@@ -130,7 +138,7 @@ class Generator:
         :param group_label:
         :return:
         """
-        dim_type, json_type = get_dimension_types(dim_val)
+        dim_type, json_type = get_dimension_types(dimension_name, dim_val)
         self.ops += 1
         full_path_nice = self.__get_full_path_str(current_view, field_path_sql, dimension_name)
         field_path_sql = field_path_sql + (":" if field_path_sql else "") + doublequote(dimension_name)
@@ -161,11 +169,19 @@ class Generator:
         self.dim_sql_definitions[current_view][dimension_name_final] = sql_select
 
         if dim_type == "time" and json_type == "timestamp":
-            new_dimension = lt.dimension_time_group_str_template.format(
+            new_dimension = lt.dimension_group_time_template.format(
                 __dimension_name=dimension_name_final,
                 __desc=" ".join(nice_description),
                 __path=field_path_sql,
                 looker_type=dim_type, json_type=json_type)
+
+        elif dim_type == "epoch" and json_type == "number":
+            new_dimension = lt.dimension_group_time_template.format(
+                __dimension_name=dimension_name_final,
+                __desc=" ".join(nice_description),
+                __path=field_path_sql,
+                looker_type=dim_type,
+                json_type=json_type + self.get_epoch_conversion(len(str(dim_val))))
         else:
             new_dimension = lt.dimension_str_template.format(__dimension_name=dimension_name_final,
                                                              __desc=" ".join(nice_description),
@@ -178,7 +194,7 @@ class Generator:
     def _build_sql_select(self, json_type, dim_type, field_path_sql, current_view, full_path_nice_upper):
         if self.handle_null_values_in_sql:
 
-            if json_type == "number":
+            if json_type.startswith('number'):
                 return st.non_nullable_numeric_field_str_template.format(__path=field_path_sql,
                                                                          TABLE=current_view, json_type=json_type,
                                                                          path_alias=full_path_nice_upper)

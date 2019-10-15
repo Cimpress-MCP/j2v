@@ -6,7 +6,7 @@ dimension_str_template = """
   }}
     """
 
-dimension_time_group_str_template = """
+dimension_group_time_template = """
   dimension_group: {__dimension_name} {{
     description: \"{__desc}\"
     type: {looker_type}
