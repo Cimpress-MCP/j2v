@@ -17,7 +17,7 @@ def test_empty():
     For empty JSON nothing should be created.
     :return:
     """
-    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False)
+    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,primary_key=None)
     g.collect_all_paths(current_dict={})
     assert not g.dim_definitions
     assert not g.explore_joins
@@ -64,7 +64,7 @@ def test_replaces_nulls_values_in_json(json_data, prefix, suffix):
     """"
     the appropriate null handling code should be added to all columns in all_non_null_fields
     """
-    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=True)
+    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=True,primary_key=None)
     g.collect_all_paths(current_dict={ORDERS_TABLE_NAME: json_data})
     for column_def in g.dim_sql_definitions[ORDERS_TABLE_NAME].values():
         assert column_def.startswith(prefix)
