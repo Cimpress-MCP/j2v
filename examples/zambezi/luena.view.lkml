@@ -1,6 +1,6 @@
 
-view: LUEANA_LATEST { 
-  sql_table_name: "CIMPRESS"."ZAMBEZI"."LUENA" ;;
+view: lueana_latest { 
+  sql_table_name: ZAMBEZI ;;
 
   dimension: category {
     description: "Category"
@@ -85,7 +85,7 @@ view: LUEANA_LATEST {
     
 }
 
-view: fulfillerList { 
+view: fulfillerlist { 
 
   dimension: fulfiller {
     description: "Fulfiller"

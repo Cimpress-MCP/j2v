@@ -4,6 +4,7 @@ view: chains_table {
 
   dimension: api_version {
     description: "Api Version"
+    primary_key: yes
     type: string
     sql: ${TABLE}."DATA":"apiVersion"::string ;;
   }

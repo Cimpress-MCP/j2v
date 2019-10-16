@@ -31,6 +31,7 @@ With J2V all the structures are discovered automatically and two files are gener
 * `sql_table_name`: Name of the DB table to be used (this is only used in the LookML files; no actual connection to a database will be done as part of this tool)
 * `table_alias`: Name of the table alias 
 * `column_name`: Name of the column in the DB table as specified in `sql_table_name`. (this is only used in the LookML files; no actual connection to a database will be done as part of this tool)
+* `primary_key`: Name of the primary key from JSON field
 
 ## Output
 
@@ -41,8 +42,7 @@ With J2V all the structures are discovered automatically and two files are gener
 
 ### Using all parameters
 
-`python3 main.py --json_files data1.json data2.json --output_view restaurant_chain.view --output_explore restaurant_chain.lkml --column_name raw_data --sql_table_name chains`
-
+`python main.py --json_files data1.json data2.json --output_view RESTAURANT_CHAIN --output_explore RESTAURANT_CHAIN --column_name DATA --sql_table_name RESTAURANT_DETAILS --table_alias chains_table --handle_null_values_in_sql true --primary_key apiVersion`
 ### Using only mandatory parameters
 
 `python3 main.py --json_files order_example.json order_example2.json order_example3.json`<br />
@@ -145,12 +145,12 @@ LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."DATA":"headquarter":"build
 
 ```LookML
 
-
 view: chains_table { 
   sql_table_name: RESTAURANT_DETAILS ;;
 
   dimension: api_version {
     description: "Api Version"
+    primary_key: yes
     type: string
     sql: ${TABLE}."DATA":"apiVersion"::string ;;
   }
