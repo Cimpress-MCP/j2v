@@ -15,9 +15,10 @@ HANDLE_NULL_VALUES_IN_SQL_DEFAULT = generator_config['HANDLE_NULL_VALUES_IN_SQL_
 
 class MainProcessor:
 
-    def __init__(self, column_name=COLUMN_WITH_JSONS_DEFAULT, output_explore_file_name=EXPLORE_LKML_OUT_DEFAULT,
+    def __init__(self, column_name=COLUMN_WITH_JSONS_DEFAULT,output_explore_file_name=EXPLORE_LKML_OUT_DEFAULT,
                  output_view_file_name=OUTPUT_VIEW_ML_OUT_DEFAULT, sql_table_name=TABLE_WITH_JSON_COLUMN_DEFAULT,
-                 table_alias=TABLE_ALIAS_DEFAULT, handle_null_values_in_sql=HANDLE_NULL_VALUES_IN_SQL_DEFAULT):
+                 table_alias=TABLE_ALIAS_DEFAULT, handle_null_values_in_sql=HANDLE_NULL_VALUES_IN_SQL_DEFAULT,
+                 primary_key=None):
         """
         Init empty lists and ops counter.
         """
@@ -29,7 +30,8 @@ class MainProcessor:
         self.handle_null_values_in_sql = handle_null_values_in_sql or HANDLE_NULL_VALUES_IN_SQL_DEFAULT
         self.generator = Generator(column_name=self.column_name,
                                    table_alias=self.table_alias,
-                                   handle_null_values_in_sql=self.handle_null_values_in_sql)
+                                   handle_null_values_in_sql=self.handle_null_values_in_sql,
+                                   primary_key=primary_key)
 
         self.sql_writer = SQLWriter(self.sql_table_name, self.table_alias)
         self.looker_writer = LookerWriter(self.output_explore_file_name, self.output_view_file_name,

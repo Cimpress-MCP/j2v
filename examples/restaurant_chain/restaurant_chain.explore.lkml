@@ -8,7 +8,7 @@ explore: chains_table {
 
   join: restaurants {
      from: restaurants
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."DATA":"restaurants") restaurants;;
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => CHAINS_TABLE."DATA":"restaurants") restaurants;;
      relationship: one_to_many 
   }
   
@@ -28,7 +28,7 @@ explore: chains_table {
   
   join: headquarter_building_floors {
      from: headquarter_building_floors
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."DATA":"headquarter":"building":"floors") headquarter_building_floors;;
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => CHAINS_TABLE."DATA":"headquarter":"building":"floors") headquarter_building_floors;;
      relationship: one_to_many 
   }
   

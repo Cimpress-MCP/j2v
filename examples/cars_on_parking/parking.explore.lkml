@@ -1,10 +1,10 @@
 include: "parking.view.lkml"
    
-explore: JSON_TABLE {
-  view_name: JSON_TABLE
-  from: JSON_TABLE
-  label: "JSON_TABLE explore"
-  description: "JSON_TABLE explore"
+explore: json_table {
+  view_name: json_table
+  from: json_table
+  label: "json_table explore"
+  description: "json_table explore"
 
   join: parkings {
      from: parkings
