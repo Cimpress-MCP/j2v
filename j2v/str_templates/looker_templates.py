@@ -1,14 +1,14 @@
 dimension_str_template = """
-  dimension: {__dimension_name} {{
-    description: \"{__desc}\"
+  dimension: {dimension_name} {{
+    description: \"{desc}\"
     type: {looker_type}
-    sql: ${{TABLE}}.{__path}::{json_type} ;;{group_label_string}
+    sql: ${{TABLE}}.{path}::{json_type} ;;{group_label_string}
   }}
     """
 
 dimension_group_time_template = """
-  dimension_group: {__dimension_name} {{
-    description: \"{__desc}\"{data_type_field}
+  dimension_group: {dimension_name} {{
+    description: \"{desc}\"{data_type_field}
     type: {looker_type}
     timeframes: [
         raw,
@@ -19,7 +19,7 @@ dimension_group_time_template = """
         quarter,
         year
     ]
-    sql: ${{TABLE}}.{__path}::{json_type} ;;
+    sql: ${{TABLE}}.{path}::{json_type} ;;
   }}
     """
 

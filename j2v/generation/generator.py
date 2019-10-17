@@ -14,20 +14,16 @@ class Generator:
         """
         Init empty lists and ops counter.
         """
-        self.dim_definitions = defaultdict(set)
+        self.all_joins = []
         self.explore_joins = {}
-        self.ops = 0
-        # setting for name construction, leave 1 or increment
-        self.maximum_naming_levels = 1
         self.column_name = column_name
         self.table_alias = table_alias
         self.handle_null_values_in_sql = handle_null_values_in_sql
-        self.all_joins = []
+        self.dim_definitions = defaultdict(set)
         self.dim_sql_definitions = defaultdict(defaultdict)
 
     def clean(self):
         self.explore_joins = {}
-        self.ops = 0
         self.all_joins = []
 
     def collect_all_paths(self, current_dict, current_path=None, current_view=None, root_view=None, group_label=None):
@@ -50,26 +46,26 @@ class Generator:
             if type(key) != str:
                 continue
             if is_primitive(value) or value is None:
-                self.__add_dimension(current_path, current_view, key, value, group_label)
+                self.add_dimension(current_path, current_view, key, value, group_label)
             elif is_dict(value):
-                self.maximum_naming_levels += 1
                 relative_path = current_path + ":" + doublequote(key)
                 self.collect_all_paths(value, relative_path, current_view, root_view, key)
             elif is_non_empty_1D_list(value):
-                new_view_name = self.__get_full_path_str(current_view, current_path, key)
+                new_view_name = self.get_full_path_str(current_view, current_path, key)
                 sample_element = value[0]
                 if is_dict(sample_element):
-                    self.__add_explore_join(new_view_name, current_view, key, current_path)
-                    self.collect_all_paths(current_dict=sample_element, current_path=ELEMENT_ACCESS_STR,
+                    self.add_explore_join(new_view_name, current_view, key, current_path)
+                    self.collect_all_paths(current_dict=sample_element,
+                                           current_path=ELEMENT_ACCESS_STR,
                                            current_view=new_view_name,
                                            root_view=current_view)
 
                 elif is_primitive(sample_element):
-                    self.__add_explore_join(new_view_name, current_view, key, current_path)
-                    self.__add_dimension("", new_view_name, ELEMENT_ACCESS_STR, sample_element, None,
-                                         primitive_array=True)
+                    self.add_explore_join(new_view_name, current_view, key, current_path)
+                    self.add_dimension("", new_view_name, ELEMENT_ACCESS_STR, sample_element, None,
+                                       primitive_array=True)
 
-    def __get_full_path_str(self, current_view, current_path, key):
+    def get_full_path_str(self, current_view, current_path, key):
         """
 
         :param current_view:
@@ -96,9 +92,9 @@ class Generator:
             conversion = 10 ** 3
         elif epoch_length == 16:
             conversion = 10 ** 6
-        return "/"+str(conversion) if conversion > 1 else ""
+        return "/" + str(conversion) if conversion > 1 else ""
 
-    def __add_explore_join(self, new_view_name, current_view, key, current_path):
+    def add_explore_join(self, new_view_name, current_view, key, current_path):
         """
 
         :param new_view_name:
@@ -129,9 +125,10 @@ class Generator:
         if join_statement not in self.all_joins:
             self.all_joins.append(join_statement)
 
-    def __add_dimension(self, field_path_sql, current_view, dimension_name, dim_val, group_label,
-                        primitive_array=False):
+    def add_dimension(self, field_path_sql, current_view, dimension_name, dim_val, group_label,
+                      primitive_array=False):
         """
+        :param primitive_array:
         :param field_path_sql:
         :param current_view:
         :param dimension_name:
@@ -140,16 +137,17 @@ class Generator:
         :return:
         """
         dim_type, json_type = get_dimension_types(dimension_name, dim_val)
-        full_path_nice = self.__get_full_path_str(current_view, field_path_sql, dimension_name)
+        full_path_nice = self.get_full_path_str(current_view, field_path_sql, dimension_name)
         field_path_sql = field_path_sql + (":" if field_path_sql else "") + doublequote(dimension_name)
 
         name_elements = full_path_nice.split("_")
 
-        #   explode camel cased  dimension names
+        #   explode camel cased dimension names
         results = re.sub('(?!^)([A-Z][a-z]+)', r' \1', dimension_name).split()
 
         if primitive_array:
             field_path_sql = dimension_name
+            #   add parent field name for naming 1-D array
             results.insert(0, name_elements[-2])
 
         nice_description = map(lambda _: _.capitalize(), results)
@@ -159,7 +157,7 @@ class Generator:
 
         dimension_name_final = "_".join(nice_dimension_name)
 
-        sql_select = self._build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
+        sql_select = self.build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
 
         # check for duplicate dimension name in current view by checking the sql definitions in the same view
         if dimension_name_final in self.dim_sql_definitions[current_view] and sql_select not in self.dim_sql_definitions[current_view][dimension_name_final]:
@@ -169,41 +167,48 @@ class Generator:
 
         if dim_type == "time" and json_type == "timestamp":
             new_dimension = lt.dimension_group_time_template.format(
-                __dimension_name=dimension_name_final,
-                __desc=" ".join(nice_description),
+                dimension_name=dimension_name_final,
+                desc=" ".join(nice_description),
                 data_type_field="",
-                __path=field_path_sql,
+                path=field_path_sql,
                 looker_type=dim_type,
                 json_type=json_type)
 
         elif dim_type == "epoch" and json_type == "number":
             new_dimension = lt.dimension_group_time_template.format(
-                __dimension_name=dimension_name_final,
-                __desc=" ".join(nice_description),
+                dimension_name=dimension_name_final,
+                desc=" ".join(nice_description),
                 data_type_field="\n    datatype:{}".format(dim_type),
                 looker_type="time",
-                __path=field_path_sql,
+                path=field_path_sql,
                 json_type=json_type + self.get_epoch_conversion(len(str(dim_val))))
         else:
-            new_dimension = lt.dimension_str_template.format(__dimension_name=dimension_name_final,
-                                                             __desc=" ".join(nice_description),
-                                                             __path=field_path_sql,
-                                                             looker_type=dim_type, json_type=json_type,
-                                                             group_label_string=group_label_string)
+            new_dimension = lt.dimension_str_template.format(
+                dimension_name=dimension_name_final,
+                desc=" ".join(nice_description),
+                path=field_path_sql,
+                looker_type=dim_type,
+                json_type=json_type,
+                group_label_string=group_label_string)
 
         self.dim_definitions[current_view].add(new_dimension)
 
-    def _build_sql_select(self, json_type, dim_type, field_path_sql, current_view, full_path_nice_upper):
+    def build_sql_select(self, json_type, dim_type, field_path_sql, current_view, full_path_nice_upper):
         if self.handle_null_values_in_sql:
 
             if json_type.startswith('number'):
-                return st.non_nullable_numeric_field_str_template.format(__path=field_path_sql,
-                                                                         TABLE=current_view, json_type=json_type,
-                                                                         path_alias=full_path_nice_upper)
+                return st.non_nullable_numeric_field_str_template.format(
+                    path=field_path_sql,
+                    TABLE=current_view, json_type=json_type,
+                    path_alias=full_path_nice_upper)
 
             elif json_type == "string" and dim_type != "time":
-                return st.non_nullable_text_field_str_template.format(__path=field_path_sql,
-                                                                      TABLE=current_view, json_type=json_type,
-                                                                      path_alias=full_path_nice_upper)
-        return st.field_str_template.format(__path=field_path_sql,
-                                            TABLE=current_view, json_type=json_type, path_alias=full_path_nice_upper)
+                return st.non_nullable_text_field_str_template.format(
+                    path=field_path_sql,
+                    TABLE=current_view, json_type=json_type,
+                    path_alias=full_path_nice_upper)
+        return st.field_str_template.format(
+            path=field_path_sql,
+            TABLE=current_view,
+            json_type=json_type,
+            path_alias=full_path_nice_upper)
