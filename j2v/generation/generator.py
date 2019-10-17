@@ -10,7 +10,7 @@ ELEMENT_ACCESS_STR = generator_config['ELEMENT_ACCESS_STR']
 
 
 class Generator:
-    def __init__(self, column_name, table_alias, handle_null_values_in_sql):
+    def __init__(self, column_name, table_alias, handle_null_values_in_sql, primary_key):
         """
         Init empty lists and ops counter.
         """
@@ -18,6 +18,7 @@ class Generator:
         self.explore_joins = {}
         self.column_name = column_name
         self.table_alias = table_alias
+        self.primary_key = primary_key
         self.handle_null_values_in_sql = handle_null_values_in_sql
         self.dim_definitions = defaultdict(set)
         self.dim_sql_definitions = defaultdict(defaultdict)
@@ -26,10 +27,10 @@ class Generator:
         self.explore_joins = {}
         self.all_joins = []
 
-    def collect_all_paths(self, current_dict, current_path=None, current_view=None, root_view=None, group_label=None):
+    def collect_all_paths(self, current_dict, current_path=None, current_view=None, root_view=None, parent_object_key=None):
         """
         Recursive. Explores the data in JSON and takes appropriate actions.
-        :param group_label: group label for dimension
+        :param parent_object_key: group label for dimension
         :param current_dict: Currently processed dict
         :param current_path: Path from the root dict
         :param current_view: Currently processed view
@@ -46,7 +47,7 @@ class Generator:
             if type(key) != str:
                 continue
             if is_primitive(value) or value is None:
-                self.add_dimension(current_path, current_view, key, value, group_label)
+                self.add_dimension(current_path, current_view, key, value, parent_object_key)
             elif is_dict(value):
                 relative_path = current_path + ":" + doublequote(key)
                 self.collect_all_paths(value, relative_path, current_view, root_view, key)
@@ -125,7 +126,7 @@ class Generator:
         if join_statement not in self.all_joins:
             self.all_joins.append(join_statement)
 
-    def add_dimension(self, field_path_sql, current_view, dimension_name, dim_val, group_label,
+    def add_dimension(self, field_path_sql, current_view, dimension_name, dim_val, parent_object_key,
                       primitive_array=False):
         """
         :param primitive_array:
@@ -133,7 +134,7 @@ class Generator:
         :param current_view:
         :param dimension_name:
         :param dim_val:
-        :param group_label:
+        :param parent_object_key:
         :return:
         """
         dim_type, json_type = get_dimension_types(dimension_name, dim_val)
@@ -155,9 +156,11 @@ class Generator:
         nice_description = map(lambda _: _.capitalize(), results)
         nice_dimension_name = map(lambda _: _.lower(), exploded_dim_name)
 
-        group_label_string = "\n    {}:\"{}\"".format("group_label", group_label) if group_label is not None else ""
+        group_label_string = "\n    {}:\"{}\"".format("group_label", parent_object_key) if parent_object_key is not None else ""
 
         dimension_name_final = "_".join(nice_dimension_name)
+
+        primary_key_field = "\n    primary_key: yes" if parent_object_key is None and self.primary_key == dimension_name else ""
 
         sql_select = self.build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
 
@@ -190,6 +193,7 @@ class Generator:
                 desc=" ".join(nice_description),
                 path=field_path_sql,
                 looker_type=dim_type,
+                primary_key_field=primary_key_field,
                 json_type=json_type,
                 group_label_string=group_label_string)
 
