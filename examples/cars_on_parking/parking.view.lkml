@@ -51,10 +51,31 @@ view: parkings {
     sql: ${TABLE}.VALUE:"capacity"::number ;;
   }
     
+  dimension: cars_now {
+    description: "Status Cars Now"
+    type: number
+    sql: ${TABLE}.VALUE:"status":"carsNow"::number ;;
+    group_label:"status"
+  }
+    
   dimension: id {
     description: "Id"
     type: number
     sql: ${TABLE}.VALUE:"id"::number ;;
+  }
+    
+  dimension: is_broken {
+    description: "Status Is Broken"
+    type: yesno
+    sql: ${TABLE}.VALUE:"status":"isBroken"::boolean ;;
+    group_label:"status"
+  }
+    
+  dimension: is_opened {
+    description: "Status Is Opened"
+    type: yesno
+    sql: ${TABLE}.VALUE:"status":"isOpened"::boolean ;;
+    group_label:"status"
   }
     
   dimension: name {
@@ -87,44 +108,23 @@ view: parkings {
     sql: ${TABLE}.VALUE:"priceUnit"::string ;;
   }
     
-  dimension: status_cars_now {
-    description: "Status Cars Now"
-    type: number
-    sql: ${TABLE}.VALUE:"status":"carsNow"::number ;;
-    group_label:"status"
-  }
-    
-  dimension: status_is_broken {
-    description: "Status Is Broken"
-    type: yesno
-    sql: ${TABLE}.VALUE:"status":"isBroken"::boolean ;;
-    group_label:"status"
-  }
-    
-  dimension: status_is_opened {
-    description: "Status Is Opened"
-    type: yesno
-    sql: ${TABLE}.VALUE:"status":"isOpened"::boolean ;;
-    group_label:"status"
-  }
-    
 }
 
 view: parkings_cars { 
 
-  dimension: cars_plate {
+  dimension: plate {
     description: "Cars Plate"
     type: string
     sql: ${TABLE}.VALUE:"plate"::string ;;
   }
     
-  dimension: cars_spot {
+  dimension: spot {
     description: "Cars Spot"
     type: number
     sql: ${TABLE}.VALUE:"spot"::number ;;
   }
     
-  dimension_group: cars_start_time {
+  dimension_group: start_time {
     description: "Cars Start Time"
     type: time
     timeframes: [
@@ -143,13 +143,13 @@ view: parkings_cars {
 
 view: parkings_cars_damages { 
 
-  dimension: cars_damages_side {
+  dimension: side {
     description: "Cars Damages Side"
     type: string
     sql: ${TABLE}.VALUE:"side"::string ;;
   }
     
-  dimension: cars_damages_state {
+  dimension: state {
     description: "Cars Damages State"
     type: string
     sql: ${TABLE}.VALUE:"state"::string ;;

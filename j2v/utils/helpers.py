@@ -1,43 +1,54 @@
 import datetime
 
 
-def get_dimension_types(dim_val):
+def get_dimension_types(dim_name, dim_val):
     """
-
+    :param dim_name:
     :param dim_val:
     :return:
     """
     json_type = "string"
     dim_type = "string"
-    if type(dim_val) == str:
-        dim_type = "string"
-        json_type = "string"
-        if is_str_timestamp(dim_val):
-            dim_type = "time"
-            json_type = "timestamp"
+    if type(dim_val) == str and is_str_timestamp(dim_val):
+        dim_type = "time"
+        json_type = "timestamp"
     elif type(dim_val) == bool:
         dim_type = "yesno"
         json_type = "boolean"
-    elif type(dim_val) == int or type(dim_val) == float:
+    elif type(dim_val) == int:
         dim_type = "number"
         json_type = "number"
-    elif dim_val is None:
-        dim_type = "string"
-        json_type = "string"
+        if is_unix_timestamp(dim_name, dim_val):
+            dim_type = "epoch"
+    elif type(dim_val) == float:
+        dim_type = "number"
+        json_type = "number(38, 2)"
     return dim_type, json_type
 
 
-def is_str_timestamp(potential_ts):
+def is_str_timestamp(dim_val):
     """
     Checks if a string represents a timestamp
-    :param potential_ts:
+    :param dim_val:
     :return: True only if string represents a timestamp
     """
     try:
-        datetime.datetime.strptime(potential_ts, "%Y-%m-%dT%H:%M:%S.%fZ")
-        return True
+        if datetime.datetime.strptime(dim_val, "%Y-%m-%dT%H:%M:%S.%fZ"):
+            return True
     except:
         return False
+
+
+def is_unix_timestamp(dim_name, dim_val):
+    """
+       Checks if a string represents a timestamp
+       :param dim_name:
+       :param dim_val:
+       :return: True only if string represents a timestamp
+       """
+    digits = len(str(dim_val))
+    possible_digits = {10, 13, 16}
+    return dim_val > 0 and "time" in dim_name.lower() and digits in possible_digits
 
 
 def is_non_empty_array_with_dicts(value):

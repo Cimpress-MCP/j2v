@@ -8,6 +8,7 @@
       "country": "Australia",
       "address": "Big Street 3",
       "currency": "AUD",
+      "openTime": 1571143824,
       "menu": [
         {
           "dishName": "BurgerPlus",

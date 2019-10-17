@@ -2,18 +2,17 @@
 view: chains_table { 
   sql_table_name: RESTAURANT_DETAILS ;;
 
-  dimension: api_version {
-    description: "Api Version"
-    primary_key: yes
-    type: string
-    sql: ${TABLE}."DATA":"apiVersion"::string ;;
-  }
-    
-  dimension: building_address {
+  dimension: address {
     description: "Building Address"
     type: string
     sql: ${TABLE}."DATA":"headquarter":"building":"address"::string ;;
     group_label:"building"
+  }
+    
+  dimension: api_version {
+    description: "Api Version"
+    type: string
+    sql: ${TABLE}."DATA":"apiVersion"::string ;;
   }
     
   dimension: city {
@@ -30,6 +29,12 @@ view: chains_table {
     group_label:"headquarter"
   }
     
+  dimension: data_provider {
+    description: "Provider"
+    type: string
+    sql: ${TABLE}."DATA":"data Provider"::string ;;
+  }
+    
   dimension: employees {
     description: "Employees"
     type: number
@@ -41,12 +46,6 @@ view: chains_table {
     description: "Payload Primary Key Value"
     type: string
     sql: ${TABLE}."DATA":"payloadPrimaryKeyValue"::string ;;
-  }
-    
-  dimension: provider {
-    description: "Provider"
-    type: string
-    sql: ${TABLE}."DATA":"data Provider"::string ;;
   }
     
   dimension: version {
@@ -104,17 +103,33 @@ view: restaurants {
     sql: ${TABLE}.VALUE:"name"::string ;;
   }
     
+  dimension_group: open_time {
+    description: "Open Time"
+    datatype:epoch
+    type: time
+    timeframes: [
+        raw,
+        time,
+        date,
+        week,
+        month,
+        quarter,
+        year
+    ]
+    sql: ${TABLE}.VALUE:"openTime"::number ;;
+  }
+    
 }
 
 view: restaurants_menu { 
 
-  dimension: menu_dish_name {
+  dimension: dish_name {
     description: "Menu Dish Name"
     type: string
     sql: ${TABLE}.VALUE:"dishName"::string ;;
   }
     
-  dimension: menu_price {
+  dimension: price {
     description: "Menu Price"
     type: number
     sql: ${TABLE}.VALUE:"price"::number ;;
@@ -124,7 +139,7 @@ view: restaurants_menu {
 
 view: restaurants_menu_ingredients { 
 
-  dimension: menu_ingredients_value {
+  dimension: ingredients_value {
     description: "Menu Ingredients Value"
     type: string
     sql: ${TABLE}.VALUE::string ;;
@@ -134,7 +149,7 @@ view: restaurants_menu_ingredients {
 
 view: headquarter_building_floors { 
 
-  dimension: building_floors_value {
+  dimension: floors_value {
     description: "Building Floors Value"
     type: number
     sql: ${TABLE}.VALUE::number ;;

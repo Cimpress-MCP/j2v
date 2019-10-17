@@ -112,25 +112,18 @@ view: session {
     group_label:"clientEnvironment"
   }
     
-  dimension: things_id {
-    description: "Things Id"
-    type: number
-    sql: ${TABLE}."session_user":"ALL":"things":"id"::number ;;
-    group_label:"things"
-  }
-    
-  dimension: things_secret_id {
+  dimension: secret_id {
     description: "Things Secret Id"
     type: number
     sql: ${TABLE}."session_user":"ALL":"things":"secret":"id"::number ;;
     group_label:"secret"
   }
     
-  dimension: things_secret_secret_for_you_id {
-    description: "Things Secret Secret For You Id"
+  dimension: things_id {
+    description: "Things Id"
     type: number
-    sql: ${TABLE}."session_user":"ALL":"things":"secret":"secret_for_you":"id"::number ;;
-    group_label:"secret_for_you"
+    sql: ${TABLE}."session_user":"ALL":"things":"id"::number ;;
+    group_label:"things"
   }
     
   dimension: user_display_name {
@@ -149,6 +142,13 @@ view: session {
     description: "User Name"
     type: string
     sql: ${TABLE}."session_user":"userName"::string ;;
+  }
+    
+  dimension: you_id {
+    description: "Things Secret Secret For You Id"
+    type: number
+    sql: ${TABLE}."session_user":"ALL":"things":"secret":"secret_for_you":"id"::number ;;
+    group_label:"secret_for_you"
   }
     
 }
