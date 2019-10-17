@@ -1,5 +1,5 @@
 
-view: JSON_TABLE { 
+view: json_table { 
   sql_table_name: parking_table ;;
 
   dimension: api_version {
