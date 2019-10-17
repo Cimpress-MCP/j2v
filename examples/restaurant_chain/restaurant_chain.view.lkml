@@ -3,7 +3,7 @@ view: chains_table {
   sql_table_name: RESTAURANT_DETAILS ;;
 
   dimension: address {
-    description: "Address"
+    description: "Building Address"
     type: string
     sql: ${TABLE}."DATA":"headquarter":"building":"address"::string ;;
     group_label:"building"
@@ -30,7 +30,7 @@ view: chains_table {
   }
     
   dimension: data_provider {
-    description: "Data Provider"
+    description: "Provider"
     type: string
     sql: ${TABLE}."DATA":"data Provider"::string ;;
   }
@@ -124,13 +124,13 @@ view: restaurants {
 view: restaurants_menu { 
 
   dimension: dish_name {
-    description: "Dish Name"
+    description: "Menu Dish Name"
     type: string
     sql: ${TABLE}.VALUE:"dishName"::string ;;
   }
     
   dimension: price {
-    description: "Price"
+    description: "Menu Price"
     type: number
     sql: ${TABLE}.VALUE:"price"::number ;;
   }
@@ -140,7 +140,7 @@ view: restaurants_menu {
 view: restaurants_menu_ingredients { 
 
   dimension: ingredients_value {
-    description: "Ingredients Value"
+    description: "Menu Ingredients Value"
     type: string
     sql: ${TABLE}.VALUE::string ;;
   }
@@ -150,7 +150,7 @@ view: restaurants_menu_ingredients {
 view: headquarter_building_floors { 
 
   dimension: floors_value {
-    description: "Floors Value"
+    description: "Building Floors Value"
     type: number
     sql: ${TABLE}.VALUE::number ;;
   }

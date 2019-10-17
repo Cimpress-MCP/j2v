@@ -52,7 +52,7 @@ view: parkings {
   }
     
   dimension: cars_now {
-    description: "Cars Now"
+    description: "Status Cars Now"
     type: number
     sql: ${TABLE}.VALUE:"status":"carsNow"::number ;;
     group_label:"status"
@@ -65,14 +65,14 @@ view: parkings {
   }
     
   dimension: is_broken {
-    description: "Is Broken"
+    description: "Status Is Broken"
     type: yesno
     sql: ${TABLE}.VALUE:"status":"isBroken"::boolean ;;
     group_label:"status"
   }
     
   dimension: is_opened {
-    description: "Is Opened"
+    description: "Status Is Opened"
     type: yesno
     sql: ${TABLE}.VALUE:"status":"isOpened"::boolean ;;
     group_label:"status"
@@ -113,19 +113,19 @@ view: parkings {
 view: parkings_cars { 
 
   dimension: plate {
-    description: "Plate"
+    description: "Cars Plate"
     type: string
     sql: ${TABLE}.VALUE:"plate"::string ;;
   }
     
   dimension: spot {
-    description: "Spot"
+    description: "Cars Spot"
     type: number
     sql: ${TABLE}.VALUE:"spot"::number ;;
   }
     
   dimension_group: start_time {
-    description: "Start Time"
+    description: "Cars Start Time"
     type: time
     timeframes: [
         raw,
@@ -144,13 +144,13 @@ view: parkings_cars {
 view: parkings_cars_damages { 
 
   dimension: side {
-    description: "Side"
+    description: "Cars Damages Side"
     type: string
     sql: ${TABLE}.VALUE:"side"::string ;;
   }
     
   dimension: state {
-    description: "State"
+    description: "Cars Damages State"
     type: string
     sql: ${TABLE}.VALUE:"state"::string ;;
   }

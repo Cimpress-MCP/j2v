@@ -29,7 +29,6 @@ def get_dimension_types(dim_name, dim_val):
 def is_str_timestamp(dim_val):
     """
     Checks if a string represents a timestamp
-    :param dim_name:
     :param dim_val:
     :return: True only if string represents a timestamp
     """
@@ -49,9 +48,7 @@ def is_unix_timestamp(dim_name, dim_val):
        """
     digits = len(str(dim_val))
     possible_digits = {10, 13, 16}
-    if dim_val > 0 and "time" in dim_name.lower() and digits in possible_digits:
-        return True
-    return False
+    return dim_val > 0 and "time" in dim_name.lower() and digits in possible_digits
 
 
 def is_non_empty_array_with_dicts(value):

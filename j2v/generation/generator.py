@@ -141,17 +141,19 @@ class Generator:
         field_path_sql = field_path_sql + (":" if field_path_sql else "") + doublequote(dimension_name)
 
         name_elements = full_path_nice.split("_")
-
+        results = list()
+        for element in name_elements[1 if len(name_elements) > 1 else 0:]:
+            results.extend(re.sub('(?!^)([A-Z][a-z]+)', r' \1', element).split())
         #   explode camel cased dimension names
-        results = re.sub('(?!^)([A-Z][a-z]+)', r' \1', dimension_name).split()
+        exploded_dim_name = re.sub('(?!^)([A-Z][a-z]+)', r' \1', dimension_name).split()
 
         if primitive_array:
             field_path_sql = dimension_name
             #   add parent field name for naming 1-D array
-            results.insert(0, name_elements[-2])
+            exploded_dim_name.insert(0, name_elements[-2])
 
         nice_description = map(lambda _: _.capitalize(), results)
-        nice_dimension_name = map(lambda _: _.lower(), results)
+        nice_dimension_name = map(lambda _: _.lower(), exploded_dim_name)
 
         group_label_string = "\n    {}:\"{}\"".format("group_label", group_label) if group_label is not None else ""
 

@@ -70,28 +70,28 @@ view: session {
   }
     
   dimension: java_runtime {
-    description: "Java_runtime"
+    description: "Java Runtime"
     type: string
     sql: ${TABLE}."session_user":"clientEnvironment":"JAVA_RUNTIME"::string ;;
     group_label:"clientEnvironment"
   }
     
   dimension: java_version {
-    description: "Java_version"
+    description: "Java Version"
     type: string
     sql: ${TABLE}."session_user":"clientEnvironment":"JAVA_VERSION"::string ;;
     group_label:"clientEnvironment"
   }
     
   dimension: java_vm {
-    description: "Java_vm"
+    description: "Java Vm"
     type: string
     sql: ${TABLE}."session_user":"clientEnvironment":"JAVA_VM"::string ;;
     group_label:"clientEnvironment"
   }
     
   dimension: ocsp_mode {
-    description: "Ocsp_mode"
+    description: "Ocsp Mode"
     type: string
     sql: ${TABLE}."session_user":"clientEnvironment":"OCSP_MODE"::string ;;
     group_label:"clientEnvironment"
@@ -105,21 +105,21 @@ view: session {
   }
     
   dimension: os_version {
-    description: "Os_version"
+    description: "Os Version"
     type: string
     sql: ${TABLE}."session_user":"clientEnvironment":"OS_VERSION"::string ;;
     group_label:"clientEnvironment"
   }
     
   dimension: secret_id {
-    description: "Id"
+    description: "Things Secret Id"
     type: number
     sql: ${TABLE}."session_user":"ALL":"things":"secret":"id"::number ;;
     group_label:"secret"
   }
     
   dimension: things_id {
-    description: "Id"
+    description: "Things Id"
     type: number
     sql: ${TABLE}."session_user":"ALL":"things":"id"::number ;;
     group_label:"things"
@@ -144,7 +144,7 @@ view: session {
   }
     
   dimension: you_id {
-    description: "Id"
+    description: "Things Secret Secret For You Id"
     type: number
     sql: ${TABLE}."session_user":"ALL":"things":"secret":"secret_for_you":"id"::number ;;
     group_label:"secret_for_you"
