@@ -1,6 +1,6 @@
 dimension_str_template = """
   dimension: {dimension_name} {{
-    description: \"{desc}\"
+    description: \"{desc}\"{primary_key_field}
     type: {looker_type}
     sql: ${{TABLE}}.{path}::{json_type} ;;{group_label_string}
   }}

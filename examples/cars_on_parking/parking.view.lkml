@@ -22,6 +22,7 @@ view: json_table {
     
   dimension: payload_primary_key_value {
     description: "Payload Primary Key Value"
+    primary_key: yes
     type: string
     sql: ${TABLE}."data_column":"payloadPrimaryKeyValue"::string ;;
   }
