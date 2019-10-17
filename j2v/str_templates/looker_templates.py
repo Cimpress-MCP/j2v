@@ -8,7 +8,7 @@ dimension_str_template = """
 
 dimension_group_time_template = """
   dimension_group: {__dimension_name} {{
-    description: \"{__desc}\"
+    description: \"{__desc}\"{data_type_field}
     type: {looker_type}
     timeframes: [
         raw,

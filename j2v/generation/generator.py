@@ -52,6 +52,7 @@ class Generator:
             if is_primitive(value) or value is None:
                 self.__add_dimension(current_path, current_view, key, value, group_label)
             elif is_dict(value):
+                self.maximum_naming_levels += 1
                 relative_path = current_path + ":" + doublequote(key)
                 self.collect_all_paths(value, relative_path, current_view, root_view, key)
             elif is_non_empty_1D_list(value):
@@ -89,11 +90,11 @@ class Generator:
             self.table_alias + "_" + self.column_name + "_", "", 1)
         return full_path_nice
 
-    def get_epoch_conversion(self, epoch_lenght):
+    def get_epoch_conversion(self, epoch_length):
         conversion = 1
-        if epoch_lenght == 13:
+        if epoch_length == 13:
             conversion = 10 ** 3
-        elif epoch_lenght == 16:
+        elif epoch_length == 16:
             conversion = 10 ** 6
         return "/"+str(conversion) if conversion > 1 else ""
 
@@ -139,19 +140,17 @@ class Generator:
         :return:
         """
         dim_type, json_type = get_dimension_types(dimension_name, dim_val)
-        self.ops += 1
         full_path_nice = self.__get_full_path_str(current_view, field_path_sql, dimension_name)
         field_path_sql = field_path_sql + (":" if field_path_sql else "") + doublequote(dimension_name)
 
-        if primitive_array:
-            field_path_sql = dimension_name
-
         name_elements = full_path_nice.split("_")
 
-        results = []
-        # split elements by camel case
-        for element in name_elements[self.maximum_naming_levels if len(name_elements) > 1 else 0:]:
-            results.extend(re.sub('(?!^)([A-Z][a-z]+)', r' \1', element).split())
+        #   explode camel cased  dimension names
+        results = re.sub('(?!^)([A-Z][a-z]+)', r' \1', dimension_name).split()
+
+        if primitive_array:
+            field_path_sql = dimension_name
+            results.insert(0, name_elements[-2])
 
         nice_description = map(lambda _: _.capitalize(), results)
         nice_dimension_name = map(lambda _: _.lower(), results)
@@ -164,7 +163,7 @@ class Generator:
 
         # check for duplicate dimension name in current view by checking the sql definitions in the same view
         if dimension_name_final in self.dim_sql_definitions[current_view] and sql_select not in self.dim_sql_definitions[current_view][dimension_name_final]:
-            dimension_name_final = "_".join(["" if len(name_elements) == 1 else name_elements[0], dimension_name_final])
+            dimension_name_final = "_".join(["" if len(name_elements) == 1 else name_elements[-2], dimension_name_final])
 
         self.dim_sql_definitions[current_view][dimension_name_final] = sql_select
 
@@ -172,15 +171,18 @@ class Generator:
             new_dimension = lt.dimension_group_time_template.format(
                 __dimension_name=dimension_name_final,
                 __desc=" ".join(nice_description),
+                data_type_field="",
                 __path=field_path_sql,
-                looker_type=dim_type, json_type=json_type)
+                looker_type=dim_type,
+                json_type=json_type)
 
         elif dim_type == "epoch" and json_type == "number":
             new_dimension = lt.dimension_group_time_template.format(
                 __dimension_name=dimension_name_final,
                 __desc=" ".join(nice_description),
+                data_type_field="\n    datatype:{}".format(dim_type),
+                looker_type="time",
                 __path=field_path_sql,
-                looker_type=dim_type,
                 json_type=json_type + self.get_epoch_conversion(len(str(dim_val))))
         else:
             new_dimension = lt.dimension_str_template.format(__dimension_name=dimension_name_final,
