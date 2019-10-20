@@ -1,9 +1,8 @@
-import datetime
+from datetime import timedelta, datetime
 
 
-def get_dimension_types(dim_name, dim_val):
+def get_dimension_types(dim_val):
     """
-    :param dim_name:
     :param dim_val:
     :return:
     """
@@ -18,7 +17,7 @@ def get_dimension_types(dim_name, dim_val):
     elif type(dim_val) == int:
         dim_type = "number"
         json_type = "number"
-        if is_unix_timestamp(dim_name, dim_val):
+        if is_unix_timestamp(dim_val):
             dim_type = "epoch"
     elif type(dim_val) == float:
         dim_type = "number"
@@ -33,22 +32,21 @@ def is_str_timestamp(dim_val):
     :return: True only if string represents a timestamp
     """
     try:
-        if datetime.datetime.strptime(dim_val, "%Y-%m-%dT%H:%M:%S.%fZ"):
+        if datetime.strptime(dim_val, "%Y-%m-%dT%H:%M:%S.%fZ").isoformat():
             return True
     except:
         return False
 
 
-def is_unix_timestamp(dim_name, dim_val):
+def is_unix_timestamp(dim_val):
     """
-       Checks if a string represents a timestamp
-       :param dim_name:
+       Checks if dim_val represents a timestamp
        :param dim_val:
        :return: True only if string represents a timestamp
        """
-    digits = len(str(dim_val))
-    possible_digits = {10, 13, 16}
-    return dim_val > 0 and "time" in dim_name.lower() and digits in possible_digits
+    date_now = datetime.now()
+    time_diff = timedelta(days=365)
+    return dim_val > 0 and date_now + time_diff > datetime.fromtimestamp(dim_val) > date_now - time_diff
 
 
 def is_non_empty_array_with_dicts(value):
