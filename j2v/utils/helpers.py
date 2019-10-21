@@ -32,8 +32,8 @@ def is_str_timestamp(dim_val):
     :return: True only if string represents a timestamp
     """
     try:
-        if datetime.strptime(dim_val, "%Y-%m-%dT%H:%M:%S.%fZ").isoformat():
-            return True
+        datetime.strptime(dim_val, "%Y-%m-%dT%H:%M:%S.%fZ")
+        return True
     except:
         return False
 
