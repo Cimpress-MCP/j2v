@@ -137,7 +137,7 @@ class Generator:
         :param parent_object_key:
         :return:
         """
-        dim_type, json_type = get_dimension_types(dimension_name, dim_val)
+        dim_type, json_type = get_dimension_types(dim_val)
         full_path_nice = self.get_full_path_str(current_view, field_path_sql, dimension_name)
         field_path_sql = field_path_sql + (":" if field_path_sql else "") + doublequote(dimension_name)
 
