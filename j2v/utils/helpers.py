@@ -8,7 +8,7 @@ def get_dimension_types(dim_val):
     """
     json_type = "string"
     dim_type = "string"
-    if type(dim_val) == str and is_str_timestamp(dim_val):
+    if type(dim_val) == str and (is_str_timestamp(dim_val) or is_ISO_Time(dim_val)):
         dim_type = "time"
         json_type = "timestamp"
     elif type(dim_val) == bool:
@@ -33,6 +33,19 @@ def is_str_timestamp(dim_val):
     """
     try:
         datetime.strptime(dim_val, "%Y-%m-%dT%H:%M:%S.%fZ")
+        return True
+    except:
+        return False
+
+
+def is_ISO_Time(dim_val):
+    """
+    Checks if a string represents a ISO timestamp
+    :param dim_val:
+    :return: True only if string represents an ISO timestamp
+    """
+    try:
+        datetime.fromisoformat(dim_val)
         return True
     except:
         return False

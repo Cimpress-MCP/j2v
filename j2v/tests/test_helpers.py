@@ -14,6 +14,7 @@ from j2v.utils.helpers import get_dimension_types
         pytest.param(784, ("number", "number"), id="Number type verified"),
         pytest.param(1571569684, ("epoch", "number"), id="Timestamp verified"),
         pytest.param(747.34, ("number", "number(38, 2)"), id="Number (Decimal) type verified"),
+        pytest.param("2019-10-21T11:55:00+02:00", ("time", "timestamp"), id="Check for ISO time")
     ]
 )
 def test_get_dimension_types(candidate_value, expected_result):
