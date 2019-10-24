@@ -17,7 +17,8 @@ def test_empty():
     For empty JSON nothing should be created.
     :return:
     """
-    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,primary_key=None)
+    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
+                  primary_key=None)
     g.collect_all_paths(current_dict={})
     assert not g.dim_definitions
     assert not g.explore_joins
@@ -46,7 +47,23 @@ def test_one_array():
     assert ORDERS_TABLE_NAME in g.dim_definitions
     assert 1 == len(g.dim_definitions["orders"])
     assert "id" in list(g.dim_definitions["orders"])[0]
+    __test_lower_cases(g)
     assert 1 == len(g.explore_joins)
+
+
+def test_lower_cases():
+    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
+                  primary_key=None)
+    g.collect_all_paths(current_dict={ORDERS_TABLE_NAME: [{"ID": 3}, {"ID": 334}], "AMOUNT": 5654.3})
+    __test_lower_cases(g)
+
+
+def __test_lower_cases(g):
+    for view_name, dims in g.dim_definitions.items():
+        assert not any(c.isupper() for c in view_name)
+        for dim in dims:
+            dim_first_line = dim[dim.index("dimension"):dim.index("{")]
+            assert not any(c.isupper() for c in dim_first_line)
 
 
 @pytest.mark.parametrize(
@@ -64,7 +81,7 @@ def test_replaces_nulls_values_in_json(json_data, prefix, suffix):
     """"
     the appropriate null handling code should be added to all columns in all_non_null_fields
     """
-    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=True,primary_key=None)
+    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=True, primary_key=None)
     g.collect_all_paths(current_dict={ORDERS_TABLE_NAME: json_data})
     for column_def in g.dim_sql_definitions[ORDERS_TABLE_NAME].values():
         assert column_def.startswith(prefix)
