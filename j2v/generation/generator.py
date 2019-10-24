@@ -16,6 +16,7 @@ class Generator:
         """
         self.all_joins = []
         self.explore_joins = {}
+        self.max_naming_levels = 3
         self.column_name = column_name
         self.table_alias = table_alias
         self.primary_key = primary_key
@@ -27,7 +28,8 @@ class Generator:
         self.explore_joins = {}
         self.all_joins = []
 
-    def collect_all_paths(self, current_dict, current_path=None, current_view=None, root_view=None, parent_object_key=None):
+    def collect_all_paths(self, current_dict, current_path=None, current_view=None, root_view=None,
+                          parent_object_key=None):
         """
         Recursive. Explores the data in JSON and takes appropriate actions.
         :param parent_object_key: group label for dimension
@@ -142,19 +144,16 @@ class Generator:
         field_path_sql = field_path_sql + (":" if field_path_sql else "") + doublequote(dimension_name)
 
         name_elements = full_path_nice.split("_")
-        results = list()
-        for element in name_elements[1 if len(name_elements) > 1 else 0:]:
-            results.extend(re.sub('(?!^)([A-Z][a-z]+)', r' \1', element).split())
-        #   explode camel cased dimension names
-        exploded_dim_name = re.sub('(?!^)([A-Z][a-z]+)', r' \1', dimension_name).split()
+        exploded_fields = list()
+        for element in name_elements:
+            exploded_fields.extend(re.sub('(?!^)([A-Z][a-z]+)', r' \1', element).split())
 
         if primitive_array:
             field_path_sql = dimension_name
-            #   add parent field name for naming 1-D array
-            exploded_dim_name.insert(0, name_elements[-2])
 
-        nice_description = map(lambda _: _.capitalize(), results)
-        nice_dimension_name = map(lambda _: _.lower(), exploded_dim_name)
+        dim_desc_name = exploded_fields[-self.max_naming_levels if len(exploded_fields) > self.max_naming_levels else -len(exploded_fields):]
+        nice_description = map(lambda _: _.capitalize(), dim_desc_name)
+        nice_dimension_name = map(lambda _: _.lower(), dim_desc_name)
 
         group_label_string = "\n    {}:\"{}\"".format("group_label", parent_object_key) if parent_object_key is not None else ""
 
