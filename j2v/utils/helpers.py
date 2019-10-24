@@ -64,7 +64,7 @@ def is_unix_timestamp(dim_val):
             if timestamp_len == 13:
                 dim_val = dim_val/10**3
             elif timestamp_len == 16:
-                dim_val = dim_val / 10 ** 6
+                dim_val = dim_val/10 ** 6
             # check if modifications of dim_val can generate valid dates
             map(datetime.fromtimestamp, [dim_val, timestamp_now - 3.154e+7, timestamp_now + 3.154e+7])
             return True
