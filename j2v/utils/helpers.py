@@ -3,8 +3,8 @@ from datetime import timedelta, datetime
 
 def get_dimension_types(dim_val):
     """
-    :param dim_val:
-    :return:
+        :param dim_val:
+        :return: dim_type, json_type
     """
     json_type = "string"
     dim_type = "string"
@@ -53,13 +53,21 @@ def is_ISO_Time(dim_val):
 
 def is_unix_timestamp(dim_val):
     """
-       Checks if dim_val represents a timestamp
-       :param dim_val:
-       :return: True only if string represents a timestamp
-       """
+    Checks if dim_val represents a timestamp if in seconds, milliseconds and microseconds
+    :param dim_val:
+    :return: True only if string represents a timestamp
+    """
     try:
-        if dim_val > 0 and len(str(dim_val)) <= 10:
-            datetime.fromtimestamp(dim_val)
+        timestamp_now = datetime.timestamp(datetime.now())
+        timestamp_len = len(str(dim_val))
+        if dim_val > 0:
+            if timestamp_len == 13:
+                dim_val = dim_val/10**3
+            elif timestamp_len == 16:
+                dim_val = dim_val / 10 ** 6
+            time_mods = [dim_val, timestamp_now - 3.154e+7, timestamp_now + 3.154e+7]
+            for _ in time_mods:
+                datetime.fromtimestamp(_)
             return True
         return False
     except:
