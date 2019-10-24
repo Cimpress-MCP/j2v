@@ -62,12 +62,12 @@ def is_unix_timestamp(dim_val):
         timestamp_len = len(str(dim_val))
         if dim_val > 0:
             if timestamp_len == 13:
-                dim_val = dim_val/10**3
+                is_unix_timestamp(dim_val/10**3)
             elif timestamp_len == 16:
-                dim_val = dim_val/10**6
-            # check if modifications of dim_val can generate valid dates
-            map(datetime.fromtimestamp, [dim_val, timestamp_now - 3.154e+7, timestamp_now + 3.154e+7])
-            return True
+                is_unix_timestamp(dim_val/10**6)
+            elif timestamp_len == 10:
+                map(datetime.fromtimestamp, [dim_val, timestamp_now - 3.154e+7, timestamp_now + 3.154e+7])
+                return True
         return False
     except:
         return False
