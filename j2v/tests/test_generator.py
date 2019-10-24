@@ -51,10 +51,18 @@ def test_one_array():
     assert 1 == len(g.explore_joins)
 
 
-def test_lower_cases():
+def test_lower_cases_1():
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
                   primary_key=None)
     g.collect_all_paths(current_dict={ORDERS_TABLE_NAME: [{"ID": 3}, {"ID": 334}], "AMOUNT": 5654.3})
+    __test_lower_cases(g)
+
+
+def test_lower_cases_2():
+    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
+                  primary_key=None)
+    g.collect_all_paths(
+        current_dict={ORDERS_TABLE_NAME: [{"ID": 3}, {"ID": 334}], "AMOUNT": {"value": 5654.3, "CURRENCY": "EUR"}})
     __test_lower_cases(g)
 
 
