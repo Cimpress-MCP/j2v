@@ -57,9 +57,13 @@ def is_unix_timestamp(dim_val):
        :param dim_val:
        :return: True only if string represents a timestamp
        """
-    date_now = datetime.now()
-    time_diff = timedelta(days=365)
-    return dim_val > 0 and date_now + time_diff > datetime.fromtimestamp(dim_val) > date_now - time_diff
+    try:
+        if dim_val > 0 and len(str(dim_val)) <= 10:
+            datetime.fromtimestamp(dim_val)
+            return True
+        return False
+    except:
+        return False
 
 
 def is_non_empty_array_with_dicts(value):
