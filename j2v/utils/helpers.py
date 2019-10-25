@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def get_dimension_types(dim_val):
@@ -57,20 +57,14 @@ def is_unix_timestamp(dim_val):
     :param dim_val:
     :return: True only if string represents a timestamp
     """
-    try:
-        timestamp_now = datetime.timestamp(datetime.now())
-        timestamp_len = len(str(dim_val))
-        if dim_val > 0:
-            if timestamp_len == 13:
-                is_unix_timestamp(dim_val/10**3)
-            elif timestamp_len == 16:
-                is_unix_timestamp(dim_val/10**6)
-            elif timestamp_len == 10:
-                map(datetime.fromtimestamp, [dim_val, timestamp_now - 3.154e+7, timestamp_now + 3.154e+7])
-                return True
-        return False
-    except:
-        return False
+    dt_now = datetime.now()
+    dt_delta = timedelta(days=365)
+    number_digits = len(str(dim_val))
+    base_10 = 10
+    if dim_val > 0 and number_digits in {base_10, 13, 16}:
+        dim_val = int(dim_val / base_10 ** (number_digits - base_10))
+        return dt_now + dt_delta > datetime.fromtimestamp(dim_val) > dt_now - dt_delta
+    return False
 
 
 def is_non_empty_array_with_dicts(value):
