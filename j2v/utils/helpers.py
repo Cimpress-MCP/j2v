@@ -57,13 +57,14 @@ def is_unix_timestamp(dim_val):
     :param dim_val:
     :return: True only if string represents a timestamp
     """
-    dt_now = datetime.now()
-    dt_delta = timedelta(days=365)
+    date_now = datetime.now()
+    date_delta = timedelta(days=365)
     number_digits = len(str(dim_val))
     base_10 = 10
+    
     if dim_val > 0 and number_digits in {base_10, 13, 16}:
         dim_val = int(dim_val / base_10 ** (number_digits - base_10))
-        return dt_now + dt_delta > datetime.fromtimestamp(dim_val) > dt_now - dt_delta
+        return date_now + date_delta > datetime.fromtimestamp(dim_val) > date_now - date_delta
     return False
 
 
