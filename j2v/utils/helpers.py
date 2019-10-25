@@ -53,17 +53,18 @@ def is_ISO_Time(dim_val):
 
 def is_unix_timestamp(dim_val):
     """
-       Checks if dim_val represents a timestamp
-       :param dim_val:
-       :return: True only if string represents a timestamp
-       """
-    try:
-        if dim_val > 0 and len(str(dim_val)) <= 10:
-            datetime.fromtimestamp(dim_val)
-            return True
-        return False
-    except:
-        return False
+    Checks if dim_val represents a timestamp if in seconds, milliseconds and microseconds
+    :param dim_val:
+    :return: True only if string represents a timestamp
+    """
+    date_now = datetime.now()
+    date_delta = timedelta(days=365)
+    number_digits = len(str(dim_val))
+    base_10 = 10
+    if dim_val > 0 and number_digits in {base_10, 13, 16}:
+        dim_val = int(dim_val / base_10 ** (number_digits - base_10))
+        return date_now + date_delta > datetime.fromtimestamp(dim_val) > date_now - date_delta
+    return False
 
 
 def is_non_empty_array_with_dicts(value):
