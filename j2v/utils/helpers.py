@@ -1,10 +1,10 @@
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
 
 def get_dimension_types(dim_val):
     """
-    :param dim_val:
-    :return:
+        :param dim_val:
+        :return: dim_type, json_type
     """
     json_type = "string"
     dim_type = "string"
@@ -61,6 +61,7 @@ def is_unix_timestamp(dim_val):
     date_delta = timedelta(days=365)
     number_digits = len(str(dim_val))
     base_10 = 10
+    
     if dim_val > 0 and number_digits in {base_10, 13, 16}:
         dim_val = int(dim_val / base_10 ** (number_digits - base_10))
         return date_now + date_delta > datetime.fromtimestamp(dim_val) > date_now - date_delta
