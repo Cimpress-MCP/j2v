@@ -16,7 +16,6 @@ class Generator:
         """
         self.all_joins = []
         self.explore_joins = {}
-        self.max_naming_levels = 3
         self.column_name = column_name
         self.table_alias = table_alias
         self.primary_key = primary_key
@@ -151,13 +150,10 @@ class Generator:
         if primitive_array:
             field_path_sql = dimension_name
 
-        dim_desc_name = exploded_fields[-self.max_naming_levels if len(exploded_fields) > self.max_naming_levels else -len(exploded_fields):]
-        nice_description = map(lambda _: _.capitalize(), dim_desc_name)
-        nice_dimension_name = map(lambda _: _.lower(), dim_desc_name)
+        dimension_name_final = exploded_fields[-1].lower()
+        nice_description = exploded_fields[-1].capitalize()
 
-        group_label_string = "\n    {}:\"{}\"".format("group_label", parent_object_key) if parent_object_key is not None else ""
-
-        dimension_name_final = "_".join(nice_dimension_name)
+        group_label_string = "\n    {}: \"{}\"".format("group_label", parent_object_key) if parent_object_key is not None else ""
 
         primary_key_field = "\n    primary_key: yes" if parent_object_key is None and self.primary_key == dimension_name else ""
 
@@ -165,14 +161,14 @@ class Generator:
 
         # check for duplicate dimension name in current view by checking the sql definitions in the same view
         if dimension_name_final in self.dim_sql_definitions[current_view] and sql_select not in self.dim_sql_definitions[current_view][dimension_name_final]:
-            dimension_name_final = "_".join(["" if len(name_elements) == 1 else name_elements[-2], dimension_name_final])
+            dimension_name_final = "_".join(["" if len(exploded_fields) == 1 else exploded_fields[-2].lower(), dimension_name_final])
 
         self.dim_sql_definitions[current_view][dimension_name_final] = sql_select
 
         if dim_type == "time" and json_type == "timestamp":
             new_dimension = lt.dimension_group_time_template.format(
                 dimension_name=dimension_name_final,
-                desc=" ".join(nice_description),
+                desc=nice_description,
                 data_type_field="",
                 path=field_path_sql,
                 looker_type=dim_type,
@@ -181,7 +177,7 @@ class Generator:
         elif dim_type == "epoch" and json_type == "number":
             new_dimension = lt.dimension_group_time_template.format(
                 dimension_name=dimension_name_final,
-                desc=" ".join(nice_description),
+                desc=nice_description,
                 data_type_field="\n    datatype:{}".format(dim_type),
                 looker_type="time",
                 path=field_path_sql,
@@ -189,7 +185,7 @@ class Generator:
         else:
             new_dimension = lt.dimension_str_template.format(
                 dimension_name=dimension_name_final,
-                desc=" ".join(nice_description),
+                desc=nice_description,
                 path=field_path_sql,
                 looker_type=dim_type,
                 primary_key_field=primary_key_field,
