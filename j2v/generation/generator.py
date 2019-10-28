@@ -42,7 +42,8 @@ class Generator:
             current_view = self.table_alias
         if not root_view:
             root_view = self.table_alias
-        for key, value in current_dict.items():
+        primitives_first_items = sorted(current_dict.items(), key=lambda x: not is_primitive(x[1]))
+        for key, value in primitives_first_items:
             if type(key) != str:
                 continue
             if is_primitive(value) or value is None:
@@ -125,13 +126,13 @@ class Generator:
         """
         dim_type, json_type = get_dimension_types(dim_val)
         full_path_nice = self.get_full_path_str(current_view, field_path_sql, dimension_name)
-        field_path_sql = field_path_sql + (":" if field_path_sql else "") + doublequote(dimension_name)
+        field_path_with_key = field_path_sql + (":" if field_path_sql else "") + doublequote(dimension_name)
 
         dimension_name_final = get_formatted_var_name(dimension_name)
         nice_description = " ".join(dimension_name_final.split("_")).capitalize()
 
         if primitive_array:
-            field_path_sql = dimension_name
+            field_path_with_key = dimension_name
 
         group_label_string = ""
         if parent_object_key:
@@ -140,19 +141,22 @@ class Generator:
 
         primary_key_field = "\n    primary_key: yes" if parent_object_key is None and self.primary_key == dimension_name else ""
 
-        sql_select = self.build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
+        sql_select = self.build_sql_select(json_type, dim_type, field_path_with_key, current_view,
+                                           full_path_nice.upper())
 
         # check for duplicate dimension name in current view by checking the sql definitions in the same view
         i = 1
+        dimension_name_final_origin = dimension_name_final
         while dimension_name_final in self.dim_sql_definitions[current_view] and sql_select not in \
-                self.dim_sql_definitions[current_view][dimension_name_final]:
-            dimension_name_final = "_".join(full_path_nice.split("_")[-i:])
+                self.dim_sql_definitions[current_view][dimension_name_final] and i < len(field_path_sql.split(":")):
+            dimension_name_final = "_".join(field_path_sql.split(":")[-i:]) + dimension_name_final_origin
             dimension_name_final = get_formatted_var_name(dimension_name_final)
             i += 1
 
         self.dim_sql_definitions[current_view][dimension_name_final] = sql_select
 
-        new_dimension = self.get_dim_str(dim_type, dim_val, dimension_name_final, field_path_sql, group_label_string,
+        new_dimension = self.get_dim_str(dim_type, dim_val, dimension_name_final, field_path_with_key,
+                                         group_label_string,
                                          json_type, nice_description, primary_key_field)
 
         self.dim_definitions[current_view].add(new_dimension)
