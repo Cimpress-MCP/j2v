@@ -1,1 +1,2 @@
+pytest
 PyYAML>=5.1

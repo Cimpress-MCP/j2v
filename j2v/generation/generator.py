@@ -10,12 +10,12 @@ ELEMENT_ACCESS_STR = generator_config['ELEMENT_ACCESS_STR']
 class Generator:
     def __init__(self, column_name, table_alias, handle_null_values_in_sql, primary_key):
         """
-        Init empty lists and ops counter.
+        Init empty lists.
         """
         self.all_joins = []
         self.explore_joins = {}
         self.column_name = column_name
-        self.table_alias = get_formatted_var_name(table_alias)
+        self.table_alias = table_alias
         self.primary_key = primary_key
         self.handle_null_values_in_sql = handle_null_values_in_sql
         self.dim_definitions = defaultdict(set)
@@ -133,8 +133,11 @@ class Generator:
         if primitive_array:
             field_path_sql = dimension_name
 
-        group_label = get_formatted_var_name(parent_object_key)
-        group_label_string = "\n    group_label: \"{}\"".format(group_label) if group_label else ""
+        group_label_string = ""
+        if parent_object_key:
+            group_label = " ".join(get_formatted_var_name(parent_object_key).split("_")).capitalize()
+            group_label_string = "\n    group_label: \"{}\"".format(group_label)
+
         primary_key_field = "\n    primary_key: yes" if parent_object_key is None and self.primary_key == dimension_name else ""
 
         sql_select = self.build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
@@ -142,7 +145,7 @@ class Generator:
         # check for duplicate dimension name in current view by checking the sql definitions in the same view
         i = 1
         while dimension_name_final in self.dim_sql_definitions[current_view] and sql_select not in \
-                self.dim_sql_definitions[current_view][dimension_name_final] and i < 20:
+                self.dim_sql_definitions[current_view][dimension_name_final]:
             dimension_name_final = "_".join(full_path_nice.split("_")[-i:])
             dimension_name_final = get_formatted_var_name(dimension_name_final)
             i += 1
@@ -154,7 +157,8 @@ class Generator:
 
         self.dim_definitions[current_view].add(new_dimension)
 
-    def get_dim_str(self, dim_type, dim_val, dimension_name_final, field_path_sql, group_label_string, json_type,
+    @staticmethod
+    def get_dim_str(dim_type, dim_val, dimension_name_final, field_path_sql, group_label_string, json_type,
                     nice_description, primary_key_field):
         if dim_type == "time" and json_type == "timestamp":
             new_dimension = lt.dimension_group_time_template.format(

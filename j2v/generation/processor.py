@@ -3,6 +3,7 @@ import json
 from j2v.generation.generator import Generator
 from j2v.generation.result_writer import SQLWriter, LookerWriter
 from j2v.utils.config import generator_config
+from j2v.utils.helpers import get_formatted_var_name
 
 TABLE_WITH_JSON_COLUMN_DEFAULT = generator_config['TABLE_WITH_JSON_COLUMN_DEFAULT']
 OUTPUT_VIEW_ML_OUT_DEFAULT = generator_config['OUTPUT_VIEW_ML_OUT_DEFAULT']
@@ -15,7 +16,7 @@ HANDLE_NULL_VALUES_IN_SQL_DEFAULT = generator_config['HANDLE_NULL_VALUES_IN_SQL_
 
 class MainProcessor:
 
-    def __init__(self, column_name=COLUMN_WITH_JSONS_DEFAULT,output_explore_file_name=EXPLORE_LKML_OUT_DEFAULT,
+    def __init__(self, column_name=COLUMN_WITH_JSONS_DEFAULT, output_explore_file_name=EXPLORE_LKML_OUT_DEFAULT,
                  output_view_file_name=OUTPUT_VIEW_ML_OUT_DEFAULT, sql_table_name=TABLE_WITH_JSON_COLUMN_DEFAULT,
                  table_alias=TABLE_ALIAS_DEFAULT, handle_null_values_in_sql=HANDLE_NULL_VALUES_IN_SQL_DEFAULT,
                  primary_key=None):
@@ -26,7 +27,7 @@ class MainProcessor:
         self.output_view_file_name = output_view_file_name or OUTPUT_VIEW_ML_OUT_DEFAULT
         self.column_name = column_name or COLUMN_WITH_JSONS_DEFAULT
         self.sql_table_name = sql_table_name or TABLE_WITH_JSON_COLUMN_DEFAULT
-        self.table_alias = table_alias or TABLE_ALIAS_DEFAULT
+        self.table_alias = get_formatted_var_name(table_alias or TABLE_ALIAS_DEFAULT)
         self.handle_null_values_in_sql = handle_null_values_in_sql or HANDLE_NULL_VALUES_IN_SQL_DEFAULT
         self.generator = Generator(column_name=self.column_name,
                                    table_alias=self.table_alias,
