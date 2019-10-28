@@ -1,10 +1,12 @@
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
+import re
+from j2v.str_templates import looker_templates as lt
 
 
 def get_dimension_types(dim_val):
     """
-    :param dim_val:
-    :return:
+        :param dim_val:
+        :return: dim_type, json_type
     """
     json_type = "string"
     dim_type = "string"
@@ -61,6 +63,7 @@ def is_unix_timestamp(dim_val):
     date_delta = timedelta(days=365)
     number_digits = len(str(dim_val))
     base_10 = 10
+
     if dim_val > 0 and number_digits in {base_10, 13, 16}:
         dim_val = int(dim_val / base_10 ** (number_digits - base_10))
         return date_now + date_delta > datetime.fromtimestamp(dim_val) > date_now - date_delta
@@ -112,3 +115,43 @@ def is_truthy(candidate_value):
         return candidate_value
     else:
         raise TypeError("Expected a str, int or bool and got {}".format(type(candidate_value)))
+
+
+def make_valid_variable_name(name):
+    nice_name = re.sub(lt.invalid_dim_name_regex, '_', name)
+    # make view name nicer
+    nice_name = re.sub("_+", "_", nice_name)
+    return nice_name
+
+
+def camel_case_split(name):
+    splits = re.split('(?=[A-Z])', name)
+    if len(splits) == 0 or all(map(lambda c: c.isupper(), name)) or all(map(lambda c: c.islower(), name)):
+        return [name]
+    else:
+        return splits
+
+
+def get_epoch_conversion(epoch_length):
+    conversion = 1
+    if epoch_length == 13:
+        conversion = 10 ** 3
+    elif epoch_length == 16:
+        conversion = 10 ** 6
+    return "/" + str(conversion) if conversion > 1 else ""
+
+
+def get_formatted_var_name(field_name):
+    """
+    From any string makes a Looker valid var name, makes it lower and add underscores where camelcase
+    :param field_name:
+    :return:
+    """
+    if field_name is None:
+        return None
+    name_elements = make_valid_variable_name(field_name).split("_")
+    parts = list()
+    for element in name_elements:
+        parts.extend(camel_case_split(element))
+    name_final = "_".join(parts).lower()
+    return name_final

@@ -1,7 +1,6 @@
 import re
 from collections import defaultdict
 
-from j2v.str_templates import looker_templates as lt
 from j2v.str_templates import sql_templates as st
 from j2v.utils.config import generator_config
 from j2v.utils.helpers import *
@@ -80,21 +79,13 @@ class Generator:
         # we cannot remove more, it can be in some field name
         full_path = current_view + ":" + current_path.replace(ELEMENT_ACCESS_STR, "", 1) + key
         # make the name valid Looker view name
-        full_path_nice = re.sub(lt.invalid_dim_name_regex, '_', full_path)
-        # make view name nicer
-        full_path_nice = re.sub("_+", "_", full_path_nice)
+        full_path_nice = make_valid_variable_name(full_path)
         # remove the table-column name prefix, only 1 left most occurrence
         full_path_nice = full_path_nice.replace(
             self.table_alias + "_" + self.column_name + "_", "", 1)
         return full_path_nice
 
-    def get_epoch_conversion(self, epoch_length):
-        conversion = 1
-        if epoch_length == 13:
-            conversion = 10 ** 3
-        elif epoch_length == 16:
-            conversion = 10 ** 6
-        return "/" + str(conversion) if conversion > 1 else ""
+
 
     def add_explore_join(self, new_view_name, current_view, key, current_path):
         """
@@ -113,7 +104,6 @@ class Generator:
             # root view
             required_joins_line = ""
             join_path = current_view + "." + current_path + ":" + doublequote(key)
-
         join_path = join_path.replace(":" + ELEMENT_ACCESS_STR, "." + ELEMENT_ACCESS_STR)
         join_statement = st.join_str_template.format(alias=new_view_name,
                                                      exploded_structure_path=join_path)
@@ -142,26 +132,26 @@ class Generator:
         full_path_nice = self.get_full_path_str(current_view, field_path_sql, dimension_name)
         field_path_sql = field_path_sql + (":" if field_path_sql else "") + doublequote(dimension_name)
 
-        name_elements = full_path_nice.split("_")
-        exploded_fields = list()
-        for element in name_elements:
-            exploded_fields.extend(re.sub('(?!^)([A-Z][a-z]+)', r' \1', element).split())
+        dimension_name_final = get_formatted_var_name(dimension_name)
+        nice_description = " ".join(dimension_name_final.split("_")).capitalize()
 
         if primitive_array:
             field_path_sql = dimension_name
 
-        dimension_name_final = exploded_fields[-1].lower()
-        nice_description = exploded_fields[-1].capitalize()
-
-        group_label_string = "\n    {}: \"{}\"".format("group_label", parent_object_key) if parent_object_key is not None else ""
+        group_label = get_formatted_var_name(parent_object_key)
+        group_label_string = "\n    group_label: \"{}\"".format(group_label) if group_label else ""
 
         primary_key_field = "\n    primary_key: yes" if parent_object_key is None and self.primary_key == dimension_name else ""
 
         sql_select = self.build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
 
         # check for duplicate dimension name in current view by checking the sql definitions in the same view
-        if dimension_name_final in self.dim_sql_definitions[current_view] and sql_select not in self.dim_sql_definitions[current_view][dimension_name_final]:
-            dimension_name_final = "_".join(["" if len(exploded_fields) == 1 else exploded_fields[-2].lower(), dimension_name_final])
+        i = 0
+        while dimension_name_final in self.dim_sql_definitions[current_view] and sql_select not in \
+                self.dim_sql_definitions[current_view][dimension_name_final] and i < 20:
+            dimension_name_final = full_path_nice.split("_")[-i] + "_" + dimension_name_final
+            dimension_name_final = get_formatted_var_name(dimension_name_final)
+            i += 1
 
         self.dim_sql_definitions[current_view][dimension_name_final] = sql_select
 

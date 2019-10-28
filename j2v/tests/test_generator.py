@@ -54,7 +54,7 @@ def test_one_array():
 def test_one_problematic_dim_name():
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
                   primary_key=None)
-    g.collect_all_paths(current_dict={ORDERS_TABLE_NAME: [{"aaaaID-ABC-DEF": 3}, {"abID-ABC--DEF": 334}], "zz": 5654.3})
+    g.collect_all_paths(current_dict={ORDERS_TABLE_NAME: [{"aaaaId-ABC-DEF": 3}, {"abId-ABC--DEF": 334}], "zz": 5654.3})
     count = 0
     dims = g.dim_definitions[ORDERS_TABLE_NAME]
     for dim in dims:
