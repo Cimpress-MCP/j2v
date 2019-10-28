@@ -119,8 +119,6 @@ def is_truthy(candidate_value):
 
 def make_valid_variable_name(name):
     nice_name = re.sub(lt.invalid_dim_name_regex, '_', name)
-    # make view name nicer
-    nice_name = re.sub("_+", "_", nice_name)
     return nice_name
 
 
@@ -153,5 +151,6 @@ def get_formatted_var_name(field_name):
     parts = list()
     for element in name_elements:
         parts.extend(camel_case_split(element))
-    name_final = "_".join(parts).lower()
+    name_final = "_".join(parts).lower().lstrip('_')
+    name_final = re.sub("_+", "_", name_final)
     return name_final

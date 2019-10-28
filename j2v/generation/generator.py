@@ -1,4 +1,3 @@
-import re
 from collections import defaultdict
 
 from j2v.str_templates import sql_templates as st
@@ -16,7 +15,7 @@ class Generator:
         self.all_joins = []
         self.explore_joins = {}
         self.column_name = column_name
-        self.table_alias = table_alias
+        self.table_alias = get_formatted_var_name(table_alias)
         self.primary_key = primary_key
         self.handle_null_values_in_sql = handle_null_values_in_sql
         self.dim_definitions = defaultdict(set)
@@ -78,14 +77,10 @@ class Generator:
         # remove access string from view name, only one left most occurrence,
         # we cannot remove more, it can be in some field name
         full_path = current_view + ":" + current_path.replace(ELEMENT_ACCESS_STR, "", 1) + key
-        # make the name valid Looker view name
-        full_path_nice = make_valid_variable_name(full_path)
-        # remove the table-column name prefix, only 1 left most occurrence
-        full_path_nice = full_path_nice.replace(
-            self.table_alias + "_" + self.column_name + "_", "", 1)
-        return full_path_nice
+        full_path_nice = full_path.replace(self.table_alias, "", 1)
+        full_path_nice = full_path_nice.replace(self.column_name, "", 1)
 
-
+        return get_formatted_var_name(full_path_nice)
 
     def add_explore_join(self, new_view_name, current_view, key, current_path):
         """
@@ -140,21 +135,27 @@ class Generator:
 
         group_label = get_formatted_var_name(parent_object_key)
         group_label_string = "\n    group_label: \"{}\"".format(group_label) if group_label else ""
-
         primary_key_field = "\n    primary_key: yes" if parent_object_key is None and self.primary_key == dimension_name else ""
 
         sql_select = self.build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
 
         # check for duplicate dimension name in current view by checking the sql definitions in the same view
-        i = 0
+        i = 1
         while dimension_name_final in self.dim_sql_definitions[current_view] and sql_select not in \
                 self.dim_sql_definitions[current_view][dimension_name_final] and i < 20:
-            dimension_name_final = full_path_nice.split("_")[-i] + "_" + dimension_name_final
+            dimension_name_final = "_".join(full_path_nice.split("_")[-i:])
             dimension_name_final = get_formatted_var_name(dimension_name_final)
             i += 1
 
         self.dim_sql_definitions[current_view][dimension_name_final] = sql_select
 
+        new_dimension = self.get_dim_str(dim_type, dim_val, dimension_name_final, field_path_sql, group_label_string,
+                                         json_type, nice_description, primary_key_field)
+
+        self.dim_definitions[current_view].add(new_dimension)
+
+    def get_dim_str(self, dim_type, dim_val, dimension_name_final, field_path_sql, group_label_string, json_type,
+                    nice_description, primary_key_field):
         if dim_type == "time" and json_type == "timestamp":
             new_dimension = lt.dimension_group_time_template.format(
                 dimension_name=dimension_name_final,
@@ -171,7 +172,7 @@ class Generator:
                 data_type_field="\n    datatype:{}".format(dim_type),
                 looker_type="time",
                 path=field_path_sql,
-                json_type=json_type + self.get_epoch_conversion(len(str(dim_val))))
+                json_type=json_type + get_epoch_conversion(len(str(dim_val))))
         else:
             new_dimension = lt.dimension_str_template.format(
                 dimension_name=dimension_name_final,
@@ -181,8 +182,7 @@ class Generator:
                 primary_key_field=primary_key_field,
                 json_type=json_type,
                 group_label_string=group_label_string)
-
-        self.dim_definitions[current_view].add(new_dimension)
+        return new_dimension
 
     def build_sql_select(self, json_type, dim_type, field_path_sql, current_view, full_path_nice_upper):
         if self.handle_null_values_in_sql:
