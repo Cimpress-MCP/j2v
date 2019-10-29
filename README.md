@@ -78,6 +78,7 @@ With J2V all the structures are discovered automatically and two files are gener
       "country": "Australia",
       "address": "Big Street 3",
       "currency": "AUD",
+      "openTime": 1571143824,
       "menu": [
         {
           "dishName": "BurgerPlus",
@@ -108,25 +109,29 @@ With J2V all the structures are discovered automatically and two files are gener
 
 ```SQL
 
+ ---VIEW WITH NUll VALUE HANDLING---
+
+
 SELECT
 ---chains_table Information
-IFNULL(chains_table."DATA":"apiVersion"::string,'N/A') AS APIVERSION,
+IFNULL(chains_table."DATA":"apiVersion"::string,'N/A') AS API_VERSION,
 IFNULL(chains_table."DATA":"data Provider"::string,'N/A') AS DATA_PROVIDER,
 IFNULL(chains_table."DATA":"headquarter":"building":"address"::string,'N/A') AS HEADQUARTER_BUILDING_ADDRESS,
 IFNULL(chains_table."DATA":"headquarter":"city"::string,'N/A') AS HEADQUARTER_CITY,
 IFNULL(chains_table."DATA":"headquarter":"country"::string,'N/A') AS HEADQUARTER_COUNTRY,
 IFNULL(chains_table."DATA":"headquarter":"employees"::number,0) AS HEADQUARTER_EMPLOYEES,
-IFNULL(chains_table."DATA":"payloadPrimaryKeyValue"::string,'N/A') AS PAYLOADPRIMARYKEYVALUE,
+IFNULL(chains_table."DATA":"payloadPrimaryKeyValue"::string,'N/A') AS PAYLOAD_PRIMARY_KEY_VALUE,
 IFNULL(chains_table."DATA":"version"::string,'N/A') AS VERSION,
-chains_table."DATA":"dataGenerationTimestamp"::timestamp AS DATAGENERATIONTIMESTAMP,
+chains_table."DATA":"dataGenerationTimestamp"::timestamp AS DATA_GENERATION_TIMESTAMP,
 ---restaurants Information
 IFNULL(restaurants.VALUE:"address"::string,'N/A') AS RESTAURANTS_ADDRESS,
 IFNULL(restaurants.VALUE:"city"::string,'N/A') AS RESTAURANTS_CITY,
 IFNULL(restaurants.VALUE:"country"::string,'N/A') AS RESTAURANTS_COUNTRY,
 IFNULL(restaurants.VALUE:"currency"::string,'N/A') AS RESTAURANTS_CURRENCY,
 IFNULL(restaurants.VALUE:"name"::string,'N/A') AS RESTAURANTS_NAME,
+IFNULL(restaurants.VALUE:"openTime"::number,0) AS RESTAURANTS_OPEN_TIME,
 ---restaurants_menu Information
-IFNULL(restaurants_menu.VALUE:"dishName"::string,'N/A') AS RESTAURANTS_MENU_DISHNAME,
+IFNULL(restaurants_menu.VALUE:"dishName"::string,'N/A') AS RESTAURANTS_MENU_DISH_NAME,
 IFNULL(restaurants_menu.VALUE:"price"::number,0) AS RESTAURANTS_MENU_PRICE,
 ---restaurants_menu_ingredients Information
 IFNULL(restaurants_menu_ingredients.VALUE::string,'N/A') AS RESTAURANTS_MENU_INGREDIENTS_VALUE,
@@ -137,7 +142,6 @@ LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."DATA":"restaurants") resta
 LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants.VALUE:"menu") restaurants_menu,
 LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants_menu.VALUE:"ingredients") restaurants_menu_ingredients,
 LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."DATA":"headquarter":"building":"floors") headquarter_building_floors
-
 ```
 
 #### Ouput files:
@@ -146,54 +150,55 @@ LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."DATA":"headquarter":"build
 
 ```LookML
 
+
 view: chains_table { 
   sql_table_name: RESTAURANT_DETAILS ;;
 
+  dimension: address {
+    description: "Address"
+    type: string
+    sql: ${TABLE}."DATA":"headquarter":"building":"address"::string ;;
+    group_label: "Building"
+  }
+    
   dimension: api_version {
-    description: "Api Version"
+    description: "Api version"
     primary_key: yes
     type: string
     sql: ${TABLE}."DATA":"apiVersion"::string ;;
-  }
-    
-  dimension: building_address {
-    description: "Building Address"
-    type: string
-    sql: ${TABLE}."DATA":"headquarter":"building":"address"::string ;;
-    group_label:"building"
   }
     
   dimension: city {
     description: "City"
     type: string
     sql: ${TABLE}."DATA":"headquarter":"city"::string ;;
-    group_label:"headquarter"
+    group_label: "Headquarter"
   }
     
   dimension: country {
     description: "Country"
     type: string
     sql: ${TABLE}."DATA":"headquarter":"country"::string ;;
-    group_label:"headquarter"
+    group_label: "Headquarter"
+  }
+    
+  dimension: data_provider {
+    description: "Data provider"
+    type: string
+    sql: ${TABLE}."DATA":"data Provider"::string ;;
   }
     
   dimension: employees {
     description: "Employees"
     type: number
     sql: ${TABLE}."DATA":"headquarter":"employees"::number ;;
-    group_label:"headquarter"
+    group_label: "Headquarter"
   }
     
   dimension: payload_primary_key_value {
-    description: "Payload Primary Key Value"
+    description: "Payload primary key value"
     type: string
     sql: ${TABLE}."DATA":"payloadPrimaryKeyValue"::string ;;
-  }
-    
-  dimension: provider {
-    description: "Provider"
-    type: string
-    sql: ${TABLE}."DATA":"data Provider"::string ;;
   }
     
   dimension: version {
@@ -203,7 +208,7 @@ view: chains_table {
   }
     
   dimension_group: data_generation_timestamp {
-    description: "Data Generation Timestamp"
+    description: "Data generation timestamp"
     type: time
     timeframes: [
         raw,
@@ -251,18 +256,34 @@ view: restaurants {
     sql: ${TABLE}.VALUE:"name"::string ;;
   }
     
+  dimension_group: open_time {
+    description: "Open time"
+    datatype: epoch
+    type: time
+    timeframes: [
+        raw,
+        time,
+        date,
+        week,
+        month,
+        quarter,
+        year
+    ]
+    sql: ${TABLE}.VALUE:"openTime"::number ;;
+  }
+    
 }
 
 view: restaurants_menu { 
 
-  dimension: menu_dish_name {
-    description: "Menu Dish Name"
+  dimension: dish_name {
+    description: "Dish name"
     type: string
     sql: ${TABLE}.VALUE:"dishName"::string ;;
   }
     
-  dimension: menu_price {
-    description: "Menu Price"
+  dimension: price {
+    description: "Price"
     type: number
     sql: ${TABLE}.VALUE:"price"::number ;;
   }
@@ -271,8 +292,8 @@ view: restaurants_menu {
 
 view: restaurants_menu_ingredients { 
 
-  dimension: menu_ingredients_value {
-    description: "Menu Ingredients Value"
+  dimension: value {
+    description: "Value"
     type: string
     sql: ${TABLE}.VALUE::string ;;
   }
@@ -281,13 +302,14 @@ view: restaurants_menu_ingredients {
 
 view: headquarter_building_floors { 
 
-  dimension: building_floors_value {
-    description: "Building Floors Value"
+  dimension: value {
+    description: "Value"
     type: number
     sql: ${TABLE}.VALUE::number ;;
   }
     
 }
+
 
 ```
 

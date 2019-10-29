@@ -6,9 +6,9 @@ explore: lueana_latest {
   label: "lueana_latest explore"
   description: "lueana_latest explore"
 
-  join: fulfillerlist {
-     from: fulfillerlist
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => LUEANA_LATEST."JSON":"fulfillerList") fulfillerlist;;
+  join: fulfiller_list {
+     from: fulfiller_list
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => lueana_latest."JSON":"fulfillerList") fulfiller_list;;
      relationship: one_to_many 
   }
   
