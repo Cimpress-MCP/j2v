@@ -177,7 +177,7 @@ class Generator:
             new_dimension = lt.dimension_group_time_template.format(
                 dimension_name=dimension_name_final,
                 desc=nice_description,
-                data_type_field="\n    datatype:{}".format(dim_type),
+                data_type_field="\n    datatype: {}".format(dim_type),
                 looker_type="time",
                 path=field_path_sql,
                 json_type=json_type + get_epoch_conversion(len(str(dim_val))))
