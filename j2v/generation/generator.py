@@ -25,12 +25,12 @@ class Generator:
         self.explore_joins = {}
         self.all_joins = []
 
-    def collect_all_paths(self, current_dict, current_path=None, current_view=None, root_view=None,
+    def collect_all_paths(self, data_object, current_path=None, current_view=None, root_view=None,
                           parent_object_key=None):
         """
         Recursive. Explores the data in JSON and takes appropriate actions.
         :param parent_object_key: group label for dimension
-        :param current_dict: Currently processed dict
+        :param data_object: Currently processed dict
         :param current_path: Path from the root dict
         :param current_view: Currently processed view
         :param root_view:
@@ -42,7 +42,7 @@ class Generator:
             current_view = self.table_alias
         if not root_view:
             root_view = self.table_alias
-        primitives_first_items = sorted(current_dict.items(), key=lambda x: not is_primitive(x[1]))
+        primitives_first_items = sorted(data_object.items(), key=lambda x: not is_primitive(x[1]))
         for key, value in primitives_first_items:
             if type(key) != str:
                 continue
@@ -56,7 +56,7 @@ class Generator:
                 sample_element = value[0]
                 if is_dict(sample_element):
                     self.add_explore_join(new_view_name, current_view, key, current_path)
-                    self.collect_all_paths(current_dict=sample_element,
+                    self.collect_all_paths(data_object=sample_element,
                                            current_path=ELEMENT_ACCESS_STR,
                                            current_view=new_view_name,
                                            root_view=current_view)

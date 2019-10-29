@@ -46,23 +46,23 @@ class MainProcessor:
         for json_file in json_file_list:
             with open(json_file) as f_in:
                 json_obj = json.load(f_in)
-                self.process_single_dict(json_obj)
+                self.process_single_object(json_obj)
 
         self.looker_writer.create_view_file(self.generator.dim_definitions)
         self.looker_writer.create_explore_file(self.generator.explore_joins)
         self.sql_writer.print_sql(self.generator.dim_sql_definitions, self.generator.all_joins,
                                   self.handle_null_values_in_sql)
 
-    def transform(self, python_dict):
+    def transform(self, data_object):
         self.pre_process()
-        self.process_single_dict(python_dict)
+        self.process_single_object(data_object)
         model, sql, views = self.post_process()
         return {"sql": sql, "model": model, "views": views}
 
-    def transform_rich(self, python_dict_list):
+    def transform_rich(self, data_object_list):
         self.pre_process()
-        for python_dict in python_dict_list:
-            self.process_single_dict(python_dict)
+        for data_object in data_object_list:
+            self.process_single_object(data_object)
         model, sql, views = self.post_process()
         return {"sql": sql, "model": model, "views": views}
 
@@ -76,4 +76,7 @@ class MainProcessor:
         return model, sql, views
 
     def process_single_dict(self, python_dict):
-        self.generator.collect_all_paths(current_dict=python_dict)
+        self.process_single_object(data_object=python_dict)
+
+    def process_single_object(self, data_object):
+        self.generator.collect_all_paths(data_object=data_object)
