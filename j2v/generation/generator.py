@@ -1,7 +1,5 @@
-import re
 from collections import defaultdict
 
-from j2v.str_templates import looker_templates as lt
 from j2v.str_templates import sql_templates as st
 from j2v.utils.config import generator_config
 from j2v.utils.helpers import *
@@ -12,12 +10,11 @@ ELEMENT_ACCESS_STR = generator_config['ELEMENT_ACCESS_STR']
 class Generator:
     def __init__(self, column_name, table_alias, handle_null_values_in_sql, primary_key):
         """
-        Init empty lists and ops counter.
+        Init empty lists.
         """
         self.all_joins = []
         self.explore_joins = {}
         self.column_name = column_name
-        self.max_naming_levels = 3
         self.table_alias = table_alias
         self.primary_key = primary_key
         self.handle_null_values_in_sql = handle_null_values_in_sql
@@ -28,7 +25,8 @@ class Generator:
         self.explore_joins = {}
         self.all_joins = []
 
-    def collect_all_paths(self, current_dict, current_path=None, current_view=None, root_view=None, parent_object_key=None):
+    def collect_all_paths(self, current_dict, current_path=None, current_view=None, root_view=None,
+                          parent_object_key=None):
         """
         Recursive. Explores the data in JSON and takes appropriate actions.
         :param parent_object_key: group label for dimension
@@ -44,7 +42,8 @@ class Generator:
             current_view = self.table_alias
         if not root_view:
             root_view = self.table_alias
-        for key, value in current_dict.items():
+        primitives_first_items = sorted(current_dict.items(), key=lambda x: not is_primitive(x[1]))
+        for key, value in primitives_first_items:
             if type(key) != str:
                 continue
             if is_primitive(value) or value is None:
@@ -79,22 +78,10 @@ class Generator:
         # remove access string from view name, only one left most occurrence,
         # we cannot remove more, it can be in some field name
         full_path = current_view + ":" + current_path.replace(ELEMENT_ACCESS_STR, "", 1) + key
-        # make the name valid Looker view name
-        full_path_nice = re.sub(lt.invalid_dim_name_regex, '_', full_path)
-        # make view name nicer
-        full_path_nice = re.sub("_+", "_", full_path_nice)
-        # remove the table-column name prefix, only 1 left most occurrence
-        full_path_nice = full_path_nice.replace(
-            self.table_alias + "_" + self.column_name + "_", "", 1)
-        return full_path_nice
+        full_path_nice = full_path.replace(self.table_alias, "", 1)
+        full_path_nice = full_path_nice.replace(self.column_name, "", 1)
 
-    def get_epoch_conversion(self, epoch_length):
-        conversion = 1
-        if epoch_length == 13:
-            conversion = 10 ** 3
-        elif epoch_length == 16:
-            conversion = 10 ** 6
-        return "/" + str(conversion) if conversion > 1 else ""
+        return get_formatted_var_name(full_path_nice)
 
     def add_explore_join(self, new_view_name, current_view, key, current_path):
         """
@@ -113,7 +100,6 @@ class Generator:
             # root view
             required_joins_line = ""
             join_path = current_view + "." + current_path + ":" + doublequote(key)
-
         join_path = join_path.replace(":" + ELEMENT_ACCESS_STR, "." + ELEMENT_ACCESS_STR)
         join_statement = st.join_str_template.format(alias=new_view_name,
                                                      exploded_structure_path=join_path)
@@ -140,32 +126,44 @@ class Generator:
         """
         dim_type, json_type = get_dimension_types(dim_val)
         full_path_nice = self.get_full_path_str(current_view, field_path_sql, dimension_name)
-        field_path_sql = field_path_sql + (":" if field_path_sql else "") + doublequote(dimension_name)
+        field_path_with_key = field_path_sql + (":" if field_path_sql else "") + doublequote(dimension_name)
 
-        name_elements = full_path_nice.split("_")
-        exploded_fields = list()
-        for element in name_elements:
-            exploded_fields.extend(re.sub('(?!^)([A-Z][a-z]+)', r' \1', element).split())
+        dimension_name_final = get_formatted_var_name(dimension_name)
+        nice_description = " ".join(dimension_name_final.split("_")).capitalize()
 
         if primitive_array:
-            field_path_sql = dimension_name
+            field_path_with_key = dimension_name
 
-        dim_desc_name = exploded_fields[-self.max_naming_levels if len(exploded_fields) > self.max_naming_levels else -len(exploded_fields):]
-        nice_description = " ".join(map(lambda _: _.capitalize(), dim_desc_name))
-        dimension_name_final = "_".join(map(lambda _: _.lower(), dim_desc_name))
-
-        group_label_string = "\n    {}:\"{}\"".format("group_label", parent_object_key) if parent_object_key is not None else ""
+        group_label_string = ""
+        if parent_object_key:
+            group_label = " ".join(get_formatted_var_name(parent_object_key).split("_")).capitalize()
+            group_label_string = "\n    group_label: \"{}\"".format(group_label)
 
         primary_key_field = "\n    primary_key: yes" if parent_object_key is None and self.primary_key == dimension_name else ""
 
-        sql_select = self.build_sql_select(json_type, dim_type, field_path_sql, current_view, full_path_nice.upper())
+        sql_select = self.build_sql_select(json_type, dim_type, field_path_with_key, current_view,
+                                           full_path_nice.upper())
 
         # check for duplicate dimension name in current view by checking the sql definitions in the same view
-        if dimension_name_final in self.dim_sql_definitions[current_view] and sql_select not in self.dim_sql_definitions[current_view][dimension_name_final]:
-            dimension_name_final = "_".join(["" if len(name_elements) == 1 else name_elements[-2], dimension_name_final])
+        i = 1
+        dimension_name_final_origin = dimension_name_final
+        while dimension_name_final in self.dim_sql_definitions[current_view] and sql_select not in \
+                self.dim_sql_definitions[current_view][dimension_name_final] and i < len(field_path_sql.split(":")):
+            dimension_name_final = "_".join(field_path_sql.split(":")[-i:]) + dimension_name_final_origin
+            dimension_name_final = get_formatted_var_name(dimension_name_final)
+            i += 1
 
         self.dim_sql_definitions[current_view][dimension_name_final] = sql_select
 
+        new_dimension = self.get_dim_str(dim_type, dim_val, dimension_name_final, field_path_with_key,
+                                         group_label_string,
+                                         json_type, nice_description, primary_key_field)
+
+        self.dim_definitions[current_view].add(new_dimension)
+
+    @staticmethod
+    def get_dim_str(dim_type, dim_val, dimension_name_final, field_path_sql, group_label_string, json_type,
+                    nice_description, primary_key_field):
         if dim_type == "time" and json_type == "timestamp":
             new_dimension = lt.dimension_group_time_template.format(
                 dimension_name=dimension_name_final,
@@ -179,10 +177,10 @@ class Generator:
             new_dimension = lt.dimension_group_time_template.format(
                 dimension_name=dimension_name_final,
                 desc=nice_description,
-                data_type_field="\n    datatype:{}".format(dim_type),
+                data_type_field="\n    datatype: {}".format(dim_type),
                 looker_type="time",
                 path=field_path_sql,
-                json_type=json_type + self.get_epoch_conversion(len(str(dim_val))))
+                json_type=json_type + get_epoch_conversion(len(str(dim_val))))
         else:
             new_dimension = lt.dimension_str_template.format(
                 dimension_name=dimension_name_final,
@@ -192,8 +190,7 @@ class Generator:
                 primary_key_field=primary_key_field,
                 json_type=json_type,
                 group_label_string=group_label_string)
-
-        self.dim_definitions[current_view].add(new_dimension)
+        return new_dimension
 
     def build_sql_select(self, json_type, dim_type, field_path_sql, current_view, full_path_nice_upper):
         if self.handle_null_values_in_sql:

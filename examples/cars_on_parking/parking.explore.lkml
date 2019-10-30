@@ -8,7 +8,7 @@ explore: json_table {
 
   join: parkings {
      from: parkings
-     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => JSON_TABLE."data_column":"parkings") parkings;;
+     sql:,LATERAL FLATTEN(OUTER => TRUE, INPUT => json_table."data_column":"parkings") parkings;;
      relationship: one_to_many 
   }
   

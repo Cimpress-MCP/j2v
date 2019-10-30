@@ -12,17 +12,17 @@ view: lueana_latest {
     description: "Id"
     type: string
     sql: ${TABLE}."JSON":"_datalakeMetadata":"id"::string ;;
-    group_label:"_datalakeMetadata"
+    group_label: "Datalake metadata"
   }
     
   dimension: is_active {
-    description: "Is Active"
+    description: "Is active"
     type: yesno
     sql: ${TABLE}."JSON":"isActive"::boolean ;;
   }
     
-  dimension: mcpsku {
-    description: "Mcpsku"
+  dimension: mcp_s_k_u {
+    description: "Mcp s k u"
     type: string
     sql: ${TABLE}."JSON":"mcpSKU"::string ;;
   }
@@ -37,18 +37,18 @@ view: lueana_latest {
     description: "Principal"
     type: string
     sql: ${TABLE}."JSON":"_datalakeMetadata":"principal"::string ;;
-    group_label:"_datalakeMetadata"
+    group_label: "Datalake metadata"
   }
     
   dimension: stream_id {
-    description: "Stream Id"
+    description: "Stream id"
     type: string
     sql: ${TABLE}."JSON":"_datalakeMetadata":"streamId"::string ;;
-    group_label:"_datalakeMetadata"
+    group_label: "Datalake metadata"
   }
     
   dimension: transaction_id {
-    description: "Transaction Id"
+    description: "Transaction id"
     type: string
     sql: ${TABLE}."JSON":"transactionId"::string ;;
   }
@@ -85,7 +85,7 @@ view: lueana_latest {
     
 }
 
-view: fulfillerlist { 
+view: fulfiller_list { 
 
   dimension: fulfiller {
     description: "Fulfiller"
