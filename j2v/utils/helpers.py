@@ -123,8 +123,8 @@ def make_valid_variable_name(name):
 
 
 def camel_case_split(name):
-    splits = re.split('(?=[A-Z])', name)
-    if len(splits) == 0 or all(map(lambda c: c.isupper(), name)) or all(map(lambda c: c.islower(), name)):
+    splits = re.sub('(?!^)([A-Z][a-z]+)', r' \1', name).split()
+    if len(splits) == 0 or name.isupper() or name.islower():
         return [name]
     else:
         return splits

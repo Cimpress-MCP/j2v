@@ -51,7 +51,7 @@ class Generator:
                                parent_object_key)
         elif is_dict(data_object):
             str_keys_only = filter(lambda item: type(item[0]) == str, data_object.items())
-            primitives_first_items = sorted(str_keys_only, key=lambda x: not is_primitive(x[1]))
+            primitives_first_items = sorted(str_keys_only, key=lambda x: self.sortation_order(x[1]))
             for key, value in primitives_first_items:
                 self.collect_all_paths(data_object=value, current_path=current_path, current_view=current_view,
                                        data_object_key=key,
@@ -63,6 +63,21 @@ class Generator:
             self.collect_all_paths(data_object=sample_element,
                                    current_path=current_path,
                                    current_view=new_view_name)
+
+    @staticmethod
+    def sortation_order(value):
+        def depth(x):
+            if type(x) is dict and x:
+                return 1 + max(depth(x[a]) for a in x)
+            if type(x) is list and x:
+                return 1 + max(depth(a) for a in x)
+            return 0
+
+        # put primitives at the first place, since we will not have altrenatives in case of duplicated dim names
+        # the deepest dicts should be processed at the end
+        if is_primitive(value) or value is None:
+            return -1
+        return depth(value)
 
     def get_new_view_name(self, current_view, current_path):
         """
@@ -145,7 +160,7 @@ class Generator:
         dimension_name_final_origin = dimension_name_final
         while dimension_name_final in self.dim_sql_definitions[current_view] and sql_select not in \
                 self.dim_sql_definitions[current_view][dimension_name_final] and i < len(field_path_sql.split(":")) - 1:
-            dimension_name_final = "_".join(field_path_sql.split(":")[-i:-1]) + dimension_name_final_origin
+            dimension_name_final = "_".join(field_path_sql.split(":")[-i - 1:-1]) + dimension_name_final_origin
             dimension_name_final = get_formatted_var_name(dimension_name_final)
             i += 1
 

@@ -21,8 +21,8 @@ view: lueana_latest {
     sql: ${TABLE}."JSON":"isActive"::boolean ;;
   }
     
-  dimension: mcp_s_k_u {
-    description: "Mcp s k u"
+  dimension: mcpsku {
+    description: "Mcpsku"
     type: string
     sql: ${TABLE}."JSON":"mcpSKU"::string ;;
   }
