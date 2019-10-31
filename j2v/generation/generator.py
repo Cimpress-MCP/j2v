@@ -25,16 +25,15 @@ class Generator:
         self.explore_joins = {}
         self.all_joins = []
 
-    def collect_all_paths(self, data_object, current_path=None, current_view=None, root_view=None,
-                          data_object_key=None, parent_object_key=None):
+    def collect_all_paths(self, data_object, current_path=None, current_view=None, data_object_key=None,
+                          parent_object_key=None):
         """
-        Recursive. Explores the data in JSON and takes appropriate actions.
-        :param parent_object_key:
-        :param data_object_key: group label for dimension
+        Recursive. Explores the data and takes appropriate actions.
         :param data_object: Currently processed dict, list or primitive type
-        :param current_path: Path from the root dict
+        :param current_path: Path from the root
         :param current_view: Currently processed view
-        :param root_view:
+        :param data_object_key: data object key (the object parent in a json tree)
+        :param parent_object_key: a key of a data object key (the object grandparent in a json tree)
         :return:
         """
 
@@ -46,33 +45,29 @@ class Generator:
             current_path = ELEMENT_ACCESS_STR
         if current_view is None:
             current_view = self.table_alias
-        if root_view is None:
-            root_view = self.table_alias
 
         if is_primitive(data_object) or data_object is None:
-            self.add_dimension(current_path, current_view, data_object_key or ELEMENT_ACCESS_STR, data_object, parent_object_key)
+            self.add_dimension(current_path, current_view, data_object_key or ELEMENT_ACCESS_STR, data_object,
+                               parent_object_key)
         elif is_dict(data_object):
             str_keys_only = filter(lambda item: type(item[0]) == str, data_object.items())
             primitives_first_items = sorted(str_keys_only, key=lambda x: not is_primitive(x[1]))
             for key, value in primitives_first_items:
-                self.collect_all_paths(value, current_path, current_view, root_view, data_object_key=key,
+                self.collect_all_paths(data_object=value, current_path=current_path, current_view=current_view,
+                                       data_object_key=key,
                                        parent_object_key=data_object_key)
         elif is_non_empty_1D_list(data_object):
-            new_view_name = self.get_new_view_name(current_view, current_path, data_object_key)
+            new_view_name = self.get_new_view_name(current_view, current_path)
             sample_element = data_object[0]
-            self.add_explore_join(new_view_name, current_view, data_object_key, current_path)
+            self.add_explore_join(new_view_name, current_view, current_path)
             self.collect_all_paths(data_object=sample_element,
                                    current_path=current_path,
-                                   current_view=new_view_name,
-                                   root_view=current_view,
-                                   data_object_key=None)
+                                   current_view=new_view_name)
 
-    def get_new_view_name(self, current_view, current_path, key):
+    def get_new_view_name(self, current_view, current_path):
         """
-
         :param current_view:
         :param current_path:
-        :param key:
         :return:
         """
         # create name based on the full access path
@@ -87,12 +82,10 @@ class Generator:
             view_name_candidate = get_formatted_var_name(full_path)
         return view_name_candidate
 
-    def add_explore_join(self, new_view_name, current_view, key, current_path):
+    def add_explore_join(self, new_view_name, current_view, current_path):
         """
-
         :param new_view_name:
         :param current_view:
-        :param key:
         :param current_path:
         :return:
         """
@@ -113,7 +106,6 @@ class Generator:
 
         self.explore_joins[join_path] = explore_join
 
-        # keep the order
         if join_statement not in self.all_joins:
             self.all_joins.append(join_statement)
 
@@ -129,7 +121,7 @@ class Generator:
         :return:
         """
         dim_type, json_type = get_dimension_types(object_value)
-        full_path_nice = self.get_new_view_name(current_view, field_path_sql, object_key)
+        full_path_nice = self.get_new_view_name(current_view, field_path_sql)
         field_path_with_key = field_path_sql
 
         dimension_name_final = get_formatted_var_name(object_key)
@@ -152,7 +144,7 @@ class Generator:
         i = 1
         dimension_name_final_origin = dimension_name_final
         while dimension_name_final in self.dim_sql_definitions[current_view] and sql_select not in \
-                self.dim_sql_definitions[current_view][dimension_name_final] and i < len(field_path_sql.split(":"))-1:
+                self.dim_sql_definitions[current_view][dimension_name_final] and i < len(field_path_sql.split(":")) - 1:
             dimension_name_final = "_".join(field_path_sql.split(":")[-i:-1]) + dimension_name_final_origin
             dimension_name_final = get_formatted_var_name(dimension_name_final)
             i += 1
