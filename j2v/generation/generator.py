@@ -26,47 +26,48 @@ class Generator:
         self.all_joins = []
 
     def collect_all_paths(self, data_object, current_path=None, current_view=None, root_view=None,
-                          parent_object_key=None):
+                          data_object_key=None, parent_object_key=None):
         """
         Recursive. Explores the data in JSON and takes appropriate actions.
-        :param parent_object_key: group label for dimension
-        :param data_object: Currently processed dict
+        :param parent_object_key:
+        :param data_object_key: group label for dimension
+        :param data_object: Currently processed dict, list or primitive type
         :param current_path: Path from the root dict
         :param current_view: Currently processed view
         :param root_view:
         :return:
         """
-        if not current_path:
+
+        if current_path is None and data_object_key is None:
             current_path = doublequote(self.column_name)
-        if not current_view:
+        elif data_object_key is not None:
+            current_path = current_path + ":" + doublequote(data_object_key)
+        elif current_path is not None and data_object_key is None:
+            current_path = ELEMENT_ACCESS_STR
+        if current_view is None:
             current_view = self.table_alias
-        if not root_view:
+        if root_view is None:
             root_view = self.table_alias
-        primitives_first_items = sorted(data_object.items(), key=lambda x: not is_primitive(x[1]))
-        for key, value in primitives_first_items:
-            if type(key) != str:
-                continue
-            if is_primitive(value) or value is None:
-                self.add_dimension(current_path, current_view, key, value, parent_object_key)
-            elif is_dict(value):
-                relative_path = current_path + ":" + doublequote(key)
-                self.collect_all_paths(value, relative_path, current_view, root_view, key)
-            elif is_non_empty_1D_list(value):
-                new_view_name = self.get_full_path_str(current_view, current_path, key)
-                sample_element = value[0]
-                if is_dict(sample_element):
-                    self.add_explore_join(new_view_name, current_view, key, current_path)
-                    self.collect_all_paths(data_object=sample_element,
-                                           current_path=ELEMENT_ACCESS_STR,
-                                           current_view=new_view_name,
-                                           root_view=current_view)
 
-                elif is_primitive(sample_element):
-                    self.add_explore_join(new_view_name, current_view, key, current_path)
-                    self.add_dimension("", new_view_name, ELEMENT_ACCESS_STR, sample_element, None,
-                                       primitive_array=True)
+        if is_primitive(data_object) or data_object is None:
+            self.add_dimension(current_path, current_view, data_object_key or ELEMENT_ACCESS_STR, data_object, parent_object_key)
+        elif is_dict(data_object):
+            str_keys_only = filter(lambda item: type(item[0]) == str, data_object.items())
+            primitives_first_items = sorted(str_keys_only, key=lambda x: not is_primitive(x[1]))
+            for key, value in primitives_first_items:
+                self.collect_all_paths(value, current_path, current_view, root_view, data_object_key=key,
+                                       parent_object_key=data_object_key)
+        elif is_non_empty_1D_list(data_object):
+            new_view_name = self.get_new_view_name(current_view, current_path, data_object_key)
+            sample_element = data_object[0]
+            self.add_explore_join(new_view_name, current_view, data_object_key, current_path)
+            self.collect_all_paths(data_object=sample_element,
+                                   current_path=current_path,
+                                   current_view=new_view_name,
+                                   root_view=current_view,
+                                   data_object_key=None)
 
-    def get_full_path_str(self, current_view, current_path, key):
+    def get_new_view_name(self, current_view, current_path, key):
         """
 
         :param current_view:
@@ -77,11 +78,14 @@ class Generator:
         # create name based on the full access path
         # remove access string from view name, only one left most occurrence,
         # we cannot remove more, it can be in some field name
-        full_path = current_view + ":" + current_path.replace(ELEMENT_ACCESS_STR, "", 1) + key
+        full_path = current_view + ":" + current_path.replace(ELEMENT_ACCESS_STR, "", 1)
+
         full_path_nice = full_path.replace(self.table_alias, "", 1)
         full_path_nice = full_path_nice.replace(self.column_name, "", 1)
-
-        return get_formatted_var_name(full_path_nice)
+        view_name_candidate = get_formatted_var_name(full_path_nice)
+        if len(view_name_candidate) == 0:
+            view_name_candidate = get_formatted_var_name(full_path)
+        return view_name_candidate
 
     def add_explore_join(self, new_view_name, current_view, key, current_path):
         """
@@ -94,12 +98,12 @@ class Generator:
         """
 
         required_joins_line = lt.req_joins_str_template.format(required_join=current_view)
-        join_path = current_view + ":" + current_path + ":" + doublequote(key)
+        join_path = current_view + ":" + current_path
 
         if current_view is self.table_alias:
             # root view
             required_joins_line = ""
-            join_path = current_view + "." + current_path + ":" + doublequote(key)
+            join_path = current_view + "." + current_path
         join_path = join_path.replace(":" + ELEMENT_ACCESS_STR, "." + ELEMENT_ACCESS_STR)
         join_statement = st.join_str_template.format(alias=new_view_name,
                                                      exploded_structure_path=join_path)
@@ -113,33 +117,33 @@ class Generator:
         if join_statement not in self.all_joins:
             self.all_joins.append(join_statement)
 
-    def add_dimension(self, field_path_sql, current_view, dimension_name, dim_val, parent_object_key,
+    def add_dimension(self, field_path_sql, current_view, object_key, object_value, parent_object_key,
                       primitive_array=False):
         """
         :param primitive_array:
         :param field_path_sql:
         :param current_view:
-        :param dimension_name:
-        :param dim_val:
+        :param object_key:
+        :param object_value:
         :param parent_object_key:
         :return:
         """
-        dim_type, json_type = get_dimension_types(dim_val)
-        full_path_nice = self.get_full_path_str(current_view, field_path_sql, dimension_name)
-        field_path_with_key = field_path_sql + (":" if field_path_sql else "") + doublequote(dimension_name)
+        dim_type, json_type = get_dimension_types(object_value)
+        full_path_nice = self.get_new_view_name(current_view, field_path_sql, object_key)
+        field_path_with_key = field_path_sql
 
-        dimension_name_final = get_formatted_var_name(dimension_name)
+        dimension_name_final = get_formatted_var_name(object_key)
         nice_description = " ".join(dimension_name_final.split("_")).capitalize()
 
         if primitive_array:
-            field_path_with_key = dimension_name
+            field_path_with_key = object_key
 
         group_label_string = ""
         if parent_object_key:
             group_label = " ".join(get_formatted_var_name(parent_object_key).split("_")).capitalize()
             group_label_string = "\n    group_label: \"{}\"".format(group_label)
 
-        primary_key_field = "\n    primary_key: yes" if parent_object_key is None and self.primary_key == dimension_name else ""
+        primary_key_field = "\n    primary_key: yes" if parent_object_key is None and self.primary_key == object_key else ""
 
         sql_select = self.build_sql_select(json_type, dim_type, field_path_with_key, current_view,
                                            full_path_nice.upper())
@@ -148,14 +152,14 @@ class Generator:
         i = 1
         dimension_name_final_origin = dimension_name_final
         while dimension_name_final in self.dim_sql_definitions[current_view] and sql_select not in \
-                self.dim_sql_definitions[current_view][dimension_name_final] and i < len(field_path_sql.split(":")):
-            dimension_name_final = "_".join(field_path_sql.split(":")[-i:]) + dimension_name_final_origin
+                self.dim_sql_definitions[current_view][dimension_name_final] and i < len(field_path_sql.split(":"))-1:
+            dimension_name_final = "_".join(field_path_sql.split(":")[-i:-1]) + dimension_name_final_origin
             dimension_name_final = get_formatted_var_name(dimension_name_final)
             i += 1
 
         self.dim_sql_definitions[current_view][dimension_name_final] = sql_select
 
-        new_dimension = self.get_dim_str(dim_type, dim_val, dimension_name_final, field_path_with_key,
+        new_dimension = self.get_dim_str(dim_type, object_value, dimension_name_final, field_path_with_key,
                                          group_label_string,
                                          json_type, nice_description, primary_key_field)
 

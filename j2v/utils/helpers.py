@@ -151,6 +151,6 @@ def get_formatted_var_name(field_name):
     parts = list()
     for element in name_elements:
         parts.extend(camel_case_split(element))
-    name_final = "_".join(parts).lower().lstrip('_')
-    name_final = re.sub("_+", "_", name_final)
+    name_final = "_".join(parts).lower()
+    name_final = re.sub("_+", "_", name_final).lstrip('_').rstrip('_')
     return name_final
