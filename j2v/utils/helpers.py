@@ -124,6 +124,13 @@ def make_valid_variable_name(name):
 
 def camel_case_split(name):
     splits = re.sub('(?!^)([A-Z][a-z]+)', r' \1', name).split()
+    # Camel case split avoiding splits of upper case substrings.
+    # 'NameSurname' -> ['Name','Surname']
+    # 'NameSURNAME' -> ['NameSURNAME']
+    # 'NameSurnameId' -> ['Name', 'Surname', 'Id']
+    # 'NameSurnameID' -> ['Name', 'SurnameID']
+    # 'DeviceIP' -> ['DeviceIP']
+
     if len(splits) == 0 or name.isupper() or name.islower():
         return [name]
     else:

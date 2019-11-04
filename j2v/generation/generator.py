@@ -57,12 +57,12 @@ class Generator:
                                        data_object_key=key,
                                        parent_object_key=data_object_key)
         elif is_non_empty_1D_list(data_object):
-            new_view_name = self.get_new_view_name(current_view, current_path)
+            view_name = self.create_view_name(current_view, current_path)
             sample_element = data_object[0]
-            self.add_explore_join(new_view_name, current_view, current_path)
+            self.add_explore_join(view_name, current_view, current_path)
             self.collect_all_paths(data_object=sample_element,
                                    current_path=current_path,
-                                   current_view=new_view_name)
+                                   current_view=view_name)
 
     @staticmethod
     def sortation_order(value):
@@ -79,7 +79,7 @@ class Generator:
             return -1
         return depth(value)
 
-    def get_new_view_name(self, current_view, current_path):
+    def create_view_name(self, current_view, current_path):
         """
         :param current_view:
         :param current_path:
@@ -136,7 +136,7 @@ class Generator:
         :return:
         """
         dim_type, json_type = get_dimension_types(object_value)
-        full_path_nice = self.get_new_view_name(current_view, field_path_sql)
+        full_path_nice = self.create_view_name(current_view, field_path_sql)
         field_path_with_key = field_path_sql
 
         dimension_name_final = get_formatted_var_name(object_key)
