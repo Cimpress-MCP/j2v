@@ -45,6 +45,7 @@ class Generator:
             current_path = ELEMENT_ACCESS_STR
         if current_view is None:
             current_view = self.table_alias
+            self.dim_definitions[current_view] = set()
 
         if is_primitive(data_object) or data_object is None:
             self.add_dimension(current_path, current_view, data_object_key or ELEMENT_ACCESS_STR, data_object,

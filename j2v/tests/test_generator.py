@@ -20,8 +20,16 @@ def test_empty():
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
                   primary_key=None)
     g.collect_all_paths(data_object={})
-    assert not g.dim_definitions
+
+    assert count_dims(g) == 0
     assert not g.explore_joins
+
+
+def count_dims(g):
+    count = 0
+    for view, dims in g.dim_definitions.items():
+        count += len(dims)
+    return count
 
 
 def test_int_key():
@@ -32,7 +40,7 @@ def test_int_key():
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
                   primary_key=None)
     g.collect_all_paths(data_object={1: 2})
-    assert not g.dim_definitions
+    assert count_dims(g) == 0
     assert not g.explore_joins
 
 
