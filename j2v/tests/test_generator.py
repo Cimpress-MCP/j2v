@@ -19,9 +19,17 @@ def test_empty():
     """
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
                   primary_key=None)
-    g.collect_all_paths(current_dict={})
-    assert not g.dim_definitions
+    g.collect_all_paths(data_object={})
+
+    assert count_dims(g) == 0
     assert not g.explore_joins
+
+
+def count_dims(g):
+    count = 0
+    for view, dims in g.dim_definitions.items():
+        count += len(dims)
+    return count
 
 
 def test_int_key():
@@ -31,8 +39,8 @@ def test_int_key():
     """
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
                   primary_key=None)
-    g.collect_all_paths(current_dict={1: 2})
-    assert not g.dim_definitions
+    g.collect_all_paths(data_object={1: 2})
+    assert count_dims(g) == 0
     assert not g.explore_joins
 
 
@@ -43,7 +51,7 @@ def test_one_array():
     """
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
                   primary_key=None)
-    g.collect_all_paths(current_dict={ORDERS_TABLE_NAME: [{"id": 3}, {"id": 334}]})
+    g.collect_all_paths(data_object={ORDERS_TABLE_NAME: [{"id": 3}, {"id": 334}]})
     assert ORDERS_TABLE_NAME in g.dim_definitions
     assert 1 == len(g.dim_definitions["orders"])
     assert "id" in list(g.dim_definitions["orders"])[0]
@@ -54,7 +62,7 @@ def test_one_array():
 def test_one_problematic_dim_name():
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
                   primary_key=None)
-    g.collect_all_paths(current_dict={ORDERS_TABLE_NAME: [{"aaaaId-ABC-DEF": 3}, {"abId-ABC--DEF": 334}], "zz": 5654.3})
+    g.collect_all_paths(data_object={ORDERS_TABLE_NAME: [{"aaaaId-ABC-DEF": 3}, {"abId-ABC--DEF": 334}], "zz": 5654.3})
     count = 0
     dims = g.dim_definitions[ORDERS_TABLE_NAME]
     for dim in dims:
@@ -67,7 +75,7 @@ def test_one_problematic_dim_name():
 def test_lower_cases_1():
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
                   primary_key=None)
-    g.collect_all_paths(current_dict={ORDERS_TABLE_NAME: [{"ID": 3}, {"ID": 334}], "AMOUNT": 5654.3})
+    g.collect_all_paths(data_object={ORDERS_TABLE_NAME: [{"ID": 3}, {"ID": 334}], "AMOUNT": 5654.3})
     __test_lower_cases(g)
 
 
@@ -75,7 +83,7 @@ def test_lower_cases_2():
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
                   primary_key=None)
     g.collect_all_paths(
-        current_dict={ORDERS_TABLE_NAME: [{"ID": 3}, {"ID": 334}], "AMOUNT": {"value": 5654.3, "CURRENCY": "EUR"}})
+        data_object={ORDERS_TABLE_NAME: [{"ID": 3}, {"ID": 334}], "AMOUNT": {"value": 5654.3, "CURRENCY": "EUR"}})
     __test_lower_cases(g)
 
 
@@ -104,7 +112,7 @@ def __test_lower_cases(g):
         """
         g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=True,
                       primary_key=None)
-        g.collect_all_paths(current_dict={ORDERS_TABLE_NAME: json_data})
+        g.collect_all_paths(data_object={ORDERS_TABLE_NAME: json_data})
         for column_def in g.dim_sql_definitions[ORDERS_TABLE_NAME].values():
             assert column_def.startswith(prefix)
             assert suffix in column_def

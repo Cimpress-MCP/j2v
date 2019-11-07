@@ -123,8 +123,15 @@ def make_valid_variable_name(name):
 
 
 def camel_case_split(name):
-    splits = re.split('(?=[A-Z])', name)
-    if len(splits) == 0 or all(map(lambda c: c.isupper(), name)) or all(map(lambda c: c.islower(), name)):
+    splits = re.sub('(?!^)([A-Z][a-z]+)', r' \1', name).split()
+    # Camel case split avoiding splits of upper case substrings.
+    # 'NameSurname' -> ['Name','Surname']
+    # 'NameSURNAME' -> ['NameSURNAME']
+    # 'NameSurnameId' -> ['Name', 'Surname', 'Id']
+    # 'NameSurnameID' -> ['Name', 'SurnameID']
+    # 'DeviceIP' -> ['DeviceIP']
+
+    if len(splits) == 0 or name.isupper() or name.islower():
         return [name]
     else:
         return splits
@@ -151,6 +158,6 @@ def get_formatted_var_name(field_name):
     parts = list()
     for element in name_elements:
         parts.extend(camel_case_split(element))
-    name_final = "_".join(parts).lower().lstrip('_')
-    name_final = re.sub("_+", "_", name_final)
+    name_final = "_".join(parts).lower()
+    name_final = re.sub("_+", "_", name_final).lstrip('_').rstrip('_')
     return name_final
