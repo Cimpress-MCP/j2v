@@ -7,6 +7,7 @@ view: json_table {
 view: json_table_json { 
 
   dimension: value {
+    label: "Value"
     description: "Value"
     type: number
     sql: ${TABLE}.VALUE::number ;;

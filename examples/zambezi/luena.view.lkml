@@ -3,12 +3,14 @@ view: lueana_latest {
   sql_table_name: ZAMBEZI ;;
 
   dimension: category {
+    label: "Category"
     description: "Category"
     type: string
     sql: ${TABLE}."JSON":"category"::string ;;
   }
     
   dimension: id {
+    label: "Id"
     description: "Id"
     type: string
     sql: ${TABLE}."JSON":"_datalakeMetadata":"id"::string ;;
@@ -16,24 +18,28 @@ view: lueana_latest {
   }
     
   dimension: is_active {
+    label: "Is active"
     description: "Is active"
     type: yesno
     sql: ${TABLE}."JSON":"isActive"::boolean ;;
   }
     
   dimension: mcpsku {
+    label: "Mcpsku"
     description: "Mcpsku"
     type: string
     sql: ${TABLE}."JSON":"mcpSKU"::string ;;
   }
     
   dimension: price {
+    label: "Price"
     description: "Price"
     type: string
     sql: ${TABLE}."JSON":"price"::string ;;
   }
     
   dimension: principal {
+    label: "Principal"
     description: "Principal"
     type: string
     sql: ${TABLE}."JSON":"_datalakeMetadata":"principal"::string ;;
@@ -41,6 +47,7 @@ view: lueana_latest {
   }
     
   dimension: stream_id {
+    label: "Stream id"
     description: "Stream id"
     type: string
     sql: ${TABLE}."JSON":"_datalakeMetadata":"streamId"::string ;;
@@ -48,6 +55,7 @@ view: lueana_latest {
   }
     
   dimension: transaction_id {
+    label: "Transaction id"
     description: "Transaction id"
     type: string
     sql: ${TABLE}."JSON":"transactionId"::string ;;
@@ -88,6 +96,7 @@ view: lueana_latest {
 view: fulfiller_list { 
 
   dimension: fulfiller {
+    label: "Fulfiller"
     description: "Fulfiller"
     type: string
     sql: ${TABLE}.VALUE:"fulfiller"::string ;;
