@@ -1,6 +1,7 @@
 
 view: lueana_latest { 
   sql_table_name: ZAMBEZI ;;
+  label: Lueana Latest
 
   dimension: category {
     label: "Category"
@@ -18,8 +19,8 @@ view: lueana_latest {
   }
     
   dimension: is_active {
-    label: "Is active"
-    description: "Is active"
+    label: "Is Active"
+    description: "Is Active"
     type: yesno
     sql: ${TABLE}."JSON":"isActive"::boolean ;;
   }
@@ -47,16 +48,16 @@ view: lueana_latest {
   }
     
   dimension: stream_id {
-    label: "Stream id"
-    description: "Stream id"
+    label: "Stream Id"
+    description: "Stream Id"
     type: string
     sql: ${TABLE}."JSON":"_datalakeMetadata":"streamId"::string ;;
     group_label: "Datalake metadata"
   }
     
   dimension: transaction_id {
-    label: "Transaction id"
-    description: "Transaction id"
+    label: "Transaction Id"
+    description: "Transaction Id"
     type: string
     sql: ${TABLE}."JSON":"transactionId"::string ;;
   }
@@ -94,6 +95,7 @@ view: lueana_latest {
 }
 
 view: fulfiller_list { 
+  label: Fulfiller List
 
   dimension: fulfiller {
     label: "Fulfiller"
