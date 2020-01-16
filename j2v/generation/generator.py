@@ -74,7 +74,7 @@ class Generator:
                 return 1 + max(depth(a) for a in x)
             return 0
 
-        # put primitives at the first place, since we will not have altrenatives in case of duplicated dim names
+        # put primitives at the first place, since we will not have alternatives in case of duplicated dim names
         # the deepest dicts should be processed at the end
         if is_primitive(value) or value is None:
             return -1
@@ -168,8 +168,7 @@ class Generator:
         self.dim_sql_definitions[current_view][dimension_name_final] = sql_select
 
         new_dimension = self.get_dim_str(dim_type, object_value, dimension_name_final, field_path_with_key,
-                                         group_label_string,
-                                         json_type, nice_description, primary_key_field)
+                                         group_label_string, json_type, nice_description, primary_key_field)
 
         self.dim_definitions[current_view].add(new_dimension)
 
@@ -179,6 +178,7 @@ class Generator:
         if dim_type == "time" and json_type == "timestamp":
             new_dimension = lt.dimension_group_time_template.format(
                 dimension_name=dimension_name_final,
+                dimension_label=nice_description,
                 desc=nice_description,
                 data_type_field="",
                 path=field_path_sql,
@@ -188,6 +188,7 @@ class Generator:
         elif dim_type == "epoch" and json_type == "number":
             new_dimension = lt.dimension_group_time_template.format(
                 dimension_name=dimension_name_final,
+                dimension_label=nice_description,
                 desc=nice_description,
                 data_type_field="\n    datatype: {}".format(dim_type),
                 looker_type="time",
@@ -196,6 +197,7 @@ class Generator:
         else:
             new_dimension = lt.dimension_str_template.format(
                 dimension_name=dimension_name_final,
+                dimension_label=nice_description,
                 desc=nice_description,
                 path=field_path_sql,
                 looker_type=dim_type,
