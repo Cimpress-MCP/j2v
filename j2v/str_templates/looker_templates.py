@@ -26,6 +26,7 @@ dimension_group_time_template = """
 
 view_start_str_template = """
 view: {name} {{ {base_table}
+  label: {label}
 """
 
 view_end_str = """
