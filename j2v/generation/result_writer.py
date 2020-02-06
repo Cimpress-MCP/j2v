@@ -50,12 +50,13 @@ class LookerWriter:
         """
         explore_out = list()
         alias = self.table_alias.lower()
+        nice_description = " ".join(alias.split("_")).capitalize()
         explore_out.append(
             lt.explore_start_str_template.format(explore_name=alias,
                                                  base_view_alias=alias,
                                                  base_view=alias,
-                                                 description=alias + " explore",
-                                                 label=alias + " explore",
+                                                 description=nice_description,
+                                                 label=nice_description,
                                                  view_file_name=self.output_view_file_name))
         explore_out.extend(explore_joins.values())
 
