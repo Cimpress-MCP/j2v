@@ -60,7 +60,8 @@ class Generator:
         elif is_non_empty_1D_list(data_object):
             view_name = self.create_view_name(current_view, current_path)            
             self.add_explore_join(view_name, current_view, current_path)
-            array_sample_size = 100
+            # Sample size i.e. the number of elements that will be sampled/processed inside an array in the JSON
+            array_sample_size = 50            
             data_objects_selected = data_object if len(data_object) <= array_sample_size else random.sample(data_object, array_sample_size)
             for element in data_objects_selected:
                 self.collect_all_paths(data_object=element,
