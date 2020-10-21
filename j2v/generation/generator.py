@@ -1,5 +1,5 @@
 from collections import defaultdict
-
+import random
 from j2v.str_templates import sql_templates as st
 from j2v.utils.config import generator_config
 from j2v.utils.helpers import *
@@ -58,10 +58,12 @@ class Generator:
                                        data_object_key=key,
                                        parent_object_key=data_object_key)
         elif is_non_empty_1D_list(data_object):
-            view_name = self.create_view_name(current_view, current_path)
-            sample_element = data_object[0]
+            view_name = self.create_view_name(current_view, current_path)            
             self.add_explore_join(view_name, current_view, current_path)
-            self.collect_all_paths(data_object=sample_element,
+            array_sample_size = 100
+            data_objects_selected = data_object if len(data_object) <= array_sample_size else random.sample(data_object, array_sample_size)
+            for element in data_objects_selected:
+                self.collect_all_paths(data_object=element,
                                    current_path=current_path,
                                    current_view=view_name)
 
