@@ -62,7 +62,7 @@ class Generator:
             self.add_explore_join(view_name, current_view, current_path)
             # Sample size i.e. the number of elements that will be sampled/processed inside an array in the JSON
             array_sample_size = 50            
-            data_objects_selected = data_object if len(data_object) <= array_sample_size else random.sample(data_object, array_sample_size)
+            data_objects_selected = random.sample(data_object,min(len(data_object), array_sample_size))
             for element in data_objects_selected:
                 self.collect_all_paths(data_object=element,
                                    current_path=current_path,

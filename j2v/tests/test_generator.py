@@ -58,6 +58,21 @@ def test_one_array():
     __test_lower_cases(g)
     assert 1 == len(g.explore_joins)
 
+def test_array_with_multiple_elements():
+    """
+    Exactly 1 view should be created with 2 dimensions, and one LATERAL FLATTEN expression
+    :return:
+    """
+    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
+                  primary_key=None)
+    g.collect_all_paths(data_object={ORDERS_TABLE_NAME: [{"id": 3}, {"info": 334}]})
+    assert ORDERS_TABLE_NAME in g.dim_definitions
+    assert 2 == len(g.dim_definitions["orders"])
+    assert "id" in list(g.dim_definitions["orders"])[0]    
+    assert "info" in list(g.dim_definitions["orders"])[1]    
+    __test_lower_cases(g)
+    assert 1 == len(g.explore_joins)
+
 
 def test_one_problematic_dim_name():
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
