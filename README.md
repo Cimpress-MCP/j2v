@@ -1,4 +1,6 @@
-[![PyPI version](https://badge.fury.io/py/j2v.svg)](https://badge.fury.io/py/j2v) ![CI/CD](https://github.com/Cimpress-MCP/j2v/workflows/Test/badge.svg?style=svg)
+[![PyPI version](https://badge.fury.io/py/j2v.svg)](https://badge.fury.io/py/j2v) 
+
+[![CI/CD](https://github.com/Cimpress-MCP/j2v/workflows/Test/badge.svg)](https://github.com/Cimpress-MCP/j2v/actions?query=workflow%3ATest)
 
 # JSONs to Looker views (J2V)
 
