@@ -60,7 +60,7 @@ def is_unix_timestamp(dim_val):
     :return: True only if string represents a timestamp
     """
     date_now = datetime.now()
-    date_delta = timedelta(days=365)
+    date_delta = timedelta(days=365*5)
     number_digits = len(str(dim_val))
     base_10 = 10
 
