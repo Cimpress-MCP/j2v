@@ -53,7 +53,7 @@ def test_one_array():
                   primary_key=None)
     g.collect_all_paths(data_object={ORDERS_TABLE_NAME: [{"id": 3}, {"id": 334}]})
     assert ORDERS_TABLE_NAME in g.dim_definitions
-    assert 1 == len(g.dim_definitions["orders"])    
+    assert 1 == len(g.dim_definitions["orders"])
     __test_lower_cases(g)
     assert 1 == len(g.explore_joins)
 
@@ -66,9 +66,24 @@ def test_array_with_multiple_elements():
                   primary_key=None)
     g.collect_all_paths(data_object={ORDERS_TABLE_NAME: [{"id": 3}, {"info": 334}, {"email": "a@a.com"}, {"phone_number": 3344531679}]})
     assert ORDERS_TABLE_NAME in g.dim_definitions
-    assert 4 == len(g.dim_definitions["orders"])    
+    assert 4 == len(g.dim_definitions["orders"])
     __test_lower_cases(g)
     assert 1 == len(g.explore_joins)
+
+
+def test_array_with_missing_object_fields():
+    """
+    Exactly 1 view should be created with 4 dimensions, and one LATERAL FLATTEN expression
+    :return:
+    """
+    g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
+                  primary_key=None)
+    g.collect_all_paths(data_object={ORDERS_TABLE_NAME: [{"id": 3}, {"id": 3, "info": 334, "email": "a@a.com", "phone_number": 3344531679}]} )
+    assert ORDERS_TABLE_NAME in g.dim_definitions
+    assert 4 == len(g.dim_definitions["orders"])
+    __test_lower_cases(g)
+    assert 1 == len(g.explore_joins)
+
 
 
 def test_one_problematic_dim_name():
