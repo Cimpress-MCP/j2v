@@ -18,7 +18,7 @@ def test_empty():
     :return:
     """
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
-                  primary_key=None)
+                  primary_key=None, sql_dialect="snowflake")
     g.collect_all_paths(data_object={})
 
     assert count_dims(g) == 0
@@ -38,7 +38,7 @@ def test_int_key():
     :return:
     """
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
-                  primary_key=None)
+                  primary_key=None, sql_dialect="snowflake")
     g.collect_all_paths(data_object={1: 2})
     assert count_dims(g) == 0
     assert not g.explore_joins
@@ -50,7 +50,7 @@ def test_one_array():
     :return:
     """
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
-                  primary_key=None)
+                  primary_key=None, sql_dialect="snowflake")
     g.collect_all_paths(data_object={ORDERS_TABLE_NAME: [{"id": 3}, {"id": 334}]})
     assert ORDERS_TABLE_NAME in g.dim_definitions
     assert 1 == len(g.dim_definitions["orders"])
@@ -63,7 +63,7 @@ def test_array_with_multiple_elements():
     :return:
     """
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
-                  primary_key=None)
+                  primary_key=None, sql_dialect="snowflake")
     g.collect_all_paths(data_object={ORDERS_TABLE_NAME: [{"id": 3}, {"info": 334}, {"email": "a@a.com"}, {"phone_number": 3344531679}]})
     assert ORDERS_TABLE_NAME in g.dim_definitions
     assert 4 == len(g.dim_definitions["orders"])
@@ -77,7 +77,7 @@ def test_array_with_missing_object_fields():
     :return:
     """
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
-                  primary_key=None)
+                  primary_key=None, sql_dialect="snowflake")
     g.collect_all_paths(data_object={ORDERS_TABLE_NAME: [{"id": 3}, {"id": 3, "info": 334, "email": "a@a.com", "phone_number": 3344531679}]} )
     assert ORDERS_TABLE_NAME in g.dim_definitions
     assert 4 == len(g.dim_definitions["orders"])
@@ -88,7 +88,7 @@ def test_array_with_missing_object_fields():
 
 def test_one_problematic_dim_name():
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
-                  primary_key=None)
+                  primary_key=None, sql_dialect="snowflake")
     g.collect_all_paths(data_object={ORDERS_TABLE_NAME: [{"aaaaId-ABC-DEF": 3}, {"abId-ABC--DEF": 334}], "zz": 5654.3})
     count = 0
     dims = g.dim_definitions[ORDERS_TABLE_NAME]
@@ -101,14 +101,14 @@ def test_one_problematic_dim_name():
 
 def test_lower_cases_1():
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
-                  primary_key=None)
+                  primary_key=None, sql_dialect="snowflake")
     g.collect_all_paths(data_object={ORDERS_TABLE_NAME: [{"ID": 3}, {"ID": 334}], "AMOUNT": 5654.3})
     __test_lower_cases(g)
 
 
 def test_lower_cases_2():
     g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=False,
-                  primary_key=None)
+                  primary_key=None, sql_dialect="snowflake")
     g.collect_all_paths(
         data_object={ORDERS_TABLE_NAME: [{"ID": 3}, {"ID": 334}], "AMOUNT": {"value": 5654.3, "CURRENCY": "EUR"}})
     __test_lower_cases(g)
@@ -138,7 +138,7 @@ def __test_lower_cases(g):
         the appropriate null handling code should be added to all columns in all_non_null_fields
         """
         g = Generator(column_name="data_column", table_alias="data_table", handle_null_values_in_sql=True,
-                      primary_key=None)
+                      primary_key=None, sql_dialect="snowflake")
         g.collect_all_paths(data_object={ORDERS_TABLE_NAME: json_data})
         for column_def in g.dim_sql_definitions[ORDERS_TABLE_NAME].values():
             assert column_def.startswith(prefix)

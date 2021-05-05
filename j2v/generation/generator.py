@@ -1,14 +1,10 @@
 from collections import defaultdict
 import random
 from j2v.str_templates import sql_templates as st
-from j2v.utils.config import generator_config
 from j2v.utils.helpers import *
 
-ELEMENT_ACCESS_STR = generator_config['ELEMENT_ACCESS_STR']
-
-
 class Generator:
-    def __init__(self, column_name, table_alias, handle_null_values_in_sql, primary_key):
+    def __init__(self, column_name, table_alias, handle_null_values_in_sql, sql_dialect, primary_key):
         """
         Init empty lists.
         """
@@ -16,6 +12,7 @@ class Generator:
         self.explore_joins = {}
         self.column_name = column_name
         self.table_alias = table_alias
+        self.sql_dialect = sql_dialect
         self.primary_key = primary_key
         self.handle_null_values_in_sql = handle_null_values_in_sql
         self.dim_definitions = defaultdict(set)
@@ -37,18 +34,20 @@ class Generator:
         :return:
         """
 
+        templates = getattr(st, self.sql_dialect)
         if current_path is None and data_object_key is None:
-            current_path = doublequote(self.column_name)
+            current_path = templates["path_step"].format(path_step=self.column_name)
         elif data_object_key is not None:
-            current_path = current_path + ":" + doublequote(data_object_key)
+            new_step = templates["path_step"].format(path_step=data_object_key)
+            current_path = templates["concat_steps"].format(step1=current_path, step2=new_step) if current_path else new_step
         elif current_path is not None and data_object_key is None:
-            current_path = ELEMENT_ACCESS_STR
+            current_path = templates["ELEMENT_ACCESS_STR"]
         if current_view is None:
             current_view = self.table_alias
             self.dim_definitions[current_view] = set()
 
         if is_primitive(data_object) or data_object is None:
-            self.add_dimension(current_path, current_view, data_object_key or ELEMENT_ACCESS_STR, data_object,
+            self.add_dimension(current_path, current_view, data_object_key or templates["ELEMENT_ACCESS_STR"], data_object,
                                parent_object_key)
         elif is_dict(data_object):
             str_keys_only = filter(lambda item: type(item[0]) == str, data_object.items())
@@ -92,7 +91,8 @@ class Generator:
         # create name based on the full access path
         # remove access string from view name, only one left most occurrence,
         # we cannot remove more, it can be in some field name
-        full_path = current_view + ":" + current_path.replace(ELEMENT_ACCESS_STR, "", 1)
+        templates = getattr(st, self.sql_dialect)
+        full_path = current_view + ":" + current_path.replace(templates["ELEMENT_ACCESS_STR"], "", 1)
 
         full_path_nice = full_path.replace(self.table_alias, "", 1)
         full_path_nice = full_path_nice.replace(self.column_name, "", 1)
@@ -109,6 +109,7 @@ class Generator:
         :return:
         """
 
+        templates = getattr(st, self.sql_dialect)
         required_joins_line = lt.req_joins_str_template.format(required_join=current_view)
         join_path = current_view + ":" + current_path
 
@@ -116,8 +117,8 @@ class Generator:
             # root view
             required_joins_line = ""
             join_path = current_view + "." + current_path
-        join_path = join_path.replace(":" + ELEMENT_ACCESS_STR, "." + ELEMENT_ACCESS_STR)
-        join_statement = st.join_str_template.format(alias=new_view_name,
+        join_path = join_path.replace(":" + templates["ELEMENT_ACCESS_STR"], "." + templates["ELEMENT_ACCESS_STR"])
+        join_statement = templates['join_str_template'].format(alias=new_view_name,
                                                      exploded_structure_path=join_path)
         explore_join = lt.explore_join_str_template.format(alias=new_view_name, view=new_view_name,
                                                            join_expression=join_statement,
@@ -213,17 +214,17 @@ class Generator:
         if self.handle_null_values_in_sql:
 
             if json_type.startswith('number'):
-                return st.non_nullable_numeric_field_str_template.format(
+                return getattr(st, self.sql_dialect)['non_nullable_numeric_field_str_template'].format(
                     path=field_path_sql,
                     TABLE=current_view, json_type=json_type,
                     path_alias=full_path_nice_upper)
 
             elif json_type == "string" and dim_type != "time":
-                return st.non_nullable_text_field_str_template.format(
+                return getattr(st, self.sql_dialect)['non_nullable_text_field_str_template'].format(
                     path=field_path_sql,
                     TABLE=current_view, json_type=json_type,
                     path_alias=full_path_nice_upper)
-        return st.field_str_template.format(
+        return getattr(st, self.sql_dialect)['field_str_template'].format(
             path=field_path_sql,
             TABLE=current_view,
             json_type=json_type,

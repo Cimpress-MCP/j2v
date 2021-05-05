@@ -107,9 +107,12 @@ With J2V all the structures are discovered automatically and two files are gener
 
 ### Ouput:
 
-#### SQL output (now only Snowflake dialect supported):
+#### SQL output:
 
-```SQL
+- Snowflake [Default]
+- BigQuery
+
+```SNOWFLAKE SQL
 
  ---VIEW WITH NUll VALUE HANDLING---
 
@@ -144,6 +147,41 @@ LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."DATA":"restaurants") resta
 LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants.VALUE:"menu") restaurants_menu,
 LATERAL FLATTEN(OUTER => TRUE, INPUT => restaurants_menu.VALUE:"ingredients") restaurants_menu_ingredients,
 LATERAL FLATTEN(OUTER => TRUE, INPUT => chains_table."DATA":"headquarter":"building":"floors") headquarter_building_floors
+```
+
+``` BIGQUERY SQL
+
+ ---VIEW WITH NUll VALUE HANDLING---
+SELECT
+---chains_table Information
+IFNULL(chains_table.DATA.apiVersion, 'N/A') AS API_VERSION,
+IFNULL(chains_table.DATA.data Provider, 'N/A') AS DATA_PROVIDER,
+IFNULL(chains_table.DATA.headquarter.building.address, 'N/A') AS HEADQUARTER_BUILDING_ADDRESS,
+IFNULL(chains_table.DATA.headquarter.city, 'N/A') AS HEADQUARTER_CITY,
+IFNULL(chains_table.DATA.headquarter.country, 'N/A') AS HEADQUARTER_COUNTRY,
+IFNULL(chains_table.DATA.headquarter.employees, 0) AS HEADQUARTER_EMPLOYEES,
+IFNULL(chains_table.DATA.payloadPrimaryKeyValue, 'N/A') AS PAYLOAD_PRIMARY_KEY_VALUE,
+IFNULL(chains_table.DATA.version, 'N/A') AS VERSION,
+chains_table.DATA.dataGenerationTimestamp AS DATA_GENERATION_TIMESTAMP,
+---headquarter_building_floors Information
+IFNULL(headquarter_building_floors., 0) AS HEADQUARTER_BUILDING_FLOORS,
+---restaurants Information
+IFNULL(restaurants.address, 'N/A') AS RESTAURANTS_ADDRESS,
+IFNULL(restaurants.city, 'N/A') AS RESTAURANTS_CITY,
+IFNULL(restaurants.country, 'N/A') AS RESTAURANTS_COUNTRY,
+IFNULL(restaurants.currency, 'N/A') AS RESTAURANTS_CURRENCY,
+IFNULL(restaurants.name, 'N/A') AS RESTAURANTS_NAME,
+IFNULL(restaurants.openTime, 0) AS RESTAURANTS_OPEN_TIME,
+---restaurants_menu Information
+IFNULL(restaurants_menu.dishName, 'N/A') AS RESTAURANTS_MENU_DISH_NAME,
+IFNULL(restaurants_menu.price, 0) AS RESTAURANTS_MENU_PRICE,
+---restaurants_menu_ingredients Information
+IFNULL(restaurants_menu_ingredients., 'N/A') AS RESTAURANTS_MENU_INGREDIENTS
+FROM RESTAURANT_DETAILS AS chains_table
+LEFT JOIN UNNEST(chains_table.DATA.headquarter.building.floors) AS headquarter_building_floors
+LEFT JOIN UNNEST(chains_table.DATA.restaurants) AS restaurants
+LEFT JOIN UNNEST(restaurants.menu) AS restaurants_menu
+LEFT JOIN UNNEST(restaurants_menu.ingredients) AS restaurants_menu_ingredients
 ```
 
 #### Ouput files:

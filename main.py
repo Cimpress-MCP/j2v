@@ -21,11 +21,12 @@ if __name__ == '__main__':
     parser.add_argument("--handle_null_values_in_sql", nargs=argparse.OPTIONAL, type=str,
                         default=generator_config['HANDLE_NULL_VALUES_IN_SQL_DEFAULT'], )
     parser.add_argument("--primary_key", nargs=argparse.OPTIONAL, type=str,)
+    parser.add_argument("--sql_dialect", nargs=argparse.OPTIONAL, type=str,)
     args = parser.parse_args()
     p = MainProcessor(column_name=args.column_name, output_explore_file_name=args.output_explore,
                       output_view_file_name=args.output_view, sql_table_name=args.sql_table_name,
                       table_alias=args.table_alias, handle_null_values_in_sql=is_truthy(args.handle_null_values_in_sql),
-                      primary_key=args.primary_key)
+                      primary_key=args.primary_key, sql_dialect=args.sql_dialect)
     start_time = time.process_time()
     print("{date} Running the generator.\n\n".format(date=datetime.datetime.now()))
     p.process_json_files(args.json_files)
