@@ -15,7 +15,7 @@ bigquery = {
     "concat_steps": "{step1}.{step2}",
     "join_str_template": "LEFT JOIN UNNEST({exploded_structure_path}) AS {alias}",
     "field_str_template":"{TABLE}.{path} AS {path_alias}",
-    "non_nullable_text_field_str_template": "IFNULL({TABLE}.{path}, 'N/A') AS {path_alias}",
-    "non_nullable_numeric_field_str_template": "IFNULL({TABLE}.{path}, 0) AS {path_alias}",
+    "non_nullable_text_field_str_template": "IFNULL({TABLE}.{path},'N/A') AS {path_alias}",
+    "non_nullable_numeric_field_str_template": "IFNULL({TABLE}.{path},0) AS {path_alias}",
     "join_separator": ""
 }

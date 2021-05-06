@@ -35,6 +35,7 @@ With J2V all the structures are discovered automatically and two files are gener
 * `table_alias`: Name of the table alias 
 * `column_name`: Name of the column in the DB table as specified in `sql_table_name`. (this is only used in the LookML files; no actual connection to a database will be done as part of this tool)
 * `primary_key`: Name of the primary key from JSON field
+* `sql_dialect`: Specifies the sql dialect of the output. [snowflake | bigquery]
 
 ## Output
 
