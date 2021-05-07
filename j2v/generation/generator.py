@@ -189,7 +189,7 @@ class Generator:
                 desc=nice_description,
                 data_type_field="",
                 looker_type=dim_type,
-                dimension_sql=dimension_sql.format(path=field_path_sql, json_type=json_type))
+                dimension_sql=dimension_sql.format(path=field_path_sql, json_type=json_type, group_label_string = ""))
 
         elif dim_type == "epoch" and json_type == "number":
             new_dimension = lt.dimension_group_time_template.format(
@@ -198,7 +198,7 @@ class Generator:
                 desc=nice_description,
                 data_type_field="\n    datatype: {}".format(dim_type),
                 looker_type="time",
-                dimension_sql=dimension_sql.format(path=field_path_sql, json_type=json_type + get_epoch_conversion(len(str(dim_val)))))
+                dimension_sql=dimension_sql.format(path=field_path_sql, json_type=json_type + get_epoch_conversion(len(str(dim_val))), group_label_string = ""))
         else:
             new_dimension = lt.dimension_str_template.format(
                 dimension_name=dimension_name_final,
