@@ -118,10 +118,13 @@ class Generator:
             required_joins_line = ""
             join_path = current_view + "." + current_path
         join_path = join_path.replace(":" + templates["ELEMENT_ACCESS_STR"], "." + templates["ELEMENT_ACCESS_STR"])
+        join_separator = templates["join_separator"]
         join_statement = templates['join_str_template'].format(alias=new_view_name,
                                                      exploded_structure_path=join_path)
+                                                     ## HERE
+
         explore_join = lt.explore_join_str_template.format(alias=new_view_name, view=new_view_name,
-                                                           join_expression=join_statement,
+                                                           join_expression=join_separator + join_statement,
                                                            required_joins_line=required_joins_line)
 
         self.explore_joins[join_path] = explore_join
@@ -176,18 +179,17 @@ class Generator:
 
         self.dim_definitions[current_view].add(new_dimension)
 
-    @staticmethod
-    def get_dim_str(dim_type, dim_val, dimension_name_final, field_path_sql, group_label_string, json_type,
+    def get_dim_str(self, dim_type, dim_val, dimension_name_final, field_path_sql, group_label_string, json_type,
                     nice_description, primary_key_field):
+        dimension_sql = getattr(st, self.sql_dialect)['dimension_sql']
         if dim_type == "time" and json_type == "timestamp":
             new_dimension = lt.dimension_group_time_template.format(
                 dimension_name=dimension_name_final,
                 dimension_label=nice_description,
                 desc=nice_description,
                 data_type_field="",
-                path=field_path_sql,
                 looker_type=dim_type,
-                json_type=json_type)
+                dimension_sql=dimension_sql.format(path=field_path_sql, json_type=json_type))
 
         elif dim_type == "epoch" and json_type == "number":
             new_dimension = lt.dimension_group_time_template.format(
@@ -196,18 +198,15 @@ class Generator:
                 desc=nice_description,
                 data_type_field="\n    datatype: {}".format(dim_type),
                 looker_type="time",
-                path=field_path_sql,
-                json_type=json_type + get_epoch_conversion(len(str(dim_val))))
+                dimension_sql=dimension_sql.format(path=field_path_sql, json_type=json_type + get_epoch_conversion(len(str(dim_val)))))
         else:
             new_dimension = lt.dimension_str_template.format(
                 dimension_name=dimension_name_final,
                 dimension_label=nice_description,
                 desc=nice_description,
-                path=field_path_sql,
                 looker_type=dim_type,
                 primary_key_field=primary_key_field,
-                json_type=json_type,
-                group_label_string=group_label_string)
+                dimension_sql=dimension_sql.format(path=field_path_sql, json_type=json_type, group_label_string = group_label_string))
         return new_dimension
 
     def build_sql_select(self, json_type, dim_type, field_path_sql, current_view, full_path_nice_upper):

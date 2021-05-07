@@ -3,7 +3,7 @@ dimension_str_template = """
     label: \"{dimension_label}\"
     description: \"{desc}\"{primary_key_field}
     type: {looker_type}
-    sql: ${{TABLE}}.{path}::{json_type} ;;{group_label_string}
+    sql: {dimension_sql}
   }}
     """
 
@@ -20,7 +20,7 @@ dimension_group_time_template = """
         quarter,
         year
     ]
-    sql: ${{TABLE}}.{path}::{json_type} ;;
+    sql: {dimension_sql} ;;
   }}
     """
 
@@ -45,7 +45,7 @@ explore: {explore_name} {{
 explore_join_str_template = """
   join: {alias} {{
      from: {view}
-     sql:,{join_expression};;
+     sql:{join_expression};;
      relationship: one_to_many {required_joins_line}
   }}
   """

@@ -6,7 +6,8 @@ snowflake = {
     "field_str_template":"{TABLE}.{path}::{json_type} AS {path_alias}",
     "non_nullable_text_field_str_template": "IFNULL({TABLE}.{path}::{json_type},'N/A') AS {path_alias}",
     "non_nullable_numeric_field_str_template": "IFNULL({TABLE}.{path}::{json_type},0) AS {path_alias}",
-    "join_separator": ","
+    "join_separator": ",",
+    "dimension_sql": "${{TABLE}}.{path}::{json_type} ;;{group_label_string}"
 }
 
 bigquery = {
@@ -17,5 +18,6 @@ bigquery = {
     "field_str_template":"{TABLE}.{path} AS {path_alias}",
     "non_nullable_text_field_str_template": "IFNULL({TABLE}.{path},'N/A') AS {path_alias}",
     "non_nullable_numeric_field_str_template": "IFNULL({TABLE}.{path},0) AS {path_alias}",
-    "join_separator": ""
+    "join_separator": "",
+    "dimension_sql": "${{TABLE}}.{path} ;;{group_label_string}"
 }
