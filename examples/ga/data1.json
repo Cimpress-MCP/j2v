@@ -1,0 +1,248 @@
+{
+  "visitorId": null,
+  "visitNumber": "2",
+  "visitId": "1616337495",
+  "visitStartTime": "1616337495",
+  "date": "20210321",
+  "totals": {
+    "visits": null,
+    "hits": "2",
+    "pageviews": null,
+    "timeOnSite": null,
+    "bounces": null,
+    "transactions": null,
+    "transactionRevenue": null,
+    "newVisits": null,
+    "screenviews": null,
+    "uniqueScreenviews": null,
+    "timeOnScreen": null,
+    "totalTransactionRevenue": null,
+    "sessionQualityDim": "1"
+  },
+  "trafficSource": {
+    "referralPath": "(not set)",
+    "campaign": "(not set)",
+    "source": "google",
+    "medium": "organic",
+    "keyword": "(not provided)",
+    "adContent": "(not set)",
+    "adwordsClickInfo": {
+      "campaignId": null,
+      "adGroupId": null,
+      "creativeId": null,
+      "criteriaId": null,
+      "page": null,
+      "slot": null,
+      "criteriaParameters": null,
+      "gclId": null,
+      "customerId": null,
+      "adNetworkType": null,
+      "targetingCriteria": null,
+      "isVideoAd": null
+    },
+    "isTrueDirect": true,
+    "campaignCode": null
+  },
+  "device": {
+    "browser": "Chrome",
+    "browserVersion": "89.0.4389.90",
+    "browserSize": "2170x1090",
+    "operatingSystem": "Macintosh",
+    "operatingSystemVersion": "Intel 10.13",
+    "isMobile": false,
+    "mobileDeviceBranding": null,
+    "mobileDeviceModel": null,
+    "mobileInputSelector": null,
+    "mobileDeviceInfo": "(not set)",
+    "mobileDeviceMarketingName": null,
+    "flashVersion": "(not set)",
+    "javaEnabled": false,
+    "language": "en-gb",
+    "screenColors": "24-bit",
+    "screenResolution": "2560x1440",
+    "deviceCategory": "desktop"
+  },
+  "geoNetwork": {
+    "continent": "Europe",
+    "subContinent": "Northern Europe",
+    "country": "United Kingdom",
+    "region": "England",
+    "metro": "North West",
+    "city": "Bolton",
+    "cityId": "1006539",
+    "networkDomain": "(not set)",
+    "latitude": "53.6769",
+    "longitude": "-2.4222",
+    "networkLocation": "(not set)"
+  },
+  "customDimensions": [
+    {
+      "index": "4",
+      "value": "35b67d19-a0fd-4726-b0b9-db888c73e6a0"
+    }
+  ],
+  "hits": [
+    {
+      "hitNumber": "1",
+      "time": "0",
+      "hour": "14",
+      "minute": "38",
+      "isSecure": null,
+      "isInteraction": false,
+      "isEntrance": null,
+      "isExit": null,
+      "referer": "https://www.google.com/",
+      "page": {
+        "pagePath": "/orders",
+        "hostname": "www.mywebsite.co.uk",
+        "pageTitle": "mywebsite",
+        "searchKeyword": null,
+        "searchCategory": null,
+        "pagePathLevel1": "",
+        "pagePathLevel2": "",
+        "pagePathLevel3": "",
+        "pagePathLevel4": ""
+      },
+      "transaction": {
+        "transactionId": null,
+        "transactionRevenue": null,
+        "transactionTax": null,
+        "transactionShipping": null,
+        "affiliation": null,
+        "currencyCode": "(not set)",
+        "localTransactionRevenue": null,
+        "localTransactionTax": null,
+        "localTransactionShipping": null,
+        "transactionCoupon": null
+      },
+      "item": {
+        "transactionId": null,
+        "productName": null,
+        "productCategory": null,
+        "productSku": null,
+        "itemQuantity": null,
+        "itemRevenue": null,
+        "currencyCode": "(not set)",
+        "localItemRevenue": null
+      },
+      "contentInfo": null,
+      "appInfo": {
+        "name": null,
+        "version": null,
+        "id": null,
+        "installerId": null,
+        "appInstallerId": null,
+        "appName": null,
+        "appVersion": null,
+        "appId": null,
+        "screenName": "www.mywebsite.co.uk",
+        "landingScreenName": "www.mywebsite.co.uk",
+        "exitScreenName": "www.mywebsite.co.uk",
+        "screenDepth": "0"
+      },
+      "exceptionInfo": {
+        "description": null,
+        "isFatal": true,
+        "exceptions": null,
+        "fatalExceptions": null
+      },
+      "eventInfo": {
+        "eventCategory": "User Interaction",
+        "eventAction": "Outbound Link",
+        "eventLabel": null,
+        "eventValue": "1"
+      },
+      "product": [
+        {
+          "productSKU": "974f4053-8531-4813-a638-242bda6c6c34",
+          "v2ProductName": "My product",
+          "v2ProductCategory": "product",
+          "productVariant": "(not set)",
+          "productBrand": "(not set)",
+          "productRevenue": null,
+          "localProductRevenue": null,
+          "productPrice": "0",
+          "localProductPrice": "0",
+          "productQuantity": null,
+          "productRefundAmount": null,
+          "localProductRefundAmount": null,
+          "isImpression": null,
+          "isClick": null,
+          "customDimensions": [
+            {
+              "index": "13",
+              "value": "product"
+            }
+          ],
+          "customMetrics": [],
+          "productListName": "(not set)",
+          "productListPosition": "0",
+          "productCouponCode": "(not set)"
+        }
+      ],
+      "promotion": [],
+      "promotionActionInfo": null,
+      "refund": null,
+      "eCommerceAction": {
+        "action_type": "2",
+        "step": "1",
+        "option": null
+      },
+      "experiment": [],
+      "publisher": null,
+      "customVariables": [],
+      "customDimensions": [
+        {
+          "index": "4",
+          "value": "35b67d19-a0fd-4726-b0b9-db888c73e6a0"
+        },
+        {
+          "index": "12",
+          "value": "product"
+        },
+        {
+          "index": "34",
+          "value": "ABC"
+        }
+      ],
+      "customMetrics": [],
+      "type": "EVENT",
+      "social": {
+        "socialInteractionNetwork": null,
+        "socialInteractionAction": null,
+        "socialInteractions": null,
+        "socialInteractionTarget": null,
+        "socialNetwork": "(not set)",
+        "uniqueSocialInteractions": null,
+        "hasSocialSourceReferral": "No",
+        "socialInteractionNetworkAction": " : "
+      },
+      "latencyTracking": null,
+      "sourcePropertyInfo": null,
+      "contentGroup": {
+        "contentGroup1": "(not set)",
+        "contentGroup2": "(not set)",
+        "contentGroup3": "(not set)",
+        "contentGroup4": "(not set)",
+        "contentGroup5": "(not set)",
+        "previousContentGroup1": "(entrance)",
+        "previousContentGroup2": "(entrance)",
+        "previousContentGroup3": "(entrance)",
+        "previousContentGroup4": "(entrance)",
+        "previousContentGroup5": "(entrance)",
+        "contentGroupUniqueViews1": null,
+        "contentGroupUniqueViews2": null,
+        "contentGroupUniqueViews3": null,
+        "contentGroupUniqueViews4": null,
+        "contentGroupUniqueViews5": null
+      },
+      "dataSource": "web",
+      "publisher_infos": []
+    }
+  ],
+  "fullVisitorId": "1473641630636915611",
+  "userId": null,
+  "clientId": "343108929.1616329627",
+  "channelGrouping": "Organic Search",
+  "socialEngagementType": "Not Socially Engaged"
+}

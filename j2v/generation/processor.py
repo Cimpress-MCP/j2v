@@ -2,14 +2,14 @@ import json
 
 from j2v.generation.generator import Generator
 from j2v.generation.result_writer import SQLWriter, LookerWriter
-from j2v.utils.config import generator_config
+from j2v.utils.config import generator_config, supported_dialects
 from j2v.utils.helpers import get_formatted_var_name
 
 TABLE_WITH_JSON_COLUMN_DEFAULT = generator_config['TABLE_WITH_JSON_COLUMN_DEFAULT']
 OUTPUT_VIEW_ML_OUT_DEFAULT = generator_config['OUTPUT_VIEW_ML_OUT_DEFAULT']
 COLUMN_WITH_JSONS_DEFAULT = generator_config['COLUMN_WITH_JSONS_DEFAULT']
 EXPLORE_LKML_OUT_DEFAULT = generator_config['EXPLORE_LKML_OUT_DEFAULT']
-ELEMENT_ACCESS_STR = generator_config['ELEMENT_ACCESS_STR']
+SQL_DIALECT_DEFAULT = generator_config['SQL_DIALECT_DEFAULT']
 TABLE_ALIAS_DEFAULT = generator_config['TABLE_ALIAS_DEFAULT']
 HANDLE_NULL_VALUES_IN_SQL_DEFAULT = generator_config['HANDLE_NULL_VALUES_IN_SQL_DEFAULT']
 
@@ -19,7 +19,7 @@ class MainProcessor:
     def __init__(self, column_name=COLUMN_WITH_JSONS_DEFAULT, output_explore_file_name=EXPLORE_LKML_OUT_DEFAULT,
                  output_view_file_name=OUTPUT_VIEW_ML_OUT_DEFAULT, sql_table_name=TABLE_WITH_JSON_COLUMN_DEFAULT,
                  table_alias=TABLE_ALIAS_DEFAULT, handle_null_values_in_sql=HANDLE_NULL_VALUES_IN_SQL_DEFAULT,
-                 primary_key=None):
+                 primary_key=None, sql_dialect=SQL_DIALECT_DEFAULT):
         """
         Init empty lists and ops counter.
         """
@@ -29,12 +29,18 @@ class MainProcessor:
         self.sql_table_name = sql_table_name or TABLE_WITH_JSON_COLUMN_DEFAULT
         self.table_alias = get_formatted_var_name(table_alias or TABLE_ALIAS_DEFAULT)
         self.handle_null_values_in_sql = handle_null_values_in_sql or HANDLE_NULL_VALUES_IN_SQL_DEFAULT
+        self.sql_dialect = sql_dialect or SQL_DIALECT_DEFAULT
+
+        if self.sql_dialect.lower() not in supported_dialects:
+            raise ValueError("SQL Dialect {} not supported. Dialects available: {}".format(self.sql_dialect, ", ".join(supported_dialects) ))
+
         self.generator = Generator(column_name=self.column_name,
                                    table_alias=self.table_alias,
                                    handle_null_values_in_sql=self.handle_null_values_in_sql,
+                                   sql_dialect=self.sql_dialect,
                                    primary_key=primary_key)
 
-        self.sql_writer = SQLWriter(self.sql_table_name, self.table_alias)
+        self.sql_writer = SQLWriter(self.sql_table_name, self.table_alias, self.sql_dialect)
         self.looker_writer = LookerWriter(self.output_explore_file_name, self.output_view_file_name,
                                           self.sql_table_name, self.table_alias)
 

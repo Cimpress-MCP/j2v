@@ -10,3 +10,5 @@ examples/abc
 /build/
 /dist/
 /j2v.egg-info/
+
+**/*.lkml

@@ -4,6 +4,9 @@ program:
     OUTPUT_VIEW_ML_OUT_DEFAULT: output_view
     COLUMN_WITH_JSONS_DEFAULT: JSON
     EXPLORE_LKML_OUT_DEFAULT: explore.lkml
-    ELEMENT_ACCESS_STR: VALUE
     TABLE_ALIAS_DEFAULT: JSON_TABLE
     HANDLE_NULL_VALUES_IN_SQL_DEFAULT: FALSE
+    SQL_DIALECT_DEFAULT: snowflake
+  supported_dialects:
+    - snowflake
+    - bigquery
