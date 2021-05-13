@@ -20,7 +20,7 @@ dimension_group_time_template = """
         quarter,
         year
     ]
-    sql: {dimension_sql} ;;
+    sql: {dimension_sql}
   }}
     """
 
@@ -45,7 +45,7 @@ explore: {explore_name} {{
 explore_join_str_template = """
   join: {alias} {{
      from: {view}
-     sql:{join_expression};;
+     sql: {join_expression};;
      relationship: one_to_many {required_joins_line}
   }}
   """
