@@ -1,6 +1,5 @@
 from j2v.str_templates import looker_templates as lt
-
-
+from j2v.str_templates import sql_templates as st
 class LookerWriter:
     def __init__(self, output_explore_file_name, output_view_file_name,
                  sql_table_name, table_alias):
@@ -65,9 +64,10 @@ class LookerWriter:
 
 
 class SQLWriter:
-    def __init__(self, sql_table_name, table_alias):
+    def __init__(self, sql_table_name, table_alias, sql_dialect):
         self.sql_table_name = sql_table_name
         self.table_alias = table_alias
+        self.sql_dialect = sql_dialect
 
     def print_sql(self, all_fields, all_joins, handle_nulls):
         if handle_nulls:
@@ -88,8 +88,9 @@ class SQLWriter:
 
         source_table_sql = "FROM {table} AS {table_alias}".format(table=self.sql_table_name,
                                                                   table_alias=self.table_alias)
-        if all_joins:
-            source_table_sql += ","
+        join_separator = getattr(st, self.sql_dialect)["join_separator"]
+        if all_joins and join_separator:
+            source_table_sql += join_separator
         sql_out.append(source_table_sql)
-        sql_out.append(",\n".join(all_joins))
+        sql_out.append(f"{join_separator}\n".join(all_joins))
         return "\n".join(sql_out)

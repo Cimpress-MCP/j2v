@@ -8,3 +8,4 @@ with open(config_file_path, 'r') as config_file:
     cfg = yaml.load(config_file, Loader=yaml.FullLoader)
 
 generator_config = cfg['program']['generator']
+supported_dialects = cfg['program']['supported_dialects']
